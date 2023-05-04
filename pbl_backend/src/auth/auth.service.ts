@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import { LoginDto, createUserDto } from './dto/auth.dto';
+import { LoginDto } from './dto/auth.dto';
 import * as argon from 'argon2';
 import { User } from '@prisma/client';
 import {
@@ -10,42 +10,10 @@ import {
   ServiceResponseStatus,
 } from 'src/serviceResponse';
 import { AuthenticationFailure } from 'src/enumTypes/enumFailures/auth.failure.enum';
-import { CreateUserFailure } from 'src/enumTypes/enumFailures/user.failure.enum';
 
 @Injectable()
 export class AuthService {
   constructor(private prisma: PrismaService, private jwt: JwtService) {}
-  async createUser(
-    dto: createUserDto,
-  ): Promise<
-    ServiceResponse<
-      Pick<User, 'id' | 'email' | 'fullName' | 'roleId'>,
-      ServiceFailure<CreateUserFailure>
-    >
-  > {
-    const hashedPassword = await argon.hash(dto.password);
-
-    const user = await this.prisma.user.create({
-      data: {
-        email: dto.email,
-        fullName: dto.fullName,
-        password: hashedPassword,
-        roleId: dto.roleId,
-      },
-
-      select: {
-        id: true,
-        email: true,
-        fullName: true,
-        roleId: true,
-      },
-    });
-
-    return {
-      status: ServiceResponseStatus.Success,
-      result: user,
-    };
-  }
 
   async authentication(
     dto: LoginDto,

@@ -1,4 +1,4 @@
 export enum AuthenticationFailure {
-  USER_NOT_FOUND = 'User not found',
-  INCORRECT_PASSWORD = 'Incorrect password',
+  USER_NOT_FOUND = 'USER_NOT_FOUND',
+  INCORRECT_PASSWORD = 'INCORRECT_PASSWORD',
 }
