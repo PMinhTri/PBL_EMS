@@ -23,8 +23,18 @@ model User {
   address     String?
   nationality String?
   status      String?
-  roleId      Int       @default(2)
+  roleId      Int
+  role        Role      @relation(fields: [roleId], references: [id])
   avatar      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Role {
+  id   Int    @id @default(autoincrement())
+  name String
+  User User[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
