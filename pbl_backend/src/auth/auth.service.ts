@@ -15,7 +15,7 @@ import { AuthenticationFailure } from 'src/enumTypes/enumFailures/auth.failure.e
 export class AuthService {
   constructor(private prisma: PrismaService, private jwt: JwtService) {}
 
-  async authentication(
+  async authenticate(
     dto: LoginDto,
   ): Promise<ServiceResponse<string, ServiceFailure<AuthenticationFailure>>> {
     const user = await this.prisma.user.findUnique({

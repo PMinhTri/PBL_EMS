@@ -23,7 +23,7 @@ export class AuthController {
       result: user,
       status,
       failure,
-    } = await this.authService.authentication(dto);
+    } = await this.authService.authenticate(dto);
 
     if (status === ServiceResponseStatus.Failed) {
       switch (failure.reason) {
