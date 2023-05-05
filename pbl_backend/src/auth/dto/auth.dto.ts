@@ -14,7 +14,7 @@ export class LoginDto {
   password: string;
 }
 
-export class ResetPasswordDto {
+export class ChangePasswordDto {
   @IsString()
   @IsNotEmpty()
   @IsEmail()
@@ -30,4 +30,12 @@ export class ResetPasswordDto {
   @ApiProperty({ type: String, required: true, nullable: false })
   @IsString()
   confirmPassword: string;
+}
+
+export class forgotPasswordDto {
+  @IsString()
+  @IsNotEmpty()
+  @IsEmail()
+  @ApiProperty({ type: String, required: true, nullable: false })
+  email: string;
 }

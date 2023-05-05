@@ -10,7 +10,7 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Post('/create')
-  async createUser(
+  public async createUser(
     @Body() dto: createUserDto,
     @Res() res: IResponse,
   ): Promise<IResponse> {
@@ -36,7 +36,7 @@ export class UserController {
   }
 
   @Get('/emails')
-  async getAllEmails(@Res() res: IResponse): Promise<IResponse> {
+  public async getAllEmails(@Res() res: IResponse): Promise<IResponse> {
     const emails = await this.userService.getAllEmails();
 
     return res.send(SuccessResult(emails));

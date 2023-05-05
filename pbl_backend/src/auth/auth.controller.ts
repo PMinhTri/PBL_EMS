@@ -1,6 +1,6 @@
 import { Body, Controller, Post, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto, ResetPasswordDto } from './dto/auth.dto';
+import { LoginDto, ChangePasswordDto, forgotPasswordDto } from './dto/auth.dto';
 import {
   BadRequestResult,
   IResponse,
@@ -15,7 +15,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('/login')
-  async login(
+  public async login(
     @Body() dto: LoginDto,
     @Res() res: IResponse,
   ): Promise<IResponse> {
@@ -47,16 +47,16 @@ export class AuthController {
     return res.send(SuccessResult(user));
   }
 
-  @Post('/reset-password')
-  async resetPassword(
-    @Body() dto: ResetPasswordDto,
+  @Post('/change-password')
+  public async changePassword(
+    @Body() dto: ChangePasswordDto,
     @Res() res: IResponse,
   ): Promise<IResponse> {
     const {
       result: newPassword,
       status,
       failure,
-    } = await this.authService.resetPassword(dto);
+    } = await this.authService.changePassword(dto);
 
     if (status === ServiceResponseStatus.Failed) {
       switch (failure.reason) {
@@ -78,5 +78,30 @@ export class AuthController {
     }
 
     return res.send(SuccessResult(newPassword));
+  }
+
+  @Post('/forgot-password')
+  public async forgotPassword(
+    @Body() dto: forgotPasswordDto,
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    console.log(dto.email);
+    const { status, failure } = await this.authService.sendResetPasswordEmail(
+      dto.email,
+    );
+
+    if (status === ServiceResponseStatus.Failed) {
+      switch (failure.reason) {
+        case AuthenticationFailure.USER_NOT_FOUND:
+          return res.send(
+            NotFoundResult({
+              reason: failure.reason,
+              message: `email not found`,
+            }),
+          );
+      }
+    }
+
+    return res.send(SuccessResult());
   }
 }
