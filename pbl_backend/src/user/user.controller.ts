@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res } from '@nestjs/common';
 import { UserService } from './user.service';
 import { createUserDto } from './dto/user.dto';
 import { BadRequestResult, IResponse, SuccessResult } from 'src/httpResponse';
@@ -33,5 +33,12 @@ export class UserController {
     }
 
     return res.send(SuccessResult(user));
+  }
+
+  @Get('/emails')
+  async getAllEmails(@Res() res: IResponse): Promise<IResponse> {
+    const emails = await this.userService.getAllEmails();
+
+    return res.send(SuccessResult(emails));
   }
 }

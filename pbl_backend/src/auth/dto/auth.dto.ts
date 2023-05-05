@@ -13,3 +13,21 @@ export class LoginDto {
   @IsString()
   password: string;
 }
+
+export class ResetPasswordDto {
+  @IsString()
+  @IsNotEmpty()
+  @IsEmail()
+  @ApiProperty({ type: String, required: true, nullable: false })
+  email: string;
+
+  @IsNotEmpty()
+  @ApiProperty({ type: String, required: true, nullable: false })
+  @IsString()
+  password: string;
+
+  @IsNotEmpty()
+  @ApiProperty({ type: String, required: true, nullable: false })
+  @IsString()
+  confirmPassword: string;
+}

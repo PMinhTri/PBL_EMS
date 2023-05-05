@@ -42,6 +42,22 @@ export const BadRequestResult = (
       : [failures],
 });
 
+export const UnauthorizedResult = (
+  failures: ResponseFailure | ResponseFailure[] | string,
+): ResponseResult => ({
+  statusCode: HttpStatus.UNAUTHORIZED,
+  failures:
+    typeof failures === 'string'
+      ? [
+          {
+            message: failures,
+          },
+        ]
+      : Array.isArray(failures)
+      ? failures
+      : [failures],
+});
+
 export const ForbiddenResult = (
   failures: ResponseFailure | ResponseFailure[] | string,
 ): ResponseResult => ({

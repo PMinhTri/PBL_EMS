@@ -6,16 +6,6 @@ export class Mailer {
   private smtpTransport: Mail;
 
   constructor() {
-    console.log({
-      host: process.env.MAIL_HOST,
-      port: Number(process.env.MAIL_PORT),
-      secure: true,
-      auth: {
-        user: process.env.MAIL_SYSTEM,
-        pass: process.env.MAIL_PASS,
-      },
-      logger: true,
-    });
     this.smtpTransport = createTransport({
       host: process.env.MAIL_HOST,
       port: Number(process.env.MAIL_PORT),
