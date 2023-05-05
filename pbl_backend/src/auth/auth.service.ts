@@ -71,12 +71,12 @@ export class AuthService {
     const secret: string = process.env.JWT_SECRET;
     const expiresIn: string = process.env.JWT_EXPIRE_IN;
 
-    const token = this.jwtService.signAsync(payload, {
+    const accessToken = this.jwtService.signAsync(payload, {
       secret: secret,
       expiresIn: expiresIn,
     });
 
-    return token;
+    return accessToken;
   }
 
   async resetPassword(
