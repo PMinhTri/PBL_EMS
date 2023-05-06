@@ -1,13 +1,21 @@
 import { Body, Controller, Get, Post, Res } from '@nestjs/common';
 import { UserService } from './user.service';
-import { createUserDto } from './dto/user.dto';
+import { createUserDto } from './user.dto';
 import { BadRequestResult, IResponse, SuccessResult } from 'src/httpResponse';
 import { ServiceResponseStatus } from 'src/serviceResponse';
-import { CreateUserFailure } from 'src/enumTypes/enumFailures/user.failure.enum';
+import { UserFailure } from 'src/enumTypes/failure.enum';
+import { updateInformationInput } from './user.type';
 
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
+
+  @Get()
+  public async getAllUsers(@Res() res: IResponse): Promise<IResponse> {
+    const { result: users } = await this.userService.getAllUsers();
+
+    return res.send(SuccessResult(users));
+  }
 
   @Post('/create')
   public async createUser(
@@ -22,7 +30,7 @@ export class UserController {
 
     if (status === ServiceResponseStatus.Failed) {
       switch (failure.reason) {
-        case CreateUserFailure.USER_ALREADY_EXISTS:
+        case UserFailure.USER_ALREADY_EXISTS:
           return res.send(
             BadRequestResult({
               reason: failure.reason,
@@ -40,5 +48,30 @@ export class UserController {
     const emails = await this.userService.getAllEmails();
 
     return res.send(SuccessResult(emails));
+  }
+
+  @Post('/update-personal-information')
+  public async updatePersonalInformation(
+    @Body() payload: updateInformationInput,
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const { email, userInformation } = payload;
+    console.log(payload);
+    const { status, failure } =
+      await this.userService.updatePersonalInformation(email, userInformation);
+
+    if (status === ServiceResponseStatus.Failed) {
+      switch (failure.reason) {
+        case UserFailure.USER_NOT_FOUND:
+          return res.send(
+            BadRequestResult({
+              reason: failure.reason,
+              message: `User not found`,
+            }),
+          );
+      }
+    }
+
+    return res.send(SuccessResult());
   }
 }

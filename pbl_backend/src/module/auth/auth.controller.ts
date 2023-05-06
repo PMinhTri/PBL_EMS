@@ -1,6 +1,6 @@
 import { Body, Controller, Post, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto, ChangePasswordDto, forgotPasswordDto } from './dto/auth.dto';
+import { LoginDto, ChangePasswordDto, forgotPasswordDto } from './auth.dto';
 import {
   BadRequestResult,
   IResponse,
@@ -8,7 +8,7 @@ import {
   SuccessResult,
 } from 'src/httpResponse';
 import { ServiceResponseStatus } from 'src/serviceResponse';
-import { AuthenticationFailure } from 'src/enumTypes/enumFailures/auth.failure.enum';
+import { AuthenticationFailure } from 'src/enumTypes/failure.enum';
 
 @Controller('auth')
 export class AuthController {
