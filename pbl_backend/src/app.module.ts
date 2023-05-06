@@ -4,11 +4,11 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
-import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { UserModule } from './user/user.module';
 import { MailModule } from './mail/mail.module';
 import { AuthenticationMiddleware } from './middleware/authentication.middleware';
+import { AuthModule } from './module/auth/auth.module';
+import { UserModule } from './module/user/user.module';
 @Module({
   imports: [AuthModule, UserModule, MailModule, PrismaModule],
 })
