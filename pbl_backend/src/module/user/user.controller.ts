@@ -5,6 +5,8 @@ import { BadRequestResult, IResponse, SuccessResult } from 'src/httpResponse';
 import { ServiceResponseStatus } from 'src/serviceResponse';
 import { UserFailure } from 'src/enumTypes/failure.enum';
 import { updateInformationInput } from './user.type';
+import { Roles } from '../role/role.decorator';
+import { RoleEnum } from 'src/enumTypes/role.enum';
 
 @Controller('user')
 export class UserController {
@@ -18,6 +20,7 @@ export class UserController {
   }
 
   @Post('/create')
+  @Roles(RoleEnum.ADMIN)
   public async createUser(
     @Body() dto: createUserDto,
     @Res() res: IResponse,

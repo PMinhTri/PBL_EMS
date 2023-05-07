@@ -85,7 +85,6 @@ export class AuthController {
     @Body() dto: forgotPasswordDto,
     @Res() res: IResponse,
   ): Promise<IResponse> {
-    console.log(dto.email);
     const { status, failure } = await this.authService.sendResetPasswordEmail(
       dto.email,
     );

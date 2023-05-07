@@ -9,8 +9,16 @@ import { MailModule } from './mail/mail.module';
 import { AuthenticationMiddleware } from './middleware/authentication.middleware';
 import { AuthModule } from './module/auth/auth.module';
 import { UserModule } from './module/user/user.module';
+import { RoleModule } from './module/role/Role.module';
+import { RolesGuard } from './module/role/role.guard';
 @Module({
-  imports: [AuthModule, UserModule, MailModule, PrismaModule],
+  imports: [AuthModule, UserModule, RoleModule, MailModule, PrismaModule],
+  providers: [
+    {
+      provide: 'APP_GUARD',
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

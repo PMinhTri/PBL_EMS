@@ -150,7 +150,11 @@ export class UserService {
         nationality: true,
         avatar: true,
         status: true,
-        roleId: true,
+        role: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
 
