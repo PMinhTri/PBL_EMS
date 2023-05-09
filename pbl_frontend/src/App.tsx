@@ -1,11 +1,7 @@
-import React from "react";
+import Routes from "./routes/Routes";
 
 function App() {
-  return (
-    <div className="flex justify-center items-center h-60 w-screen">
-      <h1>Hello World</h1>
-    </div>
-  );
+  return <Routes />;
 }
 
 export default App;
