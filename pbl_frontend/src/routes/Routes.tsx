@@ -6,7 +6,9 @@ import {
   Routes as Switch,
 } from "react-router-dom";
 import LoginPage from "../modules/auth/LoginPage";
-import HomePage from "../modules/user/HomePage";
+import Admin from "../modules/admin/Admin";
+import Dashboard from "../modules/admin/Dashboard";
+import EmployeeManagement from "../modules/admin/EmployeeManagement";
 
 const Routes: React.FunctionComponent = () => {
   return (
@@ -14,7 +16,10 @@ const Routes: React.FunctionComponent = () => {
       <Switch>
         <Route path="/" element={<Navigate to="/auth/login" replace />} />
         <Route path="/auth/login" element={<LoginPage />} />
-        <Route path="/home" element={<HomePage />} />
+        <Route path="/admin" element={<Admin />}>
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="employees" element={<EmployeeManagement />} />
+        </Route>
       </Switch>
     </BrowserRouter>
   );

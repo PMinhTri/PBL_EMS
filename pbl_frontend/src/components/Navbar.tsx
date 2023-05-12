@@ -6,7 +6,7 @@ const SelectContent: React.FunctionComponent = () => {
   const options = [
     { value: "Profile" },
     { value: "Security" },
-    { value: "Logout" },
+    { value: "Log out" },
   ];
 
   return (
@@ -44,7 +44,7 @@ const Navbar: React.FunctionComponent = () => {
       <div className="flex flex-row md:flex-row items-center justify-between md:px-10 px-7m mx-2">
         <div
           className="font-bold text-2xl cursor-pointer flex font-[Poppins] 
-        text-gray-800 mb-4 md:mb-0"
+        text-white mb-4 md:mb-0"
         >
           HR Management System
         </div>
