@@ -1,8 +1,24 @@
 import React from "react";
 import { FaRegEnvelope } from "react-icons/fa";
 import { FiLock } from "react-icons/fi";
+import { useDispatch } from "react-redux";
+import { loginRequest } from "../../redux/stores/slices/auth";
 
 const LoginPage: React.FunctionComponent = () => {
+  const [email, setEmail] = React.useState<string>("");
+  const [password, setPassword] = React.useState<string>("");
+  const dispatch = useDispatch();
+
+  const onLogin = async (event: any) => {
+    event.preventDefault();
+    dispatch(
+      loginRequest({
+        email: email,
+        password: password,
+      })
+    );
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-300">
       <div className="flex flex-col bg-white shadow-md px-4 sm:px-6 md:px-8 lg:px-10 py-8 rounded-md w-full max-w-md">
@@ -10,7 +26,7 @@ const LoginPage: React.FunctionComponent = () => {
           Login
         </div>
         <div className="mt-10">
-          <form action="#">
+          <form action="#" onSubmit={onLogin}>
             <div className="flex flex-col mb-6">
               <label className="mb-1 text-xs sm:text-sm tracking-wide text-gray-600">
                 E-Mail Address:
@@ -24,8 +40,12 @@ const LoginPage: React.FunctionComponent = () => {
                   id="email"
                   type="email"
                   name="email"
+                  value={email}
                   className="text-sm sm:text-base placeholder-gray-500 pl-10 pr-4 rounded-lg border border-gray-400 w-full py-2 focus:outline-none focus:border-blue-400"
                   placeholder="E-Mail Address"
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setEmail(event.target.value);
+                  }}
                 />
               </div>
             </div>
@@ -44,8 +64,12 @@ const LoginPage: React.FunctionComponent = () => {
                   id="password"
                   type="password"
                   name="password"
+                  value={password}
                   className="text-sm sm:text-base placeholder-gray-500 pl-10 pr-4 rounded-lg border border-gray-400 w-full py-2 focus:outline-none focus:border-blue-400"
                   placeholder="Password"
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setPassword(event.target.value);
+                  }}
                 />
               </div>
             </div>

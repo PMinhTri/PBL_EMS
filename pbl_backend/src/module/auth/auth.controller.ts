@@ -20,7 +20,7 @@ export class AuthController {
     @Res() res: IResponse,
   ): Promise<IResponse> {
     const {
-      result: user,
+      result: token,
       status,
       failure,
     } = await this.authService.authenticate(dto);
@@ -44,7 +44,7 @@ export class AuthController {
       }
     }
 
-    return res.send(SuccessResult(user));
+    return res.send(SuccessResult({ token: token }));
   }
 
   @Post('/change-password')
