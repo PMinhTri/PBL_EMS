@@ -1,5 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { AuthPayload, AuthResponse } from "../../../types/authTypes";
+import { UserInformation } from "../../../types/userTypes";
+import { handleError } from "../../../utils/errorHandler";
 
 export interface AuthState {
   token: string | null;
@@ -7,19 +9,33 @@ export interface AuthState {
   isLoading: boolean;
   isAuthenticated: boolean;
   logging: boolean;
+  userInfo: UserInformation;
   error: unknown | null;
 }
 
 const initialState: AuthState = {
-  token: localStorage.getItem("token"),
+  token: "",
   payload: {
     email: "",
     password: "",
   },
   isLoading: false,
   isAuthenticated: false,
+  userInfo: {
+    id: 0,
+    email: "",
+    fullName: "",
+    role: "",
+  },
   logging: false,
   error: null,
+};
+
+const getUserInformation = (token: string): UserInformation => {
+  const base64Url = token.split(".")[1];
+  const base64 = base64Url.replace("-", "+").replace("_", "/");
+  const userInformation = JSON.parse(window.atob(base64));
+  return userInformation;
 };
 
 export const authSlice = createSlice({
@@ -32,16 +48,17 @@ export const authSlice = createSlice({
       state.error = null;
     },
     loginSuccess: (state, action: PayloadAction<AuthResponse>) => {
-      console.log(action.payload);
       const {
         payload: { token },
       } = action.payload;
       localStorage.setItem("token", token);
+      state.userInfo = getUserInformation(token);
       state.token = token;
       state.isLoading = false;
       state.error = null;
     },
     loginFailed: (state, action: PayloadAction<unknown>) => {
+      handleError(action.payload);
       state.error = action.payload;
       state.isLoading = false;
     },

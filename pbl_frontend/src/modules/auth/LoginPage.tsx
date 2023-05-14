@@ -2,21 +2,40 @@ import React from "react";
 import { FaRegEnvelope } from "react-icons/fa";
 import { FiLock } from "react-icons/fi";
 import { useDispatch } from "react-redux";
+// import { useNavigate } from "react-router-dom";
 import { loginRequest } from "../../redux/stores/slices/auth";
+import { emailRegex } from "../../utils/email";
 
 const LoginPage: React.FunctionComponent = () => {
   const [email, setEmail] = React.useState<string>("");
   const [password, setPassword] = React.useState<string>("");
+  const [error, setError] = React.useState({
+    emailError: false,
+    passwordError: false,
+  });
   const dispatch = useDispatch();
+  // const navigate = useNavigate();
 
   const onLogin = async (event: any) => {
     event.preventDefault();
+    setError({
+      emailError: !emailRegex.test(email),
+      passwordError: !password,
+    });
+
+    if (!email || !password) return;
+
+    if (Object.values(error).some((err) => err)) return;
+
     dispatch(
       loginRequest({
         email: email,
         password: password,
       })
     );
+    if (localStorage.getItem("token")) {
+      window.location.href = "/admin/dashboard";
+    }
   };
 
   return (

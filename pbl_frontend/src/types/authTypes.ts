@@ -1,3 +1,5 @@
+import { Failures } from "../utils/errorHandler";
+
 export enum AuthType {
   LOGIN_REQUEST = "auth/loginRequest",
   LOGIN_SUCCESS = "auth/loginSuccess",

@@ -7,7 +7,11 @@ import { Login } from "../../api/auth";
 function* login(action: ReturnType<typeof loginRequest>) {
   try {
     const response: AuthResponse = yield call(Login, action.payload);
-    yield put(loginSuccess(response));
+    if (response.statusCode === 200) {
+      yield put(loginSuccess(response));
+    } else {
+      yield put(loginFailed(response));
+    }
   } catch (error) {
     yield put(loginFailed(error));
   }

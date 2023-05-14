@@ -1,13 +1,24 @@
 import React from "react";
 import loginImg from "../assets/login.jpg";
 import { Popover, Space } from "antd";
+import { useDispatch } from "react-redux";
+import { logout } from "../redux/stores/slices/auth";
 
 const SelectContent: React.FunctionComponent = () => {
+  const dispatch = useDispatch();
   const options = [
     { value: "Profile" },
     { value: "Security" },
     { value: "Log out" },
   ];
+
+  const handleSelected = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
+    e.preventDefault();
+    if (e.currentTarget.textContent === "Log out") {
+      dispatch(logout());
+      window.location.href = "/";
+    }
+  };
 
   return (
     <div>
@@ -27,6 +38,7 @@ const SelectContent: React.FunctionComponent = () => {
       <ul>
         {options.map((option, key) => (
           <li
+            onClick={handleSelected}
             key={key}
             className="flex px-4 py-2 items-center justify-center cursor-pointer hover:bg-gray-100"
           >

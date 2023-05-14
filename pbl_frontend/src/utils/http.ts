@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import { REACT_APP_API_URL } from "../config";
+import { throwHttpRequestError } from "./errorHandler";
 
 axios.interceptors.response.use(
   (response) => response,
@@ -29,8 +30,7 @@ export const $get = async (endpoint: string, option?: any) => {
 
     return response.data;
   } catch (err) {
-    console.error(err);
-    return err;
+    throwHttpRequestError(err);
   }
 };
 
@@ -51,7 +51,7 @@ export const $post = async (endpoint: string, data: any, option?: any) => {
 
     return response.data;
   } catch (err) {
-    console.log(err);
+    throwHttpRequestError(err);
   }
 };
 
@@ -71,7 +71,7 @@ export const $put = async (endpoint: string, data: any, option?: any) => {
 
     return response.data;
   } catch (err) {
-    console.log(err);
+    throwHttpRequestError(err);
   }
 };
 
@@ -92,7 +92,7 @@ export const $patch = async (endpoint: string, data: any, option?: any) => {
 
     return response.data;
   } catch (err) {
-    console.log(err);
+    throwHttpRequestError(err);
   }
 };
 
@@ -112,6 +112,6 @@ export const $delete = async (endpoint: string, option?: any) => {
 
     return response.data;
   } catch (err) {
-    console.log(err);
+    throwHttpRequestError
   }
 };
