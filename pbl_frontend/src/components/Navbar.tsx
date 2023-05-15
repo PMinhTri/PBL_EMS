@@ -1,11 +1,15 @@
 import React from "react";
 import loginImg from "../assets/login.jpg";
 import { Popover, Space } from "antd";
-import { useDispatch } from "react-redux";
-import { logout } from "../redux/stores/slices/auth";
+import { logoutRequest } from "../redux/stores/slices/auth";
+import { useAppDispatch, useAppSelector } from "../hooks";
+import { userInfoSelector } from "../redux/stores/selectors/authSelector";
 
 const SelectContent: React.FunctionComponent = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+
+  const userInfo = useAppSelector(userInfoSelector);
+
   const options = [
     { value: "Profile" },
     { value: "Security" },
@@ -15,7 +19,7 @@ const SelectContent: React.FunctionComponent = () => {
   const handleSelected = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
     e.preventDefault();
     if (e.currentTarget.textContent === "Log out") {
-      dispatch(logout());
+      dispatch(logoutRequest());
       window.location.href = "/";
     }
   };
@@ -31,8 +35,8 @@ const SelectContent: React.FunctionComponent = () => {
           />
         </div>
         <div className="text-xs pr-4 justify-center">
-          <div className="font-bold">Phan Dinh Minh Tri</div>
-          <div>tri.phan@sioux.asia</div>
+          <div className="font-bold">{userInfo.fullName}</div>
+          <div>{userInfo.email}</div>
         </div>
       </div>
       <ul>

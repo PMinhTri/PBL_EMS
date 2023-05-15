@@ -1,9 +1,10 @@
 import React from "react";
 import { FaRegEnvelope } from "react-icons/fa";
 import { FiLock } from "react-icons/fi";
-import { useDispatch } from "react-redux";
 import { loginRequest } from "../../redux/stores/slices/auth";
 import { emailRegex } from "../../utils/email";
+import { useAppDispatch, useAppSelector } from "../../hooks";
+import { authSelector } from "../../redux/stores/selectors/authSelector";
 
 const LoginPage: React.FunctionComponent = () => {
   const [email, setEmail] = React.useState<string>("");
@@ -12,9 +13,10 @@ const LoginPage: React.FunctionComponent = () => {
     emailError: false,
     passwordError: false,
   });
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+  const { isAuthenticated } = useAppSelector(authSelector);
 
-  const onLogin = async (event: React.FormEvent<HTMLFormElement>) => {
+  const onLogin = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError({
       emailError: !emailRegex.test(email),
@@ -32,6 +34,12 @@ const LoginPage: React.FunctionComponent = () => {
       })
     );
   };
+
+  React.useMemo(() => {
+    if (isAuthenticated) {
+      window.location.href = "/admin/dashboard";
+    }
+  }, [isAuthenticated]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-300">
