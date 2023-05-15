@@ -2,7 +2,6 @@ import React from "react";
 import { FaRegEnvelope } from "react-icons/fa";
 import { FiLock } from "react-icons/fi";
 import { useDispatch } from "react-redux";
-// import { useNavigate } from "react-router-dom";
 import { loginRequest } from "../../redux/stores/slices/auth";
 import { emailRegex } from "../../utils/email";
 
@@ -14,7 +13,6 @@ const LoginPage: React.FunctionComponent = () => {
     passwordError: false,
   });
   const dispatch = useDispatch();
-  // const navigate = useNavigate();
 
   const onLogin = async (event: any) => {
     event.preventDefault();
