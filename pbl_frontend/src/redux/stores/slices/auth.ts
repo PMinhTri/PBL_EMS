@@ -56,6 +56,9 @@ export const authSlice = createSlice({
       state.token = token;
       state.isLoading = false;
       state.error = null;
+      if (localStorage.getItem("token")) {
+        window.location.href = "/admin/dashboard";
+      }
     },
     loginFailed: (state, action: PayloadAction<unknown>) => {
       handleError(action.payload);

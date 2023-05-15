@@ -1,7 +1,7 @@
 import React from "react";
 
 const EmployeeManagement: React.FunctionComponent = () => {
-  return <div>Employee</div>;
+  return <div className="w-full h-screen scroll">Employee</div>;
 };
 
 export default EmployeeManagement;

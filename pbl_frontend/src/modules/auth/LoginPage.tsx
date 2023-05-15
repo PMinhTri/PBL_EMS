@@ -14,7 +14,7 @@ const LoginPage: React.FunctionComponent = () => {
   });
   const dispatch = useDispatch();
 
-  const onLogin = async (event: any) => {
+  const onLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError({
       emailError: !emailRegex.test(email),
@@ -31,9 +31,6 @@ const LoginPage: React.FunctionComponent = () => {
         password: password,
       })
     );
-    if (localStorage.getItem("token")) {
-      window.location.href = "/admin/dashboard";
-    }
   };
 
   return (
