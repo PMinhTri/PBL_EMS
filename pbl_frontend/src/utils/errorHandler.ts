@@ -1,4 +1,4 @@
-import { showErrorAlert } from "./showAlert";
+import showNotification from "./notification";
 
 export type Failures = {
   reason: string;
@@ -28,9 +28,14 @@ export const handleError = (err: RequestError | any): void => {
     throw err;
   }
 
-  showErrorAlert(
-    err.failures.map((failure: Failures) => failure.reason).join("</br>")
-  );
+  const errorReason = err.failures
+    .map((failure: Failures) => failure.reason)
+    .join("</br>");
+  const errorMessage =
+    err.message ||
+    err.failures.map((failure: Failures) => failure.message).join("</br>");
+
+  showNotification("error", errorReason, errorMessage);
 };
 
 export const throwHttpRequestError = (err: any): HttpRequestError => {

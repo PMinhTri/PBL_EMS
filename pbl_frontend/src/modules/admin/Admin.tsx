@@ -8,17 +8,15 @@ import PageWrapper from "../../components/PageWrapper";
 
 const Admin: React.FunctionComponent = () => {
   return (
-    <>
-      <Container>
-        <Navbar />
-        <ContentWrapper>
-          <Sidebar />
-          <PageWrapper>
-            <Outlet />
-          </PageWrapper>
-        </ContentWrapper>
-      </Container>
-    </>
+    <Container>
+      <Navbar />
+      <ContentWrapper>
+        <Sidebar />
+        <PageWrapper>
+          <Outlet />
+        </PageWrapper>
+      </ContentWrapper>
+    </Container>
   );
 };
 

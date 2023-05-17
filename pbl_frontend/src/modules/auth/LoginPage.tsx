@@ -1,45 +1,58 @@
 import React from "react";
 import { FaRegEnvelope } from "react-icons/fa";
 import { FiLock } from "react-icons/fi";
-import { loginRequest } from "../../redux/stores/slices/auth";
 import { emailRegex } from "../../utils/email";
-import { useAppDispatch, useAppSelector } from "../../hooks";
-import { authSelector } from "../../redux/stores/selectors/authSelector";
+import { AuthAction } from "../../actions/authAction";
+import { useRecoilState } from "recoil";
+import { authState } from "../../recoil/auth";
+import showNotification from "../../utils/notification";
+import { Button } from "antd";
 
 const LoginPage: React.FunctionComponent = () => {
+  const [auth, setAuth] = useRecoilState(authState);
   const [email, setEmail] = React.useState<string>("");
   const [password, setPassword] = React.useState<string>("");
   const [error, setError] = React.useState({
     emailError: false,
     passwordError: false,
   });
-  const dispatch = useAppDispatch();
-  const { isAuthenticated } = useAppSelector(authSelector);
+  const [loading, setLoading] = React.useState<boolean>(false);
 
-  const onLogin = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const onLogin = async () => {
     setError({
       emailError: !emailRegex.test(email),
       passwordError: !password,
     });
 
-    if (!email || !password) return;
+    if (!email || !password) {
+      showNotification("error", "Email and Password is required");
+      return;
+    }
 
-    if (Object.values(error).some((err) => err)) return;
+    if (Object.values(error).some((err) => err)) {
+      showNotification("error", "Please fill all the fields correctly");
+      return;
+    }
 
-    dispatch(
-      loginRequest({
-        email: email,
-        password: password,
-      })
-    );
+    const data = await AuthAction.login({ email, password });
+
+    if (data?.token) {
+      setAuth((prev) => {
+        return {
+          ...prev,
+          token: data.token,
+          isAuthenticated: data.isAuthenticated,
+        };
+      });
+
+      setLoading(true);
+    }
   };
 
-  React.useMemo(() => {
-    if (isAuthenticated) {
-      window.location.href = "/admin/dashboard";
-    }
-  }, [isAuthenticated]);
+  React.useEffect(() => {
+    if (auth.isAuthenticated) window.location.href = "/admin/dashboard";
+    setLoading(false);
+  }, [auth.isAuthenticated]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-300">
@@ -48,7 +61,7 @@ const LoginPage: React.FunctionComponent = () => {
           Login
         </div>
         <div className="mt-10">
-          <form action="#" onSubmit={onLogin}>
+          <form action="#">
             <div className="flex flex-col mb-6">
               <label className="mb-1 text-xs sm:text-sm tracking-wide text-gray-600">
                 E-Mail Address:
@@ -107,14 +120,14 @@ const LoginPage: React.FunctionComponent = () => {
               </div>
             </div>
 
-            <div className="flex w-full">
-              <button
-                type="submit"
-                className="flex items-center justify-center focus:outline-none text-white text-sm sm:text-base bg-blue-600 hover:bg-blue-700 rounded py-2 w-full transition duration-150 ease-in"
+            <div className="flex w-full ">
+              <Button
+                onClick={onLogin}
+                className="flex items-center justify-center w-full h-10 focus:outline-none text-white text-sm bg-blue-600 hover:bg-blue-700 rounded py-2 transition duration-150 ease-in"
+                loading={loading}
               >
                 <span className="mr-2 uppercase">Login</span>
-                <span></span>
-              </button>
+              </Button>
             </div>
           </form>
         </div>

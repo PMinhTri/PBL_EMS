@@ -1,15 +1,14 @@
 import React from "react";
 import loginImg from "../assets/login.jpg";
 import { Popover, Space } from "antd";
-import { logoutRequest } from "../redux/stores/slices/auth";
-import { useAppDispatch, useAppSelector } from "../hooks";
-import { userInfoSelector } from "../redux/stores/selectors/authSelector";
+import { AuthAction } from "../actions/authAction";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { userState } from "../recoil/user";
+import { authState } from "../recoil/auth";
 
 const SelectContent: React.FunctionComponent = () => {
-  const dispatch = useAppDispatch();
-
-  const userInfo = useAppSelector(userInfoSelector);
-
+  const setAuth = useSetRecoilState(authState);
+  const [user, setUser] = useRecoilState(userState);
   const options = [
     { value: "Profile" },
     { value: "Security" },
@@ -19,7 +18,12 @@ const SelectContent: React.FunctionComponent = () => {
   const handleSelected = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
     e.preventDefault();
     if (e.currentTarget.textContent === "Log out") {
-      dispatch(logoutRequest());
+      setAuth((prev) => {
+        return {
+          ...prev,
+          ...AuthAction.logout(),
+        };
+      });
       window.location.href = "/";
     }
   };
@@ -35,8 +39,8 @@ const SelectContent: React.FunctionComponent = () => {
           />
         </div>
         <div className="text-xs pr-4 justify-center">
-          <div className="font-bold">{userInfo.fullName}</div>
-          <div>{userInfo.email}</div>
+          <div className="font-bold">{user.fullName}</div>
+          <div>{user.email}</div>
         </div>
       </div>
       <ul>

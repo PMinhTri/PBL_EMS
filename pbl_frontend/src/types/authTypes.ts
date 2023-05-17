@@ -1,12 +1,3 @@
-import { Failures } from "../utils/errorHandler";
-
-export enum AuthType {
-  LOGIN_REQUEST = "auth/loginRequest",
-  LOGIN_SUCCESS = "auth/loginSuccess",
-  LOGIN_FAILED = "auth/loginFailed",
-  LOGOUT = "auth/logout",
-}
-
 export interface AuthPayload {
   email: string;
   password: string;
@@ -17,4 +8,9 @@ export type AuthResponse = {
   payload: {
     token: string;
   };
+};
+
+export type AuthState = {
+  token: string;
+  isAuthenticated: boolean;
 };
