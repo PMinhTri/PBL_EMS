@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Res,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { createUserDto } from './user.dto';
 import { BadRequestResult, IResponse, SuccessResult } from 'src/httpResponse';
@@ -87,6 +95,32 @@ export class UserController {
       status,
       failure,
     } = await this.userService.getById(Number(id));
+
+    if (status === ServiceResponseStatus.Failed) {
+      switch (failure.reason) {
+        case UserFailure.USER_NOT_FOUND:
+          return res.send(
+            BadRequestResult({
+              reason: failure.reason,
+              message: `User not found`,
+            }),
+          );
+      }
+    }
+
+    return res.send(SuccessResult(user));
+  }
+
+  @Delete(':id')
+  public async deleteById(
+    @Param('id') id: string,
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const {
+      result: user,
+      status,
+      failure,
+    } = await this.userService.deleteById(Number(id));
 
     if (status === ServiceResponseStatus.Failed) {
       switch (failure.reason) {

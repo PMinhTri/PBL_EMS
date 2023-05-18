@@ -27,27 +27,47 @@ model User {
   role        Role      @relation(fields: [roleId], references: [id])
   avatar      String?
 
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  JobInformation JobInformation[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  jobInformation JobInformation?
+  timeKeeping    TimeKeeping[]
+  Payrol         Payrol[]
+  Project        Project?        @relation(fields: [projectId], references: [id])
+  projectId      Int?
+  HealthCare     HealthCare[]
+  Leaves         Leaves[]
 }
 
 model JobInformation {
-  id             Int       @id @default(autoincrement())
-  userId         Int
-  user           User      @relation(fields: [userId], references: [id])
-  contractType   String?
-  contractStart  DateTime?
-  contractEnd    DateTime?
-  joinDate       DateTime?
-  employeeStatus String?
-  jobHistory     String?
-  jobTitle       String?
-  workingSkills  String?
-  office         String?
-  project        String?
-  status         String?
-  description    String?
+  id                Int       @id @default(autoincrement())
+  userId            Int       @unique
+  user              User      @relation(fields: [userId], references: [id])
+  contractType      String?
+  contractStartDate DateTime?
+  contractEndDate   DateTime?
+  joinDate          DateTime?
+  employmentStatus  String?
+  jobHistory        String?
+  jobTitle          String?
+  workingSkills     String?
+  office            String?
+  project           String?
+  status            String?
+  description       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TimeKeeping {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+  checkIn     DateTime?
+  checkOut    DateTime?
+  hoursWorked Float?
+  status      String?
+  year        Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -60,4 +80,56 @@ model Role {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Payrol {
+  id          Int     @id @default(autoincrement())
+  userId      Int
+  user        User    @relation(fields: [userId], references: [id])
+  month       Int?
+  year        Int?
+  totalSalary Float?
+  status      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Project {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  progress    String?
+  status      String?
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User[]
+}
+
+model HealthCare {
+  id         Int       @id @default(autoincrement())
+  userId     Int
+  user       User      @relation(fields: [userId], references: [id])
+  healthCare String?
+  status     String?
+  startDate  DateTime?
+  endDate    DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Leaves {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  leaveType String?
+  quantity  Int?
+  startDate DateTime?
+  endDate   DateTime?
+  reason    String?
+  status    String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }

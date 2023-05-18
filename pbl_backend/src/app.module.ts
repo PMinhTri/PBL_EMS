@@ -11,8 +11,20 @@ import { AuthModule } from './module/auth/auth.module';
 import { UserModule } from './module/user/user.module';
 import { RoleModule } from './module/role/Role.module';
 import { RolesGuard } from './module/role/role.guard';
+import { JobInformationModule } from './module/jobInformation/jobInformation.module';
+import { TimeKeepingModule } from './module/timeKeeping/timeKeeping.module';
+import { ProjectModule } from './module/project/project.module';
 @Module({
-  imports: [AuthModule, UserModule, RoleModule, MailModule, PrismaModule],
+  imports: [
+    AuthModule,
+    UserModule,
+    RoleModule,
+    JobInformationModule,
+    TimeKeepingModule,
+    ProjectModule,
+    MailModule,
+    PrismaModule,
+  ],
   providers: [
     {
       provide: 'APP_GUARD',
