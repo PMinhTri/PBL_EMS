@@ -13,7 +13,19 @@ import Auth from "../modules/auth/Auth";
 import { useSetRecoilState } from "recoil";
 import { userAuthState } from "../recoil/atoms/user";
 import { UserAction } from "../actions/userAction";
-import AdminProfile from "../modules/admin/AdminProfile";
+import Account from "../modules/Account";
+
+const AuthenticatedRoute: React.FunctionComponent<{
+  element: React.ReactNode;
+}> = ({ element }) => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    return <Navigate to="/auth/login" replace />;
+  }
+
+  return <>{element}</>;
+};
 
 const Routes: React.FunctionComponent = () => {
   const token = localStorage.getItem("token");
@@ -37,12 +49,15 @@ const Routes: React.FunctionComponent = () => {
         </Route>
         <Route
           path="/admin/*"
-          element={token ? <Admin /> : <Navigate to="/auth/login" replace />}
+          element={<AuthenticatedRoute element={<Admin />} />}
         >
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="employees" element={<EmployeeManagement />} />
-          <Route path="profile" element={<AdminProfile />} />
         </Route>
+        <Route
+          path="/account"
+          element={<AuthenticatedRoute element={<Account />} />}
+        />
       </Switch>
     </BrowserRouter>
   );

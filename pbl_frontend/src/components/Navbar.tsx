@@ -5,23 +5,16 @@ import { AuthAction } from "../actions/authAction";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { userAuthState } from "../recoil/atoms/user";
 import { authState } from "../recoil/atoms/auth";
-import { useNavigate } from "react-router-dom";
 
 enum NavbarOptions {
-  Profile = "Profile",
-  Security = "Security",
-  Logout = "Log out",
+  Account = "Account",
+  Logout = "Logout",
 }
 
 const SelectContent: React.FunctionComponent = () => {
   const setAuth = useSetRecoilState(authState);
   const user = useRecoilValue(userAuthState);
-  const navigate = useNavigate();
-  const options = [
-    { value: "Profile" },
-    { value: "Security" },
-    { value: "Log out" },
-  ];
+  const options = [{ value: "Account" }, { value: "Logout" }];
 
   const handleSelected = async (
     e: React.MouseEvent<HTMLLIElement, MouseEvent>
@@ -37,8 +30,8 @@ const SelectContent: React.FunctionComponent = () => {
       window.location.href = "/";
     }
 
-    if (e.currentTarget.textContent === NavbarOptions.Profile) {
-      navigate("/admin/profile");
+    if (e.currentTarget.textContent === NavbarOptions.Account) {
+      window.location.href = "/account";
     }
   };
 
@@ -79,6 +72,7 @@ const Navbar: React.FunctionComponent = () => {
         <div
           className="font-bold text-2xl cursor-pointer flex font-[Poppins] 
         text-white mb-4 md:mb-0"
+          onClick={() => (window.location.href = "/")}
         >
           HR Management System
         </div>

@@ -111,6 +111,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
                 <Select
                   size="middle"
                   defaultValue={"grid"}
+                  style={{ width: 80 }}
                   optionLabelProp="view mode"
                   allowClear
                   options={[
@@ -137,7 +138,15 @@ const EmployeeManagement: React.FunctionComponent = () => {
           </div>
         </div>
       </div>
-      <div className="w-full px-2 py-2 h-screen bt-[1px] rounded-2 overflow-auto">
+      <div className="w-full h-12 px-1 py-1 border-b flex flex-row justify-around">
+        <div className="border-l border-r flex justify-center items-center border-red-900 w-full">
+          <span>45</span>
+        </div>
+        <div className="w-full">152</div>
+        <div className="w-full">67</div>
+        <div className="w-full">67</div>
+      </div>
+      <div className="w-full px-2 py-2 h-screen overflow-auto">
         <div className="grid grid-cols-4 gap-4">
           {arr.map((item, index) => (
             <div
