@@ -11,17 +11,18 @@ import Dashboard from "../modules/admin/Dashboard";
 import EmployeeManagement from "../modules/admin/EmployeeManagement";
 import Auth from "../modules/auth/Auth";
 import { useSetRecoilState } from "recoil";
-import { userState } from "../recoil/user";
+import { userAuthState } from "../recoil/atoms/user";
 import { UserAction } from "../actions/userAction";
+import AdminProfile from "../modules/admin/AdminProfile";
 
 const Routes: React.FunctionComponent = () => {
   const token = localStorage.getItem("token");
 
-  const setUser = useSetRecoilState(userState);
+  const setUser = useSetRecoilState(userAuthState);
 
   React.useEffect(() => {
     if (token) {
-      setUser(UserAction.getUserInformation(token));
+      setUser(UserAction.getAuthInfo(token));
     }
   }, [token, setUser]);
   return (
@@ -40,6 +41,7 @@ const Routes: React.FunctionComponent = () => {
         >
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="employees" element={<EmployeeManagement />} />
+          <Route path="profile" element={<AdminProfile />} />
         </Route>
       </Switch>
     </BrowserRouter>

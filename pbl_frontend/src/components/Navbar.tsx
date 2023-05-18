@@ -2,22 +2,32 @@ import React from "react";
 import loginImg from "../assets/login.jpg";
 import { Popover, Space } from "antd";
 import { AuthAction } from "../actions/authAction";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { userState } from "../recoil/user";
-import { authState } from "../recoil/auth";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { userAuthState } from "../recoil/atoms/user";
+import { authState } from "../recoil/atoms/auth";
+import { useNavigate } from "react-router-dom";
+
+enum NavbarOptions {
+  Profile = "Profile",
+  Security = "Security",
+  Logout = "Log out",
+}
 
 const SelectContent: React.FunctionComponent = () => {
   const setAuth = useSetRecoilState(authState);
-  const [user, setUser] = useRecoilState(userState);
+  const user = useRecoilValue(userAuthState);
+  const navigate = useNavigate();
   const options = [
     { value: "Profile" },
     { value: "Security" },
     { value: "Log out" },
   ];
 
-  const handleSelected = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
+  const handleSelected = async (
+    e: React.MouseEvent<HTMLLIElement, MouseEvent>
+  ) => {
     e.preventDefault();
-    if (e.currentTarget.textContent === "Log out") {
+    if (e.currentTarget.textContent === NavbarOptions.Logout) {
       setAuth((prev) => {
         return {
           ...prev,
@@ -25,6 +35,10 @@ const SelectContent: React.FunctionComponent = () => {
         };
       });
       window.location.href = "/";
+    }
+
+    if (e.currentTarget.textContent === NavbarOptions.Profile) {
+      navigate("/admin/profile");
     }
   };
 

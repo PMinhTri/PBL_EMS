@@ -6,9 +6,9 @@ type Props = {
 };
 
 const Container: React.FunctionComponent<Props> = (props: Props) => {
-  const { backgroundColor, children } = props;
+  const { children } = props;
 
-  return <div className={`flex flex-col bg-${backgroundColor}`}>{children}</div>;
+  return <div className={`flex flex-col`}>{children}</div>;
 };
 
 export default Container;

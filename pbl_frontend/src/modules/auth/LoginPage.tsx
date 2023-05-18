@@ -4,7 +4,7 @@ import { FiLock } from "react-icons/fi";
 import { emailRegex } from "../../utils/email";
 import { AuthAction } from "../../actions/authAction";
 import { useRecoilState } from "recoil";
-import { authState } from "../../recoil/auth";
+import { authState } from "../../recoil/atoms/auth";
 import showNotification from "../../utils/notification";
 import { Button } from "antd";
 

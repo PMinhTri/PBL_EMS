@@ -1,14 +1,14 @@
-import { Body, Controller, Get, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
 import { UserService } from './user.service';
 import { createUserDto } from './user.dto';
 import { BadRequestResult, IResponse, SuccessResult } from 'src/httpResponse';
 import { ServiceResponseStatus } from 'src/serviceResponse';
 import { UserFailure } from 'src/enumTypes/failure.enum';
-import { updateInformationInput } from './user.type';
+import { UpdateInformationInput } from './user.type';
 import { Roles } from '../role/role.decorator';
 import { RoleEnum } from 'src/enumTypes/role.enum';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
 
@@ -55,7 +55,7 @@ export class UserController {
 
   @Post('/update-personal-information')
   public async updatePersonalInformation(
-    @Body() payload: updateInformationInput,
+    @Body() payload: UpdateInformationInput,
     @Res() res: IResponse,
   ): Promise<IResponse> {
     const { email, userInformation } = payload;
@@ -75,5 +75,31 @@ export class UserController {
     }
 
     return res.send(SuccessResult());
+  }
+
+  @Get(':id')
+  public async getById(
+    @Param('id') id: string,
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const {
+      result: user,
+      status,
+      failure,
+    } = await this.userService.getById(Number(id));
+
+    if (status === ServiceResponseStatus.Failed) {
+      switch (failure.reason) {
+        case UserFailure.USER_NOT_FOUND:
+          return res.send(
+            BadRequestResult({
+              reason: failure.reason,
+              message: `User not found`,
+            }),
+          );
+      }
+    }
+
+    return res.send(SuccessResult(user));
   }
 }
