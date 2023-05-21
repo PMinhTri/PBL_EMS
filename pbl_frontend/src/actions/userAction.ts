@@ -1,4 +1,4 @@
-import { getUserById } from "../api/user";
+import { getAllEmployees, getUserById } from "../api/user";
 import { UserAuthInfo } from "../types/userTypes";
 import { handleError } from "../utils/errorHandler";
 
@@ -17,5 +17,12 @@ export const UserAction = {
       const { payload } = response;
       return payload;
     }
+  },
+
+  getAllEmployees: async () => {
+    const response = await getAllEmployees();
+
+    const { payload } = response;
+    return payload;
   },
 };

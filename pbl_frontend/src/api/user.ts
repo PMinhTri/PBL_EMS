@@ -8,3 +8,11 @@ export const getUserById = async (id: number) => {
   } = await $get(`users/${id}`);
   return response;
 };
+
+export const getAllEmployees = async () => {
+  const response: {
+    statusCode: number;
+    payload: UserDetailInformation[];
+  } = await $get(`users`);
+  return response;
+};

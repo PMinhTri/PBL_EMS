@@ -11,17 +11,17 @@ import {
   BiMessageDetail,
 } from "react-icons/bi";
 
-const Sidebar: React.FunctionComponent = () => {
-  const sideBarItems = [
-    { name: "Dashboard", icon: <BiGridAlt />, path: "/admin/dashboard" },
-    { name: "Employees", icon: <BiGroup />, path: "/admin/employees" },
-    { name: "Time Sheet", icon: <BiTask />, path: "#" },
-    { name: "Leave", icon: <BiCalendarAlt />, path: "#" },
-    { name: "Payroll", icon: <BiDollarCircle />, path: "#" },
-    { name: "Projects", icon: <BiBarChartAlt2 />, path: "#" },
-    { name: "Calendar", icon: <BiCalendar />, path: "#" },
-    { name: "Message", icon: <BiMessageDetail />, path: "#" },
-  ];
+type SideBarItems = {
+  name: string;
+  icon: JSX.Element;
+  path: string;
+};
+export type Props = {
+  sideBarItems: SideBarItems[];
+};
+
+const Sidebar: React.FunctionComponent<Props> = (props: Props) => {
+  const { sideBarItems } = props;
 
   return (
     <div className="fixed w-64 h-screen pt-8 border-[2px]">

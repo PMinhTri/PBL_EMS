@@ -3,13 +3,13 @@ import { FaRegEnvelope } from "react-icons/fa";
 import { FiLock } from "react-icons/fi";
 import { emailRegex } from "../../utils/email";
 import { AuthAction } from "../../actions/authAction";
-import { useRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import { authState } from "../../recoil/atoms/auth";
 import showNotification from "../../utils/notification";
 import { Button } from "antd";
 
 const LoginPage: React.FunctionComponent = () => {
-  const [auth, setAuth] = useRecoilState(authState);
+  const setAuth = useSetRecoilState(authState);
   const [email, setEmail] = React.useState<string>("");
   const [password, setPassword] = React.useState<string>("");
   const [error, setError] = React.useState({
@@ -48,11 +48,6 @@ const LoginPage: React.FunctionComponent = () => {
       setLoading(true);
     }
   };
-
-  React.useEffect(() => {
-    if (auth.isAuthenticated) window.location.href = "/admin/dashboard";
-    setLoading(false);
-  }, [auth.isAuthenticated]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-300">

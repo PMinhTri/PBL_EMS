@@ -73,7 +73,7 @@ const Account = () => {
           <div>...loading</div>
         ) : (
           <div className="grid grid-cols-3 gap-4 mt-1 w-full">
-            <div className="col-span-1 border-[2px] rounded-md w-full flex flex-col">
+            <div className="col-span-1 border-[2px] rounded-md shadow-md w-full flex flex-col">
               <div className="w-full border-[2px] flex flex-row ">
                 <div className="flex flex-row w-[50%] justify-between items-center">
                   Avatar
@@ -86,7 +86,7 @@ const Account = () => {
               </div>
             </div>
             <div className="col-span-2 w-full">
-              <div className="border-[2px] mx-2 rounded-md">
+              <div className="border-[2px] mx-2 rounded-md shadow-lg">
                 <div className="flex flex-row pl-4 py-2 items-center">
                   General Information
                 </div>

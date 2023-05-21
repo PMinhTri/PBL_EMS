@@ -23,15 +23,19 @@ model User {
   address     String?
   nationality String?
   status      String?
-  roleId      Int
-  role        Role      @relation(fields: [roleId], references: [id])
-  avatar      String?
+  degree      String?
+  education   String?
+  major       String?
+
+  roleId Int
+  role   Role    @relation(fields: [roleId], references: [id])
+  avatar String?
 
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   jobInformation JobInformation?
-  timeKeeping    TimeKeeping[]
-  Payrol         Payrol[]
+  timeKeeping    TimeSheet[]
+  Payroll        Payroll[]
   Project        Project?        @relation(fields: [projectId], references: [id])
   projectId      Int?
   HealthCare     HealthCare[]
@@ -50,7 +54,7 @@ model JobInformation {
   jobHistory        String?
   jobTitle          String?
   workingSkills     String?
-  office            String?
+  department        String?
   project           String?
   status            String?
   description       String?
@@ -59,13 +63,14 @@ model JobInformation {
   updatedAt DateTime @updatedAt
 }
 
-model TimeKeeping {
+model TimeSheet {
   id          Int       @id @default(autoincrement())
   userId      Int
   user        User      @relation(fields: [userId], references: [id])
   checkIn     DateTime?
   checkOut    DateTime?
   hoursWorked Float?
+  otHours     Float?
   status      String?
   year        Int?
 
@@ -82,13 +87,15 @@ model Role {
   updatedAt DateTime @updatedAt
 }
 
-model Payrol {
+model Payroll {
   id          Int     @id @default(autoincrement())
   userId      Int
   user        User    @relation(fields: [userId], references: [id])
   month       Int?
   year        Int?
+  basicSalary Float?
   totalSalary Float?
+  additional  Float?
   status      String?
 
   createdAt DateTime @default(now())

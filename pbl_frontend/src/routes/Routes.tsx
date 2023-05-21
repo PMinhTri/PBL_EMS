@@ -10,10 +10,17 @@ import Admin from "../modules/admin/Admin";
 import Dashboard from "../modules/admin/Dashboard";
 import EmployeeManagement from "../modules/admin/EmployeeManagement";
 import Auth from "../modules/auth/Auth";
-import { useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { userAuthState } from "../recoil/atoms/user";
 import { UserAction } from "../actions/userAction";
 import Account from "../modules/Account";
+import Employee from "../modules/employee/Employee";
+import authSelector from "../recoil/selectors/auth";
+
+export enum RoleEnum {
+  ADMIN = "Admin",
+  EMPLOYEE = "Employee",
+}
 
 const AuthenticatedRoute: React.FunctionComponent<{
   element: React.ReactNode;
@@ -30,13 +37,24 @@ const AuthenticatedRoute: React.FunctionComponent<{
 const Routes: React.FunctionComponent = () => {
   const token = localStorage.getItem("token");
 
-  const setUser = useSetRecoilState(userAuthState);
+  const { auth } = useRecoilValue(authSelector);
+  const [userBasicInfo, setUserBasicInfo] = useRecoilState(userAuthState);
 
   React.useEffect(() => {
     if (token) {
-      setUser(UserAction.getAuthInfo(token));
+      setUserBasicInfo(UserAction.getAuthInfo(token));
     }
-  }, [token, setUser]);
+
+    if (auth.isAuthenticated) {
+      if (userBasicInfo.role === RoleEnum.ADMIN) {
+        window.location.href = "/admin/dashboard";
+      }
+      if (userBasicInfo.role === RoleEnum.EMPLOYEE) {
+        window.location.href = "/employee";
+      }
+    }
+  }, [token, setUserBasicInfo, userBasicInfo.role, auth.isAuthenticated]);
+
   return (
     <BrowserRouter>
       <Switch>
@@ -49,11 +67,35 @@ const Routes: React.FunctionComponent = () => {
         </Route>
         <Route
           path="/admin/*"
-          element={<AuthenticatedRoute element={<Admin />} />}
+          element={
+            <AuthenticatedRoute
+              element={
+                userBasicInfo.role === RoleEnum.ADMIN ? (
+                  <Admin />
+                ) : (
+                  <Navigate to="/employee" replace />
+                )
+              }
+            />
+          }
         >
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="employees" element={<EmployeeManagement />} />
         </Route>
+        <Route
+          path="/employee/*"
+          element={
+            <AuthenticatedRoute
+              element={
+                userBasicInfo.role === RoleEnum.EMPLOYEE ? (
+                  <Employee />
+                ) : (
+                  <Navigate to="/admin" replace />
+                )
+              }
+            />
+          }
+        />
         <Route
           path="/account"
           element={<AuthenticatedRoute element={<Account />} />}
