@@ -13,6 +13,9 @@ import { RoleModule } from './module/role/Role.module';
 import { RolesGuard } from './module/role/role.guard';
 import { JobInformationModule } from './module/jobInformation/jobInformation.module';
 import { ProjectModule } from './module/project/project.module';
+import { JobTitleModule } from './module/jobTitle/jobTitle.module';
+import { DepartmentModule } from './module/department/department.module';
+import { PayrollModule } from './module/payroll/payroll.module';
 // import { TimeSheetModule } from './module/timeSheet/timeSheet.module';
 @Module({
   imports: [
@@ -21,6 +24,9 @@ import { ProjectModule } from './module/project/project.module';
     RoleModule,
     JobInformationModule,
     // TimeSheetModule,
+    JobTitleModule,
+    PayrollModule,
+    DepartmentModule,
     ProjectModule,
     MailModule,
     PrismaModule,

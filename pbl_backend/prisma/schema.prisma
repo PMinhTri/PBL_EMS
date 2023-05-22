@@ -11,8 +11,8 @@ datasource db {
 }
 
 model User {
-  id          Int       @id @default(autoincrement())
-  email       String    @unique
+  id          Int        @id @default(autoincrement())
+  email       String     @unique
   password    String
   fullName    String?
   firstName   String?
@@ -21,11 +21,11 @@ model User {
   dateOfBirth DateTime?
   phoneNumber String?
   address     String?
+  city        String?
+  citizenId   String?
   nationality String?
   status      String?
-  degree      String?
-  education   String?
-  major       String?
+  education   Education?
 
   roleId Int
   role   Role    @relation(fields: [roleId], references: [id])
@@ -36,31 +36,48 @@ model User {
   jobInformation JobInformation?
   timeKeeping    TimeSheet[]
   Payroll        Payroll[]
-  Project        Project?        @relation(fields: [projectId], references: [id])
-  projectId      Int?
-  HealthCare     HealthCare[]
+  HealthCare     Insurance?
   Leaves         Leaves[]
+  educationId    Int?
 }
 
 model JobInformation {
-  id                Int       @id @default(autoincrement())
-  userId            Int       @unique
-  user              User      @relation(fields: [userId], references: [id])
+  id                Int            @id @default(autoincrement())
+  userId            Int            @unique
+  user              User           @relation(fields: [userId], references: [id])
   contractType      String?
   contractStartDate DateTime?
   contractEndDate   DateTime?
   joinDate          DateTime?
-  employmentStatus  String?
+  employeeStatus    String?
   jobHistory        String?
-  jobTitle          String?
-  workingSkills     String?
-  department        String?
-  project           String?
-  status            String?
-  description       String?
+  jobTitleId        Int?           @unique
+  jobTitle          JobTitle?      @relation(fields: [jobTitleId], references: [id])
+  workingSkill      WorkingSkill[]
+  departmentId      Int?           @unique
+  department        Department?    @relation(fields: [departmentId], references: [id])
+  project           Project[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model JobTitle {
+  id             Int              @id @default(autoincrement())
+  name           String
+  JobInformation JobInformation[]
+}
+
+model WorkingSkill {
+  id             Int              @id @default(autoincrement())
+  name           String
+  jobInformation JobInformation[]
+}
+
+model Department {
+  id   Int    @id @default(autoincrement())
+  name String
+  JobInformation JobInformation[]
 }
 
 model TimeSheet {
@@ -103,28 +120,28 @@ model Payroll {
 }
 
 model Project {
-  id          Int       @id @default(autoincrement())
-  name        String
-  description String?
-  progress    String?
-  status      String?
-  startDate   DateTime?
-  endDate     DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  user        User[]
+  id             Int              @id @default(autoincrement())
+  name           String
+  description    String?
+  progress       String?
+  status         String?
+  startDate      DateTime?
+  endDate        DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  jobInformation JobInformation[]
 }
 
-model HealthCare {
-  id         Int       @id @default(autoincrement())
-  userId     Int
-  user       User      @relation(fields: [userId], references: [id])
-  healthCare String?
-  status     String?
-  startDate  DateTime?
-  endDate    DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+model Insurance {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @unique
+  user            User     @relation(fields: [userId], references: [id])
+  insuranceId     Int
+  provideDate     DateTime
+  expiredDate     DateTime
+  provideLocation String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Leaves {
@@ -139,4 +156,15 @@ model Leaves {
   status    String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+}
+
+model Education {
+  id          Int     @id @default(autoincrement())
+  userId      Int     @unique
+  user        User    @relation(fields: [userId], references: [id])
+  grade       String?
+  university  String?
+  major       String?
+  certificate String?
+  degree      String?
 }

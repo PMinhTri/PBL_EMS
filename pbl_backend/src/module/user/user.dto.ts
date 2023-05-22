@@ -64,7 +64,15 @@ export class userInformationDto {
 
   @IsString()
   @ApiProperty({ type: String, required: false, nullable: true })
+  citizenId: string;
+
+  @IsString()
+  @ApiProperty({ type: String, required: false, nullable: true })
   address: string;
+
+  @IsString()
+  @ApiProperty({ type: String, required: false, nullable: true })
+  city: string;
 
   @IsString()
   @ApiProperty({ type: String, required: false, nullable: true })
