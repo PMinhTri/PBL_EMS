@@ -17,20 +17,22 @@ import { JobTitleModule } from './module/jobTitle/jobTitle.module';
 import { DepartmentModule } from './module/department/department.module';
 import { PayrollModule } from './module/payroll/payroll.module';
 import { LeaveModule } from './module/leave/leave.module';
-// import { TimeSheetModule } from './module/timeSheet/timeSheet.module';
+import { WorkingSkillModule } from './module/workingSkill/workingSkill.module';
+import { TimeSheetModule } from './module/timeSheet/timeSheet.module';
 @Module({
   imports: [
     AuthModule,
     UserModule,
     RoleModule,
     JobInformationModule,
-    // TimeSheetModule,
     JobTitleModule,
     PayrollModule,
     DepartmentModule,
     ProjectModule,
     LeaveModule,
+    TimeSheetModule,
     MailModule,
+    WorkingSkillModule,
     PrismaModule,
   ],
   providers: [

@@ -30,5 +30,10 @@ export class LeaveDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  session: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   reason: string;
 }
