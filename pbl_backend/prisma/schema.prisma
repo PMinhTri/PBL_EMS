@@ -75,8 +75,8 @@ model WorkingSkill {
 }
 
 model Department {
-  id   Int    @id @default(autoincrement())
-  name String
+  id             Int              @id @default(autoincrement())
+  name           String
   JobInformation JobInformation[]
 }
 
@@ -145,17 +145,26 @@ model Insurance {
 }
 
 model Leaves {
-  id        Int       @id @default(autoincrement())
-  userId    Int
-  user      User      @relation(fields: [userId], references: [id])
-  leaveType String?
-  quantity  Int?
-  startDate DateTime?
-  endDate   DateTime?
-  reason    String?
-  status    String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id          Int         @id @default(autoincrement())
+  userId      Int
+  user        User        @relation(fields: [userId], references: [id])
+  leaveType   String?
+  leaveDays   Int?
+  startDate   DateTime?
+  endDate     DateTime?
+  reason      String?
+  status      String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  leaveTypeId Int?        @unique
+  leaveTypes  LeaveTypes? @relation(fields: [leaveTypeId], references: [id])
+}
+
+model LeaveTypes {
+  id     Int      @id @default(autoincrement())
+  name   String
+  balance Int
+  leaves Leaves[]
 }
 
 model Education {

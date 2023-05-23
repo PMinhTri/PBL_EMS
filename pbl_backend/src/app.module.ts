@@ -16,6 +16,7 @@ import { ProjectModule } from './module/project/project.module';
 import { JobTitleModule } from './module/jobTitle/jobTitle.module';
 import { DepartmentModule } from './module/department/department.module';
 import { PayrollModule } from './module/payroll/payroll.module';
+import { LeaveModule } from './module/leave/leave.module';
 // import { TimeSheetModule } from './module/timeSheet/timeSheet.module';
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { PayrollModule } from './module/payroll/payroll.module';
     PayrollModule,
     DepartmentModule,
     ProjectModule,
+    LeaveModule,
     MailModule,
     PrismaModule,
   ],

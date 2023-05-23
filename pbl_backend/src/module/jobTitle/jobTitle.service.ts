@@ -56,6 +56,21 @@ export class JobTitleService {
       ServiceFailure<JobTitleFailure>
     >
   > {
+    const existingJobTitle = await this.prisma.jobTitle.findFirst({
+      where: {
+        name: dto.name,
+      },
+    });
+
+    if (existingJobTitle) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: JobTitleFailure.JOB_TITLE_ALREADY_EXISTS,
+        },
+      };
+    }
+
     const jobTitle = await this.prisma.jobTitle.create({
       data: {
         name: dto.name,
@@ -65,6 +80,36 @@ export class JobTitleService {
     return {
       status: ServiceResponseStatus.Success,
       result: { jobTitle },
+    };
+  }
+
+  public async deleteJobTitle(
+    id: number,
+  ): Promise<ServiceResponse<JobTitle, ServiceFailure<JobTitleFailure>>> {
+    const jobTitle = await this.prisma.jobTitle.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!jobTitle) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: JobTitleFailure.JOB_TITLE_NOT_FOUND,
+        },
+      };
+    }
+
+    await this.prisma.jobTitle.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    return {
+      status: ServiceResponseStatus.Success,
+      result: jobTitle,
     };
   }
 }

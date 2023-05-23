@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Department, JobTitle, Project, WorkingSkill } from '@prisma/client';
 import { IsDateString, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class jobInformationDto {
+export class JobInformationDto {
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty({ type: Number, required: true, nullable: false })

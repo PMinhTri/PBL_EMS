@@ -5,7 +5,7 @@ import {
   ServiceResponse,
   ServiceResponseStatus,
 } from 'src/serviceResponse';
-import { jobInformationDto } from './jobInformation.dto';
+import { JobInformationDto } from './jobInformation.dto';
 import { JobInformationFailure } from 'src/enumTypes/failure.enum';
 import { JobInformation } from '@prisma/client';
 
@@ -14,7 +14,7 @@ export class JobInformationService {
   constructor(private prisma: PrismaService) {}
 
   public async createJobInformation(
-    dto: jobInformationDto,
+    dto: Partial<JobInformationDto>,
   ): Promise<
     ServiceResponse<JobInformation, ServiceFailure<JobInformationFailure>>
   > {
@@ -36,12 +36,8 @@ export class JobInformationService {
     const jobInformation = await this.prisma.jobInformation.create({
       data: {
         userId: dto.userId,
-        contractType: dto.contractType,
-        contractStartDate: dto.contractStartDate,
-        contractEndDate: dto.contractEndDate,
         joinDate: dto.joinDate,
         employeeStatus: dto.employeeStatus,
-        jobHistory: dto.jobHistory,
       },
     });
 
@@ -95,7 +91,7 @@ export class JobInformationService {
   > {
     const jobInformation = await this.prisma.jobInformation.findFirst({
       where: {
-        userId,
+        userId: userId,
       },
     });
 
@@ -116,7 +112,7 @@ export class JobInformationService {
 
   public async updateJobInformation(
     id: number,
-    dto: jobInformationDto,
+    dto: JobInformationDto,
   ): Promise<
     ServiceResponse<JobInformation, ServiceFailure<JobInformationFailure>>
   > {
