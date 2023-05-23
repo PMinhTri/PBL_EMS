@@ -69,9 +69,11 @@ model JobTitle {
 }
 
 model WorkingSkill {
-  id             Int              @id @default(autoincrement())
-  name           String
-  jobInformation JobInformation[]
+  id               Int             @id @default(autoincrement())
+  jobInformationId Int?            @unique
+  jobInformation   JobInformation? @relation(fields: [jobInformationId], references: [id])
+  name             String
+  description      String?
 }
 
 model Department {

@@ -19,6 +19,7 @@ import { PayrollModule } from './module/payroll/payroll.module';
 import { LeaveModule } from './module/leave/leave.module';
 import { WorkingSkillModule } from './module/workingSkill/workingSkill.module';
 import { TimeSheetModule } from './module/timeSheet/timeSheet.module';
+import { EducationModule } from './module/education/education.module';
 @Module({
   imports: [
     AuthModule,
@@ -33,6 +34,7 @@ import { TimeSheetModule } from './module/timeSheet/timeSheet.module';
     TimeSheetModule,
     MailModule,
     WorkingSkillModule,
+    EducationModule,
     PrismaModule,
   ],
   providers: [
