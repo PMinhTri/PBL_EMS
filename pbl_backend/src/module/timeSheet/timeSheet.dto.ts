@@ -18,6 +18,28 @@ export class TimeSheetDto {
   hoursWorked: number;
 
   @IsNumber()
+  @IsNotEmpty()
+  @ApiProperty({ type: 'number' })
+  month: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @ApiProperty({ type: 'number' })
+  year: number;
+}
+
+export class OTTimeSheetDto {
+  @IsNotEmpty()
+  @IsNumber()
+  @ApiProperty({ type: 'number' })
+  userId: number;
+
+  @IsNotEmpty()
+  @ApiProperty({ type: 'number' })
+  @IsNumber()
+  checkInDate: number;
+
+  @IsNumber()
   @ApiProperty({ type: 'number' })
   otHoursWorked: number;
 

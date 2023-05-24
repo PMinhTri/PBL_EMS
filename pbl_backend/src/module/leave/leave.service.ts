@@ -16,7 +16,10 @@ import { LeaveSession } from 'src/enumTypes/leaveSession.enum';
 export class LeaveService {
   constructor(private prisma: PrismaService) {}
 
-  private async checkValidLeaveRequest(dto: LeaveDto): Promise<{
+  private async checkValidLeaveRequest(
+    dto: LeaveDto,
+    requestId?: number,
+  ): Promise<{
     valid: boolean;
     failure?: ServiceFailure<LeaveFailure>;
   }> {
@@ -53,6 +56,7 @@ export class LeaveService {
           endDate: new Date(dto.endDate),
         },
         select: {
+          id: true,
           session: true,
           leaveDays: true,
         },
@@ -68,6 +72,7 @@ export class LeaveService {
       }
 
       for (const leave of existedLeaveRequestByDate) {
+        if (leave.id === requestId) continue;
         if (leave.session === dto.session) {
           return {
             valid: false,
@@ -85,6 +90,7 @@ export class LeaveService {
       const allDatesRequested = [];
 
       for (const leave of allLeaveRequest) {
+        if (leave.id === requestId) continue;
         const dates = dateTimeUtils.getDatesWithCondition(
           leave.startDate,
           leave.endDate,
@@ -177,7 +183,10 @@ export class LeaveService {
       };
     }
 
-    const { valid, failure } = await this.checkValidLeaveRequest(dto);
+    const { valid, failure } = await this.checkValidLeaveRequest(
+      dto,
+      existedLeaveRequest.id,
+    );
 
     if (!valid) {
       return {

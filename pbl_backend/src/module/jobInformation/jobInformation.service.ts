@@ -143,6 +143,16 @@ export class JobInformationService {
         joinDate: dto.joinDate,
         employeeStatus: dto.employeeStatus,
         jobHistory: dto.jobHistory,
+        workingSkill: {
+          upsert: dto.workingSkills?.map((workingSkill) => ({
+            where: { id: workingSkill.id },
+            create: workingSkill,
+            update: workingSkill,
+          })),
+        },
+      },
+      include: {
+        workingSkill: true,
       },
     });
 

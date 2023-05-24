@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
 import { TimeSheetService } from './timeSheet.service';
 import { BadRequestResult, IResponse, SuccessResult } from 'src/httpResponse';
 import { ServiceResponseStatus } from 'src/serviceResponse';
-import { TimeSheetDto } from './timeSheet.dto';
+import { OTTimeSheetDto, TimeSheetDto } from './timeSheet.dto';
 import { TimeSheetFailure } from 'src/enumTypes/failure.enum';
 
 @Controller('time-sheet')
@@ -107,6 +107,36 @@ export class TimeSheetController {
     return res.send(
       SuccessResult({
         totalHoursWorked,
+      }),
+    );
+  }
+
+  @Post('overtime-check-in')
+  public async checkInOTHoursWorked(
+    @Body() dto: OTTimeSheetDto,
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const {
+      result: otHoursWorked,
+      failure,
+      status,
+    } = await this.timeSheetService.checkInOTHoursWorked(dto);
+
+    if (status === ServiceResponseStatus.Failed) {
+      switch (failure.reason) {
+        case TimeSheetFailure.OT_TIME_SHEET_ALREADY_EXISTS:
+          return res.send(
+            BadRequestResult({
+              reason: failure.reason,
+              message: 'OT time sheet already exists',
+            }),
+          );
+      }
+    }
+
+    return res.send(
+      SuccessResult({
+        otHoursWorked,
       }),
     );
   }

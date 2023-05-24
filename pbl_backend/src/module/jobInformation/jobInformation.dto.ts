@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Department, JobTitle, Project, WorkingSkill } from '@prisma/client';
 import { IsDateString, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { WorkingSkillDto } from '../workingSkill/workingSkill.dto';
 
 export class JobInformationDto {
   @IsNumber()
@@ -32,7 +33,7 @@ export class JobInformationDto {
   @IsString()
   jobHistory: string;
 
-  workingSkill: WorkingSkill[];
+  workingSkills: WorkingSkill[];
 
   department: Department;
 
