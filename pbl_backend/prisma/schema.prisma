@@ -83,15 +83,16 @@ model Department {
 }
 
 model TimeSheet {
-  id          Int       @id @default(autoincrement())
-  userId      Int
-  user        User      @relation(fields: [userId], references: [id])
-  checkIn     DateTime?
-  checkOut    DateTime?
-  hoursWorked Float?
-  otHours     Float?
-  status      String?
-  year        Int?
+  id            Int     @id @default(autoincrement())
+  userId        Int
+  user          User    @relation(fields: [userId], references: [id])
+  checkInDate       Int?
+  checkOutDate      Int?
+  hoursWorked   Float?
+  otHoursWorked Float?
+  status        String?
+  month         Int?
+  year          Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
