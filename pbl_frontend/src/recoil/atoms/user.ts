@@ -23,8 +23,10 @@ export const userInfoState = atom<UserDetailInformation>({
     dateOfBirth: new Date(),
     phoneNumber: "",
     address: "",
+    city: "",
     nationality: "",
     avatar: "",
+    citizenId: "",
     status: "",
     role: {
       name: "",

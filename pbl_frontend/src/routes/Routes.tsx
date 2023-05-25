@@ -8,7 +8,7 @@ import {
 import LoginPage from "../modules/auth/LoginPage";
 import Admin from "../modules/admin/Admin";
 import Dashboard from "../modules/admin/Dashboard";
-import EmployeeManagement from "../modules/admin/EmployeeManagement";
+import EmployeeManagement from "../modules/admin/EmployeeManagement/EmployeeManagement";
 import Auth from "../modules/auth/Auth";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { userAuthState } from "../recoil/atoms/user";
@@ -61,7 +61,7 @@ const Routes: React.FunctionComponent = () => {
         <Route path="/" element={<Navigate to="/auth/login" replace />} />
         <Route
           path="/auth/*"
-          element={!token ? <Auth /> : <Navigate to="/admin" replace />}
+          element={!token ? <Auth /> : <Navigate to="/admin/dashboard" replace />}
         >
           <Route path="login" element={<LoginPage />} />
         </Route>
@@ -90,7 +90,7 @@ const Routes: React.FunctionComponent = () => {
                 userBasicInfo.role === RoleEnum.EMPLOYEE ? (
                   <Employee />
                 ) : (
-                  <Navigate to="/admin" replace />
+                  <Navigate to="/admin/dashboard" replace />
                 )
               }
             />

@@ -11,7 +11,6 @@ export class RoleController {
   constructor(private roleService: RoleService) {}
 
   @Get()
-  @Roles(RoleEnum.ADMIN)
   public async getRoles(@Res() res: IResponse): Promise<IResponse> {
     const roles = await this.roleService.getRoles();
 

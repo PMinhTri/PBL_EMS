@@ -1,5 +1,8 @@
-import { UserDetailInformation } from "../types/userTypes";
-import { $get } from "../utils/http";
+import {
+  CreateNewUserInformation,
+  UserDetailInformation,
+} from "../types/userTypes";
+import { $get, $post } from "../utils/http";
 
 export const getUserById = async (id: number) => {
   const response: {
@@ -14,5 +17,15 @@ export const getAllEmployees = async () => {
     statusCode: number;
     payload: UserDetailInformation[];
   } = await $get(`users`);
+  return response;
+};
+
+export const createNewUser = async (data: CreateNewUserInformation) => {
+  const response: {
+    statusCode: number;
+    payload: UserDetailInformation[];
+  } = await $post(`users/create`, {
+    data,
+  });
   return response;
 };
