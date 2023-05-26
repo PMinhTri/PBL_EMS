@@ -1,5 +1,14 @@
-import { createNewUser, getAllEmployees, getUserById } from "../api/user";
-import { CreateNewUserInformation, UserAuthInfo } from "../types/userTypes";
+import {
+  createNewUser,
+  getAllEmployees,
+  getUserById,
+  updateUserInformation,
+} from "../api/user";
+import {
+  CreateNewUserInformation,
+  UpdateUserInformation,
+  UserAuthInfo,
+} from "../types/userTypes";
 import { handleError } from "../utils/errorHandler";
 
 export const UserAction = {
@@ -27,8 +36,18 @@ export const UserAction = {
   },
 
   createNewUser: async (data: CreateNewUserInformation) => {
-    console.log(data);
     const response = await createNewUser(data);
+
+    if (response.statusCode === 200) {
+      const { payload } = response;
+      return payload;
+    }
+
+    handleError(response);
+  },
+
+  updateUserInfo: async (data: UpdateUserInformation) => {
+    const response = await updateUserInformation(data);
 
     if (response.statusCode === 200) {
       const { payload } = response;

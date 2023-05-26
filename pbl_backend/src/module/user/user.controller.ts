@@ -28,7 +28,6 @@ export class UserController {
   }
 
   @Post('/create')
-  @Roles(RoleEnum.ADMIN)
   public async createUser(
     @Body() dto: createUserDto,
     @Res() res: IResponse,

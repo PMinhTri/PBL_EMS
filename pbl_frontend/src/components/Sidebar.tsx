@@ -23,7 +23,7 @@ const Sidebar: React.FunctionComponent<Props> = (props: Props) => {
             key={key}
             className={`flex w-full h-12 my-1 justify-start items-center
              cursor-pointer ${
-               active && activeKey === key
+               (active && activeKey === key) || (!active && key === 0)
                  ? "bg-blue-600 text-white rounded-md"
                  : "hover:bg-gray-100 text-gray-600"
              }`}

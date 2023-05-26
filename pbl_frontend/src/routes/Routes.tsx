@@ -61,41 +61,36 @@ const Routes: React.FunctionComponent = () => {
         <Route path="/" element={<Navigate to="/auth/login" replace />} />
         <Route
           path="/auth/*"
-          element={!token ? <Auth /> : <Navigate to="/admin/dashboard" replace />}
+          element={
+            !token ? (
+              <Auth />
+            ) : (
+              <Navigate
+                to={
+                  userBasicInfo.role === RoleEnum.ADMIN ? "/admin" : "/employee"
+                }
+                replace
+              />
+            )
+          }
         >
           <Route path="login" element={<LoginPage />} />
         </Route>
-        <Route
-          path="/admin/*"
-          element={
-            <AuthenticatedRoute
-              element={
-                userBasicInfo.role === RoleEnum.ADMIN ? (
-                  <Admin />
-                ) : (
-                  <Navigate to="/employee" replace />
-                )
-              }
-            />
-          }
-        >
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="employees" element={<EmployeeManagement />} />
-        </Route>
-        <Route
-          path="/employee/*"
-          element={
-            <AuthenticatedRoute
-              element={
-                userBasicInfo.role === RoleEnum.EMPLOYEE ? (
-                  <Employee />
-                ) : (
-                  <Navigate to="/admin/dashboard" replace />
-                )
-              }
-            />
-          }
-        />
+        {RoleEnum.ADMIN && (
+          <Route
+            path="/admin/*"
+            element={<AuthenticatedRoute element={<Admin />} />}
+          >
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="employees" element={<EmployeeManagement />} />
+          </Route>
+        )}
+        {RoleEnum.EMPLOYEE && (
+          <Route
+            path="/employee/*"
+            element={<AuthenticatedRoute element={<Employee />} />}
+          />
+        )}
         <Route
           path="/account"
           element={<AuthenticatedRoute element={<Account />} />}

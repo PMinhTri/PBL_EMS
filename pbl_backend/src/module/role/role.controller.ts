@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Res,
+} from '@nestjs/common';
 import { RoleService } from './role.service';
 import { BadRequestResult, IResponse, SuccessResult } from 'src/httpResponse';
 import { RoleEnum } from 'src/enumTypes/role.enum';
@@ -34,6 +42,31 @@ export class RoleController {
             BadRequestResult({
               reason: failure.reason,
               message: `Role already exists`,
+            }),
+          );
+      }
+    }
+
+    return res.send(SuccessResult(result));
+  }
+
+  @Delete('/delete/:id')
+  @Roles(RoleEnum.ADMIN)
+  public async deleteRole(
+    @Param('id') id: number,
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const { result, status, failure } = await this.roleService.deleteRole(
+      Number(id),
+    );
+
+    if (status === ServiceResponseStatus.Failed) {
+      switch (failure.reason) {
+        case RoleFailure.ROLE_NOT_FOUND:
+          return res.send(
+            BadRequestResult({
+              reason: failure.reason,
+              message: `Role not found`,
             }),
           );
       }

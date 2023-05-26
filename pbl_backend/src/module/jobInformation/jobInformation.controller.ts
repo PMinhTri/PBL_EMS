@@ -60,7 +60,6 @@ export class JobInformationController {
     @Query('userId') userId: string,
     @Res() res: IResponse,
   ): Promise<IResponse> {
-    console.log(userId);
     const {
       result: jobInformation,
       status,

@@ -24,7 +24,7 @@ export const $get = async (endpoint: string, option?: any) => {
 
   try {
     const response: AxiosResponse<any> = await axios.get(
-      `${REACT_APP_API_URL}/${endpoint}`,
+      `${REACT_APP_API_URL}${endpoint}`,
       config
     );
 
@@ -112,6 +112,6 @@ export const $delete = async (endpoint: string, option?: any) => {
 
     return response.data;
   } catch (err) {
-    throwHttpRequestError
+    throwHttpRequestError;
   }
 };

@@ -42,3 +42,15 @@ export type CreateNewUserInformation = {
   status: string;
   roleId: number;
 };
+
+export type UpdateUserInformation = {
+  fullName: string;
+  gender: string;
+  dateOfBirth: Date;
+  phoneNumber: string;
+  citizenId: string;
+  address: string;
+  city: string;
+  nationality: string;
+  avatar: string;
+};

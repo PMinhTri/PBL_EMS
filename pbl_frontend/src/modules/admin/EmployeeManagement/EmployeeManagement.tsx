@@ -15,6 +15,8 @@ import { BiPlus } from "react-icons/bi";
 import EmployeeSort from "./components/EmployeeSort";
 import EmployeeFilter from "./components/EmployeeFilter";
 import CreateNewEmployee from "./components/CreateNewEmployee";
+import showNotification from "../../../utils/notification";
+import { createNewUser } from "../../../api/user";
 
 const titleTable = [
   "ID",
@@ -30,10 +32,10 @@ const titleTable = [
 
 const EmployeeManagement: React.FunctionComponent = () => {
   const [isLoading, setIsLoading] = React.useState(true);
-  const [isLoadingCreated, setIsLoadingCreated] = React.useState(false);
   const [employeeList, setEmployeeList] = React.useState<
     UserDetailInformation[]
   >([]);
+  const [searchText, setSearchText] = React.useState<string>("");
 
   const [newEmployee, setNewEmployee] =
     React.useState<CreateNewUserInformation>({
@@ -51,6 +53,13 @@ const EmployeeManagement: React.FunctionComponent = () => {
     setViewMode(mode);
   };
 
+  const handleSearchEmployee = (value: string) => {
+    const searchResult = employeeList.filter((employee) =>
+      employee.fullName.toLowerCase().includes(value.toLowerCase())
+    );
+    setEmployeeList(searchResult);
+  };
+
   React.useEffect(() => {
     const fetchData = async () => {
       const employees = await UserAction.getAllEmployees();
@@ -60,6 +69,21 @@ const EmployeeManagement: React.FunctionComponent = () => {
 
     fetchData();
   }, []);
+
+  const handleCreateNewEmployee = async () => {
+    if (
+      !newEmployee.email ||
+      !newEmployee.fullName ||
+      !newEmployee.gender ||
+      !newEmployee.status ||
+      newEmployee.roleId === 1
+    ) {
+      showNotification("error", "Vui lòng điền đầy đủ thông tin");
+    } else {
+      await createNewUser(newEmployee);
+      window.location.reload();
+    }
+  };
 
   return (
     <div className="w-full h-screen flex flex-col">
@@ -105,13 +129,25 @@ const EmployeeManagement: React.FunctionComponent = () => {
           </div>
           <div>
             <Space.Compact style={{ width: "100%" }}>
-              <Input defaultValue="" />
+              <Input
+                defaultValue={searchText}
+                onChange={(e) => {
+                  setSearchText(e.target.value);
+                }}
+                allowClear
+              />
               <Button
                 className="bg-blue-600 text-white"
                 type="primary"
                 icon={<SearchOutlined />}
                 size="middle"
-                loading
+                onClick={() => {
+                  if (searchText === "") {
+                    setEmployeeList(employeeList);
+                  } else {
+                    handleSearchEmployee(searchText);
+                  }
+                }}
               >
                 Search
               </Button>
@@ -140,12 +176,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
               onCancel={() => setIsModalOpen(false)}
               footer={[
                 <Button
-                  loading={isLoadingCreated}
-                  onClick={async () => {
-                    setIsLoadingCreated(true);
-                    await UserAction.createNewUser(newEmployee);
-                    setIsLoadingCreated(false);
-                  }}
+                  onClick={handleCreateNewEmployee}
                   className="w-24 rounded-md h-8 bg-blue-500 text-white cursor-pointer"
                 >
                   Tạo mới

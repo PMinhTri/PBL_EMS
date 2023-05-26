@@ -5,6 +5,6 @@ export const getAllRoles = async () => {
   const response: {
     statusCode: number;
     payload: Role[];
-  } = await $get(`role`);
+  } = await $get(`/role`);
   return response;
 };

@@ -99,7 +99,7 @@ export class UserService {
     email: string,
     dto: userInformationDto,
   ): Promise<ServiceResponse<userInformationDto, ServiceFailure<UserFailure>>> {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findFirst({
       where: {
         email: email,
       },
@@ -188,6 +188,8 @@ export class UserService {
         dateOfBirth: true,
         phoneNumber: true,
         address: true,
+        citizenId: true,
+        city: true,
         nationality: true,
         avatar: true,
         status: true,

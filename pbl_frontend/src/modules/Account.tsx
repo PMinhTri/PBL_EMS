@@ -14,22 +14,13 @@ const Account = () => {
   const [userInfo, setUserInfo] = useRecoilState(userInfoState);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isDisabled, setIsDisabled] = React.useState(true);
+  const [isUpdatingLoading, setIsUpdatingLoading] = React.useState(false);
 
   const inputFields = [
     {
       label: "Họ tên",
       name: "fullName",
       value: userInfo.fullName,
-    },
-    {
-      label: "Tên Họ",
-      name: "firstName",
-      value: userInfo.firstName,
-    },
-    {
-      label: "Tên sau",
-      name: "lastName",
-      value: userInfo.lastName,
     },
     {
       label: "Giới tính",
@@ -73,12 +64,15 @@ const Account = () => {
     },
   ];
 
+  const handleSaveInfo = async () => {
+    setIsUpdatingLoading(true);
+    await UserAction.updateUserInfo(userInfo);
+    setIsUpdatingLoading(false);
+  };
+
   React.useEffect(() => {
     const fetchData = async () => {
       const response = await UserAction.getUserInfo(userAuthInfo.id);
-
-      console.log(response);
-
       if (response?.id) {
         setUserInfo(response);
         setIsLoading(false);
@@ -86,7 +80,7 @@ const Account = () => {
     };
 
     fetchData();
-  }, [userAuthInfo.id]);
+  }, [userAuthInfo.id, setUserInfo]);
 
   return (
     <Container>
@@ -116,7 +110,16 @@ const Account = () => {
                 <div className="grid grid-cols-2">
                   <div className="flex flex-row  items-center m-2">
                     <div className="m-2 w-36 font-bold">Họ tên:</div>
-                    <Input disabled={isDisabled} value={userInfo.fullName} />
+                    <Input
+                      disabled={isDisabled}
+                      onChange={(e) =>
+                        setUserInfo({
+                          ...userInfo,
+                          fullName: e.target.value,
+                        })
+                      }
+                      defaultValue={userInfo.fullName}
+                    />
                   </div>
                   <div></div>
                   {inputFields
@@ -135,6 +138,12 @@ const Account = () => {
                               defaultValue={item.value}
                               className="w-full"
                               disabled={isDisabled}
+                              onChange={(value) =>
+                                setUserInfo({
+                                  ...userInfo,
+                                  [item.name]: value,
+                                })
+                              }
                               options={[
                                 { label: "Nam", value: "Nam" },
                                 { label: "Nữ", value: "Nữ" },
@@ -156,7 +165,15 @@ const Account = () => {
                             <Space className="w-full">
                               <DatePicker
                                 disabled={isDisabled}
-                                value={dayjs(item.value, "D")}
+                                defaultValue={dayjs(item.value)}
+                                onChange={(date) =>
+                                  setUserInfo({
+                                    ...userInfo,
+                                    dateOfBirth: date
+                                      ? date.toDate()
+                                      : dayjs(new Date()).toDate(),
+                                  })
+                                }
                               />
                             </Space>
                           </div>
@@ -173,13 +190,19 @@ const Account = () => {
                               {item.label}:
                             </div>
                             <Select
-                              value={item.value}
+                              defaultValue={item.value}
                               disabled={isDisabled}
                               className="w-full"
                               style={{
                                 border: "1px",
                               }}
                               options={[{ label: "Việt Nam", value: "VN" }]}
+                              onChange={(value) => {
+                                setUserInfo({
+                                  ...userInfo,
+                                  [item.name]: value,
+                                });
+                              }}
                             />
                           </div>
                         );
@@ -195,9 +218,15 @@ const Account = () => {
                           </div>
                           <Input
                             disabled={isDisabled}
-                            value={
+                            defaultValue={
                               typeof item.value === "string" ? item.value : ""
                             }
+                            onChange={(e) => {
+                              setUserInfo({
+                                ...userInfo,
+                                [item.name]: e.target.value,
+                              });
+                            }}
                             allowClear
                           />
                         </div>
@@ -207,7 +236,10 @@ const Account = () => {
                 <div className="w-full flex flex-row justify-end">
                   {!isDisabled ? (
                     <button
-                      onClick={() => setIsDisabled(!isDisabled)}
+                      onClick={async () => {
+                        await handleSaveInfo();
+                        setIsDisabled(!isDisabled);
+                      }}
                       className="m-4 w-24 h-8 rounded-sm border-[1px] bg-green-600 text-white 
                     justify-end hover:text-green-600 hover:bg-white hover:border-green-600"
                     >

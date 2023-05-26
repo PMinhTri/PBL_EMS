@@ -44,11 +44,11 @@ export class userInformationDto {
 
   @IsString()
   @ApiProperty({ type: String, required: false, nullable: true })
-  firstName: string;
+  firstName?: string;
 
   @IsString()
   @ApiProperty({ type: String, required: false, nullable: true })
-  lastName: string;
+  lastName?: string;
 
   @IsString()
   @ApiProperty({ type: String, required: false, nullable: true })

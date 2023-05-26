@@ -4,9 +4,9 @@ import { Button, Select, Space } from "antd";
 
 const EmployeeSort: React.FunctionComponent = () => {
   const options = [
-    { label: "All", value: "all" },
-    { label: "Active", value: "active" },
-    { label: "Inactive", value: "inactive" },
+    { label: "Id", value: "Id" },
+    { label: "Họ và tên", value: "Họ và tên" },
+    { label: "Email", value: "Email" },
   ];
   return (
     <div className="flex flex-col justify-center items-center">

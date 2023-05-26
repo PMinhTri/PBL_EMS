@@ -70,4 +70,34 @@ export class RoleService {
       result: role,
     };
   }
+
+  public async deleteRole(
+    id: number,
+  ): Promise<ServiceResponse<Role, ServiceFailure<RoleFailure>>> {
+    const role = await this.prisma.role.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!role) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: RoleFailure.ROLE_NOT_FOUND,
+        },
+      };
+    }
+
+    await this.prisma.role.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    return {
+      status: ServiceResponseStatus.Success,
+      result: role,
+    };
+  }
 }
