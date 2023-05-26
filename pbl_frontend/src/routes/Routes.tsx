@@ -16,6 +16,8 @@ import { UserAction } from "../actions/userAction";
 import Account from "../modules/Account";
 import Employee from "../modules/employee/Employee";
 import authSelector from "../recoil/selectors/auth";
+import TimeSheetPage from "../modules/employee/TimeSheet";
+import LeaveManagement from "../modules/admin/LeaveManagement/LeaveManagement";
 
 export enum RoleEnum {
   ADMIN = "Admin",
@@ -83,13 +85,16 @@ const Routes: React.FunctionComponent = () => {
           >
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="employees" element={<EmployeeManagement />} />
+            <Route path="leaves" element={<LeaveManagement />} />
           </Route>
         )}
         {RoleEnum.EMPLOYEE && (
           <Route
             path="/employee/*"
             element={<AuthenticatedRoute element={<Employee />} />}
-          />
+          >
+            <Route path="time-sheet" element={<TimeSheetPage />} />
+          </Route>
         )}
         <Route
           path="/account"

@@ -17,6 +17,7 @@ import EmployeeFilter from "./components/EmployeeFilter";
 import CreateNewEmployee from "./components/CreateNewEmployee";
 import showNotification from "../../../utils/notification";
 import { createNewUser } from "../../../api/user";
+import GridViewMode from "./components/GridViewMode";
 
 const titleTable = [
   "ID",
@@ -223,9 +224,9 @@ const EmployeeManagement: React.FunctionComponent = () => {
               {employeeList.map((item, index) => (
                 <div
                   key={index}
-                  className="border-[2px] justify-center items-center h-48 rounded-lg"
+                  className="border-[2px] justify-center items-center p-4 rounded-lg shadow-md"
                 >
-                  {item.fullName}
+                  <GridViewMode data={item} />
                 </div>
               ))}
             </div>

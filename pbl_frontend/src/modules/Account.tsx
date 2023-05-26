@@ -90,16 +90,20 @@ const Account = () => {
           <div>...loading</div>
         ) : (
           <div className="grid grid-cols-3 gap-4 mt-4 w-full">
-            <div className="col-span-1 border-[2px] rounded-md shadow-md w-full flex flex-col">
-              <div className="w-full flex flex-row ">
-                <div className="flex flex-row w-[30%] justify-between items-center border-[2px]">
-                  Avatar
+            <div className="col-span-1 rounded-md shadow-md w-full flex flex-col">
+              <div className="w-full flex flex-row justify-between items-center border-[2px] p-4">
+                <div className="flex items-center">
+                  <div className="w-16 h-16 rounded-full bg-gray-300 flex-shrink-0 mr-4"></div>
+                  <div>
+                    <div className="text-lg font-medium">
+                      {userInfo.fullName}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {userInfo.role.name}
+                    </div>
+                  </div>
                 </div>
-                <div className="ml-2">
-                  <div className="m-2">{userInfo.fullName}</div>
-                  <div className="m-2">{userInfo.role.name}</div>
-                  <Button className="m-2">Upload</Button>
-                </div>
+                <Button className="ml-4">Upload</Button>
               </div>
             </div>
             <div className="col-span-2 w-full">
