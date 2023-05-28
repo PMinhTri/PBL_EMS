@@ -66,7 +66,7 @@ const Account = () => {
 
   const handleSaveInfo = async () => {
     setIsUpdatingLoading(true);
-    await UserAction.updateUserInfo(userInfo);
+    await UserAction.updateUserInfo(userInfo.email, userInfo);
     setIsUpdatingLoading(false);
   };
 

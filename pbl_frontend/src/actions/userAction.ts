@@ -46,8 +46,8 @@ export const UserAction = {
     handleError(response);
   },
 
-  updateUserInfo: async (data: UpdateUserInformation) => {
-    const response = await updateUserInformation(data);
+  updateUserInfo: async (email: string, userInformation: UpdateUserInformation) => {
+    const response = await updateUserInformation(email, userInformation);
 
     if (response.statusCode === 200) {
       const { payload } = response;

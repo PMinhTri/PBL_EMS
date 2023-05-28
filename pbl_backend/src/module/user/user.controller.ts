@@ -13,8 +13,6 @@ import { BadRequestResult, IResponse, SuccessResult } from 'src/httpResponse';
 import { ServiceResponseStatus } from 'src/serviceResponse';
 import { UserFailure } from 'src/enumTypes/failure.enum';
 import { UpdateInformationInput } from './user.type';
-import { Roles } from '../role/role.decorator';
-import { RoleEnum } from 'src/enumTypes/role.enum';
 
 @Controller('users')
 export class UserController {
@@ -65,6 +63,7 @@ export class UserController {
     @Body() payload: UpdateInformationInput,
     @Res() res: IResponse,
   ): Promise<IResponse> {
+    console.log(payload);
     const { email, userInformation } = payload;
     const { status, failure } =
       await this.userService.updatePersonalInformation(email, userInformation);

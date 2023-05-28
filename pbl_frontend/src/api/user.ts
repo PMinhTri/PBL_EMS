@@ -32,12 +32,16 @@ export const createNewUser = async (data: CreateNewUserInformation) => {
   return response;
 };
 
-export const updateUserInformation = async (data: UpdateUserInformation) => {
+export const updateUserInformation = async (
+  email: string,
+  userInformation: UpdateUserInformation
+) => {
   const response: {
     statusCode: number;
     payload: UserDetailInformation[];
   } = await $post(`/users/update-personal-information`, {
-    data,
+    email: email,
+    userInformation: userInformation,
   });
 
   return response;
