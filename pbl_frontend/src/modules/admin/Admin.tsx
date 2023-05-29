@@ -20,9 +20,9 @@ const Admin: React.FunctionComponent = () => {
   const adminSideBarItems = [
     { name: "Dashboard", icon: <BiGridAlt />, path: "/admin/dashboard" },
     { name: "Employees", icon: <BiGroup />, path: "/admin/employees" },
-    { name: "Time Sheet", icon: <BiTask />, path: "#" },
+    { name: "Time Sheet", icon: <BiTask />, path: "/admin/time-sheet" },
     { name: "Leave", icon: <BiCalendarAlt />, path: "/admin/leaves" },
-    { name: "Payroll", icon: <BiDollarCircle />, path: "#" },
+    { name: "Payroll", icon: <BiDollarCircle />, path: "/admin/payroll" },
     // { name: "Projects", icon: <BiBarChartAlt2 />, path: "#" },
     { name: "Calendar", icon: <BiCalendar />, path: "#" },
     // { name: "Message", icon: <BiMessageDetail />, path: "#" },

@@ -10,8 +10,7 @@ import {
   CreateNewUserInformation,
   UserDetailInformation,
 } from "../../../types/userTypes";
-import { CiEdit } from "react-icons/ci";
-import { BiPlus } from "react-icons/bi";
+import { BiEditAlt, BiPlus, BiTrashAlt } from "react-icons/bi";
 import EmployeeSort from "./components/EmployeeSort";
 import EmployeeFilter from "./components/EmployeeFilter";
 import CreateNewEmployee from "./components/CreateNewEmployee";
@@ -47,6 +46,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
     });
 
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [isModalDeleteOpen, setIsModalDeleteOpen] = React.useState(false);
   const [viewMode, setViewMode] = React.useState("Danh sách");
 
   const handleChangeViewMode = (mode: string) => {
@@ -83,6 +83,16 @@ const EmployeeManagement: React.FunctionComponent = () => {
       await UserAction.createNewUser(newEmployee);
       window.location.reload();
     }
+  };
+
+  const handleDeleteUser = async (userId: number) => {
+    try {
+      await UserAction.deleteUser(userId);
+    } catch (err) {
+      showNotification("error", "Xóa nhân viên không thành công");
+    }
+    setIsModalDeleteOpen(false);
+    window.location.reload();
   };
 
   return (
@@ -268,10 +278,38 @@ const EmployeeManagement: React.FunctionComponent = () => {
                     </td>
                     <td className="text-center border-[2px]">{item.address}</td>
                     <td className="text-center border-[2px]">{item.status}</td>
-                    <td className="text-center border-[2px]">
-                      <div className="flex justify-center items-center text-lg cursor-pointer text-orange-500">
-                        <CiEdit />
+                    <td className="flex justify-center items-center gap-2 flex-row p-4">
+                      <div className="flex justify-center items-center text-lg cursor-pointer text-orange-600">
+                        <BiEditAlt />
                       </div>
+                      <div
+                        onClick={() => {
+                          setIsModalDeleteOpen(true);
+                        }}
+                        className="flex justify-center items-center text-lg cursor-pointer text-red-600"
+                      >
+                        <BiTrashAlt />
+                      </div>
+                      <Modal
+                        title="Bạn muốn xóa nhân viên này?"
+                        open={isModalDeleteOpen}
+                        width={400}
+                        onCancel={() => setIsModalDeleteOpen(false)}
+                        footer={[
+                          <button
+                            onClick={() => setIsModalDeleteOpen(false)}
+                            className="w-24 ml-2 rounded-md h-8 bg-red-500 text-white cursor-pointer"
+                          >
+                            Hủy
+                          </button>,
+                          <Button
+                            onClick={() => handleDeleteUser(item.id)}
+                            className="ml-2 w-24 rounded-md h-8 bg-blue-500 text-white cursor-pointer"
+                          >
+                            Xóa
+                          </Button>,
+                        ]}
+                      ></Modal>
                     </td>
                   </tr>
                 ))}

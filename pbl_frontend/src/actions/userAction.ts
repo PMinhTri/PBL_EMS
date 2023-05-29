@@ -1,5 +1,6 @@
 import {
   createNewUser,
+  deleteUser,
   getAllEmployees,
   getUserById,
   updateUserInformation,
@@ -51,6 +52,17 @@ export const UserAction = {
     userInformation: UpdateUserInformation
   ) => {
     const response = await updateUserInformation(email, userInformation);
+
+    if (response.statusCode === 200) {
+      const { payload } = response;
+      return payload;
+    }
+
+    handleError(response);
+  },
+
+  deleteUser: async (id: number) => {
+    const response = await deleteUser(id);
 
     if (response.statusCode === 200) {
       const { payload } = response;

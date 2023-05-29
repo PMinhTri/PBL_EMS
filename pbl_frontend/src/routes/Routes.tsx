@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import LoginPage from "../modules/auth/LoginPage";
 import Admin from "../modules/admin/Admin";
-import Dashboard from "../modules/admin/Dashboard";
+import Dashboard from "../modules/admin/Dashboard/Dashboard";
 import EmployeeManagement from "../modules/admin/EmployeeManagement/EmployeeManagement";
 import Auth from "../modules/auth/Auth";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -18,6 +18,8 @@ import Employee from "../modules/employee/Employee";
 import authSelector from "../recoil/selectors/auth";
 import TimeSheetPage from "../modules/employee/TimeSheet";
 import LeaveManagement from "../modules/admin/LeaveManagement/LeaveManagement";
+import PayrollManagement from "../modules/admin/PayrollManagement/PayrollManagement";
+import TimeSheetManagement from "../modules/admin/TimeSheetManagement/TimeSheetManagement";
 
 export enum RoleEnum {
   ADMIN = "Admin",
@@ -86,6 +88,8 @@ const Routes: React.FunctionComponent = () => {
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="employees" element={<EmployeeManagement />} />
             <Route path="leaves" element={<LeaveManagement />} />
+            <Route path="payroll" element={<PayrollManagement />} />
+            <Route path="time-sheet" element={<TimeSheetManagement />} />
           </Route>
         )}
         {RoleEnum.EMPLOYEE && (

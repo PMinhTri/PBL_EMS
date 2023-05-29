@@ -3,7 +3,7 @@ import {
   UpdateUserInformation,
   UserDetailInformation,
 } from "../types/userTypes";
-import { $get, $post } from "../utils/http";
+import { $delete, $get, $post } from "../utils/http";
 
 export const createNewUser = async (data: CreateNewUserInformation) => {
   const response: {
@@ -40,6 +40,15 @@ export const updateUserInformation = async (
     email: email,
     userInformation: userInformation,
   });
+
+  return response;
+};
+
+export const deleteUser = async (id: number) => {
+  const response: {
+    statusCode: number;
+    payload: UserDetailInformation[];
+  } = await $delete(`/users/${id}`);
 
   return response;
 };
