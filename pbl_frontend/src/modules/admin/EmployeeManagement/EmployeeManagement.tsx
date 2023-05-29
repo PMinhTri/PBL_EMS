@@ -16,7 +16,6 @@ import EmployeeSort from "./components/EmployeeSort";
 import EmployeeFilter from "./components/EmployeeFilter";
 import CreateNewEmployee from "./components/CreateNewEmployee";
 import showNotification from "../../../utils/notification";
-import { createNewUser } from "../../../api/user";
 import GridViewMode from "./components/GridViewMode";
 
 const titleTable = [
@@ -81,7 +80,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
     ) {
       showNotification("error", "Vui lòng điền đầy đủ thông tin");
     } else {
-      await createNewUser(newEmployee);
+      await UserAction.createNewUser(newEmployee);
       window.location.reload();
     }
   };
@@ -177,7 +176,9 @@ const EmployeeManagement: React.FunctionComponent = () => {
               onCancel={() => setIsModalOpen(false)}
               footer={[
                 <Button
-                  onClick={handleCreateNewEmployee}
+                  onClick={async () => {
+                    await handleCreateNewEmployee();
+                  }}
                   className="w-24 rounded-md h-8 bg-blue-500 text-white cursor-pointer"
                 >
                   Tạo mới
@@ -190,7 +191,17 @@ const EmployeeManagement: React.FunctionComponent = () => {
                 </button>,
               ]}
             >
-              <CreateNewEmployee onChange={setNewEmployee} />
+              <CreateNewEmployee
+                onChange={(value) => {
+                  setNewEmployee({
+                    email: value.email,
+                    fullName: value.fullName,
+                    gender: value.gender,
+                    status: value.status,
+                    roleId: value.roleId,
+                  });
+                }}
+              />
             </Modal>
           </div>
         </div>

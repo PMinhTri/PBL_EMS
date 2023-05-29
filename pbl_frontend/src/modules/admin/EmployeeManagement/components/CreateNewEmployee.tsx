@@ -93,7 +93,7 @@ const CreateNewEmployee: React.FunctionComponent<Props> = (props: Props) => {
 
   React.useEffect(() => {
     onChange(createNewUserInformation);
-  }, [createNewUserInformation]);
+  }, [createNewUserInformation, onChange]);
 
   return (
     <div className="w-full h-full border-[2px] flex flex-col justify-center items-center p-4 bg-slate-200">

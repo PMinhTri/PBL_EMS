@@ -12,6 +12,17 @@ import {
 import { handleError } from "../utils/errorHandler";
 
 export const UserAction = {
+  createNewUser: async (data: CreateNewUserInformation) => {
+    const response = await createNewUser(data);
+
+    if (response.statusCode === 200) {
+      const { payload } = response;
+      return payload;
+    }
+
+    handleError(response);
+  },
+
   getAuthInfo: (token: string): UserAuthInfo => {
     const base64Url = token?.split(".")[1];
 
@@ -35,18 +46,10 @@ export const UserAction = {
     return payload;
   },
 
-  createNewUser: async (data: CreateNewUserInformation) => {
-    const response = await createNewUser(data);
-
-    if (response.statusCode === 200) {
-      const { payload } = response;
-      return payload;
-    }
-
-    handleError(response);
-  },
-
-  updateUserInfo: async (email: string, userInformation: UpdateUserInformation) => {
+  updateUserInfo: async (
+    email: string,
+    userInformation: UpdateUserInformation
+  ) => {
     const response = await updateUserInformation(email, userInformation);
 
     if (response.statusCode === 200) {
