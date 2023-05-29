@@ -20,6 +20,7 @@ import TimeSheetPage from "../modules/employee/TimeSheet";
 import LeaveManagement from "../modules/admin/LeaveManagement/LeaveManagement";
 import PayrollManagement from "../modules/admin/PayrollManagement/PayrollManagement";
 import TimeSheetManagement from "../modules/admin/TimeSheetManagement/TimeSheetManagement";
+import LeaveRequest from "../modules/employee/leave/LeaveRequest";
 
 export enum RoleEnum {
   ADMIN = "Admin",
@@ -98,6 +99,7 @@ const Routes: React.FunctionComponent = () => {
             element={<AuthenticatedRoute element={<Employee />} />}
           >
             <Route path="time-sheet" element={<TimeSheetPage />} />
+            <Route path="leaves" element={<LeaveRequest />} />
           </Route>
         )}
         <Route

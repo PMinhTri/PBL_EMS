@@ -16,7 +16,7 @@ import {
 export const Employee: React.FunctionComponent = () => {
   const employeeSideBarItems = [
     { name: "Time Sheet", icon: <BiTask />, path: "/employee/time-sheet" },
-    { name: "Leave", icon: <BiCalendarAlt />, path: "#" },
+    { name: "Leave", icon: <BiCalendarAlt />, path: "/employee/leaves" },
     { name: "Payroll", icon: <BiDollarCircle />, path: "#" },
     { name: "Calendar", icon: <BiCalendar />, path: "#" },
     { name: "Message", icon: <BiMessageDetail />, path: "" },

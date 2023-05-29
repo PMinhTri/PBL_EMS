@@ -57,7 +57,8 @@ const EmployeeManagement: React.FunctionComponent = () => {
     const searchResult = employeeList.filter((employee) =>
       employee.fullName.toLowerCase().includes(value.toLowerCase())
     );
-    setEmployeeList(searchResult);
+    console.log(searchResult);
+    // setEmployeeList(searchResult);
   };
 
   React.useEffect(() => {
@@ -264,55 +265,63 @@ const EmployeeManagement: React.FunctionComponent = () => {
                 </tr>
               </thead>
               <tbody>
-                {employeeList.map((item, index) => (
-                  <tr key={index} className="border-[2px] h-12 bg-slate-100">
-                    <td className="text-center border-[2px]">{item.id}</td>
-                    <td className="text-center border-[2px]">
-                      {item.fullName}
-                    </td>
-                    <td className="text-center border-[2px]">{item.gender}</td>
-                    <td className="text-center border-[2px]"></td>
-                    <td className="text-center border-[2px]">{item.email}</td>
-                    <td className="text-center border-[2px]">
-                      {item.phoneNumber}
-                    </td>
-                    <td className="text-center border-[2px]">{item.address}</td>
-                    <td className="text-center border-[2px]">{item.status}</td>
-                    <td className="flex justify-center items-center gap-2 flex-row p-4">
-                      <div className="flex justify-center items-center text-lg cursor-pointer text-orange-600">
-                        <BiEditAlt />
-                      </div>
-                      <div
-                        onClick={() => {
-                          setIsModalDeleteOpen(true);
-                        }}
-                        className="flex justify-center items-center text-lg cursor-pointer text-red-600"
-                      >
-                        <BiTrashAlt />
-                      </div>
-                      <Modal
-                        title="Bạn muốn xóa nhân viên này?"
-                        open={isModalDeleteOpen}
-                        width={400}
-                        onCancel={() => setIsModalDeleteOpen(false)}
-                        footer={[
-                          <button
-                            onClick={() => setIsModalDeleteOpen(false)}
-                            className="w-24 ml-2 rounded-md h-8 bg-red-500 text-white cursor-pointer"
-                          >
-                            Hủy
-                          </button>,
-                          <Button
-                            onClick={() => handleDeleteUser(item.id)}
-                            className="ml-2 w-24 rounded-md h-8 bg-blue-500 text-white cursor-pointer"
-                          >
-                            Xóa
-                          </Button>,
-                        ]}
-                      ></Modal>
-                    </td>
-                  </tr>
-                ))}
+                {employeeList
+                  .sort((a, b) => a.id - b.id)
+                  .map((item, index) => (
+                    <tr key={index} className="border-[2px] h-12 bg-slate-100">
+                      <td className="text-center border-[2px]">{item.id}</td>
+                      <td className="text-center border-[2px]">
+                        {item.fullName}
+                      </td>
+                      <td className="text-center border-[2px]">
+                        {item.gender}
+                      </td>
+                      <td className="text-center border-[2px]"></td>
+                      <td className="text-center border-[2px]">{item.email}</td>
+                      <td className="text-center border-[2px]">
+                        {item.phoneNumber}
+                      </td>
+                      <td className="text-center border-[2px]">
+                        {item.address}
+                      </td>
+                      <td className="text-center border-[2px]">
+                        {item.status}
+                      </td>
+                      <td className="flex justify-center items-center gap-2 flex-row p-4">
+                        <div className="flex justify-center items-center text-lg cursor-pointer text-orange-600">
+                          <BiEditAlt />
+                        </div>
+                        <div
+                          onClick={() => {
+                            setIsModalDeleteOpen(true);
+                          }}
+                          className="flex justify-center items-center text-lg cursor-pointer text-red-600"
+                        >
+                          <BiTrashAlt />
+                        </div>
+                        <Modal
+                          title="Bạn muốn xóa nhân viên này?"
+                          open={isModalDeleteOpen}
+                          width={400}
+                          onCancel={() => setIsModalDeleteOpen(false)}
+                          footer={[
+                            <button
+                              onClick={() => setIsModalDeleteOpen(false)}
+                              className="w-24 ml-2 rounded-md h-8 bg-red-500 text-white cursor-pointer"
+                            >
+                              Hủy
+                            </button>,
+                            <Button
+                              onClick={() => handleDeleteUser(item.id)}
+                              className="ml-2 w-24 rounded-md h-8 bg-blue-500 text-white cursor-pointer"
+                            >
+                              Xóa
+                            </Button>,
+                          ]}
+                        ></Modal>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           )}
