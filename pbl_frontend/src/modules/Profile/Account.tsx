@@ -9,6 +9,7 @@ import ContentWrapper from "../../components/ContentWrapper";
 import { Button } from "antd";
 import PersonalInformation from "./components/PersonalInformation";
 import JobInformation from "./components/JobInformation";
+import { ArrowUpOutlined } from "@ant-design/icons";
 
 enum ProfileType {
   PERSONAL = "Thông tin cá nhân",
@@ -73,7 +74,9 @@ const Account = () => {
                     </div>
                   </div>
                 </div>
-                <Button className="ml-4">Upload</Button>
+                <Button className="ml-4" icon={<ArrowUpOutlined />}>
+                  Upload
+                </Button>
               </div>
             </div>
             <div className="col-span-2 w-full">
