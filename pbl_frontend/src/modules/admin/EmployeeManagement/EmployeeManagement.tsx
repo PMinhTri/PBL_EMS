@@ -26,6 +26,7 @@ const titleTable = [
   "Email",
   "Số điện thoại",
   "Chi nhánh",
+  "Trình độ",
   "Trạng thái",
   "Thao tác",
 ];
@@ -298,6 +299,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
                           <td className="text-center border-[2px]">
                             {item.phoneNumber}
                           </td>
+                          <td className="text-center border-[2px]"></td>
                           <td className="text-center border-[2px]"></td>
                           <td className="text-center border-[2px]">
                             {item.status}

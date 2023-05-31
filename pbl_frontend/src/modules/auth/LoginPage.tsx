@@ -100,6 +100,11 @@ const LoginPage: React.FunctionComponent = () => {
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                     setPassword(event.target.value);
                   }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      onLogin();
+                    }
+                  }}
                 />
               </div>
             </div>

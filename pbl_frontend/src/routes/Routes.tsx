@@ -16,7 +16,7 @@ import { UserAction } from "../actions/userAction";
 import Account from "../modules/Profile/Account";
 import Employee from "../modules/employee/Employee";
 import authSelector from "../recoil/selectors/auth";
-import TimeSheetPage from "../modules/employee/TimeSheet";
+import TimeSheetPage from "../modules/employee/timesheet/TimeSheet";
 import LeaveManagement from "../modules/admin/LeaveManagement/LeaveManagement";
 import PayrollManagement from "../modules/admin/PayrollManagement/PayrollManagement";
 import TimeSheetManagement from "../modules/admin/TimeSheetManagement/TimeSheetManagement";
