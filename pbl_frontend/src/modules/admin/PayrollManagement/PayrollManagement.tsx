@@ -4,7 +4,7 @@ import PayrollTable from "./components/PayrollTable";
 const PayrollManagement: React.FunctionComponent = () => {
   return (
     <div className="w-full p-4 gap-2 flex flex-col overflow-auto">
-      <div className="w-full h-12 gap-2 flex flex-row border-[2px]">
+      <div className="w-full h-12 gap-2 flex flex-row">
         <div className="flex flex-row items-center">
           <label className="mr-2 text-lg">Năm</label>
           <select
