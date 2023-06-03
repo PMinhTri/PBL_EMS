@@ -8,8 +8,15 @@
   }
 }
 
+.scrollbar {
+  /* Your existing styles for the container */
+  overflow-x: auto;
+  overflow-y: auto; /* Assuming you only want a horizontal scrollbar */
+}
+
 .scrollbar::-webkit-scrollbar {
-  width: 6px; /* Set the width of the scrollbar */
+  width: 8px; /* Set the width of the scrollbar */
+  height: 8px;
 }
 
 .scrollbar::-webkit-scrollbar-track {
