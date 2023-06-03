@@ -120,8 +120,6 @@ export class UserService {
       },
       data: {
         fullName: dto.fullName,
-        firstName: dto.firstName,
-        lastName: dto.lastName,
         gender: dto.gender,
         dateOfBirth: new Date(dto.dateOfBirth),
         phoneNumber: dto.phoneNumber,
@@ -146,8 +144,6 @@ export class UserService {
         id: true,
         email: true,
         fullName: true,
-        firstName: true,
-        lastName: true,
         gender: true,
         dateOfBirth: true,
         phoneNumber: true,
@@ -172,7 +168,7 @@ export class UserService {
   }
 
   public async getById(
-    id: number,
+    id: string,
   ): Promise<ServiceResponse<UserInformation, ServiceFailure<UserFailure>>> {
     const user = await this.prisma.user.findUnique({
       where: {
@@ -182,8 +178,6 @@ export class UserService {
         id: true,
         email: true,
         fullName: true,
-        firstName: true,
-        lastName: true,
         gender: true,
         dateOfBirth: true,
         phoneNumber: true,
@@ -217,7 +211,7 @@ export class UserService {
   }
 
   public async deleteById(
-    id: number,
+    id: string,
   ): Promise<ServiceResponse<User, ServiceFailure<UserFailure>>> {
     const user = await this.prisma.user.findUnique({
       where: {

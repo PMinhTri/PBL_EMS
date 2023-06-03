@@ -4,11 +4,11 @@ import { useRecoilState } from "recoil";
 import { userInfoState } from "../../../recoil/atoms/user";
 import dayjs from "dayjs";
 import { UserAction } from "../../../actions/userAction";
+import { genderOptions } from "../../../constants/constantVariables";
 
 const PersonalInformation: React.FunctionComponent = () => {
   const [userInfo, setUserInfo] = useRecoilState(userInfoState);
   const [isDisabled, setIsDisabled] = React.useState(true);
-  const [isUpdatingLoading, setIsUpdatingLoading] = React.useState(false);
 
   const inputFields = [
     {
@@ -59,9 +59,7 @@ const PersonalInformation: React.FunctionComponent = () => {
   ];
 
   const handleSaveInfo = async () => {
-    setIsUpdatingLoading(true);
     await UserAction.updateUserInfo(userInfo.email, userInfo);
-    setIsUpdatingLoading(false);
   };
 
   return (
@@ -106,10 +104,7 @@ const PersonalInformation: React.FunctionComponent = () => {
                         [item.name]: value,
                       })
                     }
-                    options={[
-                      { label: "Nam", value: "Nam" },
-                      { label: "Nữ", value: "Nữ" },
-                    ]}
+                    options={genderOptions}
                   />
                 )}
               </div>

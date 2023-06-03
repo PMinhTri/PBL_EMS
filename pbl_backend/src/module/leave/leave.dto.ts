@@ -3,14 +3,14 @@ import { IsDateString, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class LeaveDto {
   @ApiProperty()
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  userId: number;
+  userId: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  leaveType: string;
+  leaveTypeId: string;
 
   @ApiProperty()
   @IsNumber()

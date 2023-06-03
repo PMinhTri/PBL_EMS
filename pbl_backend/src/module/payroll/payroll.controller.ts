@@ -9,56 +9,56 @@ import { PayrollDto } from './payroll.dto';
 export class PayrollController {
   constructor(private readonly payrollService: PayrollService) {}
 
-  @Post('')
-  public async calculatePayroll(
-    @Body() dto: PayrollDto,
-    @Res() res: IResponse,
-  ): Promise<IResponse> {
-    const { status, result, failure } =
-      await this.payrollService.calculatePayrollInMonth(dto);
+  // @Post('')
+  // public async calculatePayroll(
+  //   @Body() dto: PayrollDto,
+  //   @Res() res: IResponse,
+  // ): Promise<IResponse> {
+  //   const { status, result, failure } =
+  //     await this.payrollService.calculatePayrollInMonth(dto);
 
-    if (status === ServiceResponseStatus.Failed) {
-      switch (failure.reason) {
-        case PayrollFailure.PAYROLL_ALREADY_PAID:
-          return res.send(
-            BadRequestResult({
-              reason: failure.reason,
-              message: 'Payroll already paid',
-            }),
-          );
-      }
-    }
+  //   if (status === ServiceResponseStatus.Failed) {
+  //     switch (failure.reason) {
+  //       case PayrollFailure.PAYROLL_ALREADY_PAID:
+  //         return res.send(
+  //           BadRequestResult({
+  //             reason: failure.reason,
+  //             message: 'Payroll already paid',
+  //           }),
+  //         );
+  //     }
+  //   }
 
-    return res.send(SuccessResult(result));
-  }
+  //   return res.send(SuccessResult(result));
+  // }
 
-  @Get('/user')
-  public async getAllPayrollInYearOfUser(
-    @Query('userId') userId: number,
-    @Query('year') year: number,
-    @Res() res: IResponse,
-  ): Promise<IResponse> {
-    const {
-      status,
-      result: payroll,
-      failure,
-    } = await this.payrollService.getAllPayrollOfUser(
-      Number(userId),
-      Number(year),
-    );
+  // @Get('/user')
+  // public async getAllPayrollInYearOfUser(
+  //   @Query('userId') userId: number,
+  //   @Query('year') year: number,
+  //   @Res() res: IResponse,
+  // ): Promise<IResponse> {
+  //   const {
+  //     status,
+  //     result: payroll,
+  //     failure,
+  //   } = await this.payrollService.getAllPayrollOfUser(
+  //     Number(userId),
+  //     Number(year),
+  //   );
 
-    if (status === ServiceResponseStatus.Failed) {
-      switch (failure.reason) {
-        case PayrollFailure.PAYROLL_NOT_FOUND:
-          return res.send(
-            BadRequestResult({
-              reason: failure.reason,
-              message: 'Payroll not found',
-            }),
-          );
-      }
-    }
+  //   if (status === ServiceResponseStatus.Failed) {
+  //     switch (failure.reason) {
+  //       case PayrollFailure.PAYROLL_NOT_FOUND:
+  //         return res.send(
+  //           BadRequestResult({
+  //             reason: failure.reason,
+  //             message: 'Payroll not found',
+  //           }),
+  //         );
+  //     }
+  //   }
 
-    return res.send(SuccessResult(payroll));
-  }
+  //   return res.send(SuccessResult(payroll));
+  // }
 }

@@ -3,6 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { ROLES_KEY } from './role.decorator';
 import { Role } from '@prisma/client';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -20,7 +21,15 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    const { user } = context.switchToHttp().getRequest();
+    const token = context
+      .switchToHttp()
+      .getRequest()
+      .rawHeaders.find((header) => header.startsWith('Bearer'));
+
+    const user = jwt.verify(token.split(' ')[1], process.env.JWT_SECRET, {
+      ignoreExpiration: true,
+    });
+
     return requiredRoles.some((role) => user['role'] === role);
   }
 }

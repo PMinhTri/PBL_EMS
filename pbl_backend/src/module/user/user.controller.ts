@@ -95,7 +95,7 @@ export class UserController {
       result: user,
       status,
       failure,
-    } = await this.userService.getById(Number(id));
+    } = await this.userService.getById(id);
 
     if (status === ServiceResponseStatus.Failed) {
       switch (failure.reason) {
@@ -121,7 +121,7 @@ export class UserController {
       result: user,
       status,
       failure,
-    } = await this.userService.deleteById(Number(id));
+    } = await this.userService.deleteById(id);
 
     if (status === ServiceResponseStatus.Failed) {
       switch (failure.reason) {

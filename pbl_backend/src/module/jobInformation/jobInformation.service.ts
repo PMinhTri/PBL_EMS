@@ -59,7 +59,7 @@ export class JobInformationService {
   }
 
   public async getJobInformationById(
-    id: number,
+    id: string,
   ): Promise<
     ServiceResponse<JobInformation, ServiceFailure<JobInformationFailure>>
   > {
@@ -85,7 +85,7 @@ export class JobInformationService {
   }
 
   public async getJobInformationByUserId(
-    userId: number,
+    userId: string,
   ): Promise<
     ServiceResponse<JobInformation, ServiceFailure<JobInformationFailure>>
   > {
@@ -110,55 +110,55 @@ export class JobInformationService {
     };
   }
 
-  public async updateJobInformation(
-    id: number,
-    dto: JobInformationDto,
-  ): Promise<
-    ServiceResponse<JobInformation, ServiceFailure<JobInformationFailure>>
-  > {
-    const existingJobInformation = await this.prisma.jobInformation.findUnique({
-      where: {
-        id,
-      },
-    });
+  // public async updateJobInformation(
+  //   id: string,
+  //   dto: JobInformationDto,
+  // ): Promise<
+  //   ServiceResponse<JobInformation, ServiceFailure<JobInformationFailure>>
+  // > {
+  //   const existingJobInformation = await this.prisma.jobInformation.findUnique({
+  //     where: {
+  //       id,
+  //     },
+  //   });
 
-    if (!existingJobInformation) {
-      return {
-        status: ServiceResponseStatus.Failed,
-        failure: {
-          reason: JobInformationFailure.JOB_INFORMATION_NOT_FOUND,
-        },
-      };
-    }
+  //   if (!existingJobInformation) {
+  //     return {
+  //       status: ServiceResponseStatus.Failed,
+  //       failure: {
+  //         reason: JobInformationFailure.JOB_INFORMATION_NOT_FOUND,
+  //       },
+  //     };
+  //   }
 
-    const jobInformation = await this.prisma.jobInformation.update({
-      where: {
-        id,
-      },
-      data: {
-        userId: dto.userId,
-        contractType: dto.contractType,
-        contractStartDate: dto.contractStartDate,
-        contractEndDate: dto.contractEndDate,
-        joinDate: dto.joinDate,
-        employeeStatus: dto.employeeStatus,
-        jobHistory: dto.jobHistory,
-        workingSkill: {
-          upsert: dto.workingSkills?.map((workingSkill) => ({
-            where: { id: workingSkill.id },
-            create: workingSkill,
-            update: workingSkill,
-          })),
-        },
-      },
-      include: {
-        workingSkill: true,
-      },
-    });
+  //   const jobInformation = await this.prisma.jobInformation.update({
+  //     where: {
+  //       id,
+  //     },
+  //     data: {
+  //       userId: dto.userId,
+  //       contractType: dto.contractType,
+  //       contractStartDate: dto.contractStartDate,
+  //       contractEndDate: dto.contractEndDate,
+  //       joinDate: dto.joinDate,
+  //       employeeStatus: dto.employeeStatus,
+  //       jobHistory: dto.jobHistory,
+  //       workingSkill: {
+  //         upsert: dto.workingSkills?.map((workingSkill) => ({
+  //           where: { id: workingSkill.id },
+  //           create: workingSkill,
+  //           update: workingSkill,
+  //         })),
+  //       },
+  //     },
+  //     include: {
+  //       workingSkill: true,
+  //     },
+  //   });
 
-    return {
-      status: ServiceResponseStatus.Success,
-      result: jobInformation,
-    };
-  }
+  //   return {
+  //     status: ServiceResponseStatus.Success,
+  //     result: jobInformation,
+  //   };
+  // }
 }

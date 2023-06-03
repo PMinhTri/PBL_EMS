@@ -53,12 +53,10 @@ export class RoleController {
   @Delete('/delete/:id')
   @Roles(RoleEnum.ADMIN)
   public async deleteRole(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Res() res: IResponse,
   ): Promise<IResponse> {
-    const { result, status, failure } = await this.roleService.deleteRole(
-      Number(id),
-    );
+    const { result, status, failure } = await this.roleService.deleteRole(id);
 
     if (status === ServiceResponseStatus.Failed) {
       switch (failure.reason) {

@@ -6,15 +6,15 @@ export type UpdateInformationInput = {
 };
 
 export type UserInformation = {
-  id: number;
+  id: string;
   email: string;
   fullName: string;
-  firstName: string;
-  lastName: string;
   gender: string;
   dateOfBirth: Date;
   phoneNumber: string;
+  citizenId: string;
   address: string;
+  city: string;
   nationality: string;
   avatar: string;
   status: string;

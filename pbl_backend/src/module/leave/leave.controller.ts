@@ -90,7 +90,7 @@ export class LeaveController {
 
   @Patch('/update/:id')
   public async updateLeaveRequest(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() payload: LeaveDto,
     @Res() res: IResponse,
   ): Promise<IResponse> {
@@ -98,7 +98,7 @@ export class LeaveController {
       result: leaveRequest,
       status,
       failure,
-    } = await this.leaveService.updateLeaveRequest(Number(id), payload);
+    } = await this.leaveService.updateLeaveRequest(id, payload);
 
     if (status === 'Failed') {
       switch (failure.reason) {
@@ -141,14 +141,14 @@ export class LeaveController {
 
   @Get('/remaining-balance')
   public async getRemainingBalance(
-    @Query('userId') userId: number,
+    @Query('userId') userId: string,
     @Res() res: IResponse,
   ): Promise<IResponse> {
     const {
       result: remainingLeaveDays,
       status,
       failure,
-    } = await this.leaveService.getRemainingBalance(Number(userId));
+    } = await this.leaveService.getRemainingBalance(userId);
 
     if (status === 'Failed') {
       switch (failure.reason) {
@@ -167,14 +167,14 @@ export class LeaveController {
 
   @Patch('/cancel/:id')
   public async cancelLeaveRequest(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Res() res: IResponse,
   ): Promise<IResponse> {
     const {
       result: leaveRequest,
       status,
       failure,
-    } = await this.leaveService.cancelLeaveRequest(Number(id));
+    } = await this.leaveService.cancelLeaveRequest(id);
 
     if (status === 'Failed') {
       switch (failure.reason) {
@@ -193,14 +193,14 @@ export class LeaveController {
 
   @Delete('/remove/:id')
   public async removeLeaveRequest(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Res() res: IResponse,
   ): Promise<IResponse> {
     const {
       result: leaveRequest,
       status,
       failure,
-    } = await this.leaveService.removeLeaveRequest(Number(id));
+    } = await this.leaveService.removeLeaveRequest(id);
 
     if (status === 'Failed') {
       switch (failure.reason) {
@@ -219,14 +219,14 @@ export class LeaveController {
 
   @Get('/user/')
   public async getLeaveRequestByUserId(
-    @Query('userId') userId: number,
+    @Query('userId') userId: string,
     @Res() res: IResponse,
   ): Promise<IResponse> {
     const {
       result: leaveRequest,
       status,
       failure,
-    } = await this.leaveService.getLeaveRequestByUserId(Number(userId));
+    } = await this.leaveService.getLeaveRequestByUserId(userId);
 
     if (status === 'Failed') {
       switch (failure.reason) {
@@ -245,14 +245,14 @@ export class LeaveController {
 
   @Get(':id')
   public async getLeaveRequestById(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Res() res: IResponse,
   ): Promise<IResponse> {
     const {
       result: leaveRequest,
       status,
       failure,
-    } = await this.leaveService.getLeaveRequestById(Number(id));
+    } = await this.leaveService.getLeaveRequestById(id);
 
     if (status === 'Failed') {
       switch (failure.reason) {

@@ -32,7 +32,7 @@ export class JobTitleController {
       result: jobTitle,
       status,
       failure,
-    } = await this.jobTitleService.getJobTitleById(Number(id));
+    } = await this.jobTitleService.getJobTitleById(id);
 
     if (status === ServiceResponseStatus.Failed) {
       switch (failure.reason) {
@@ -84,7 +84,7 @@ export class JobTitleController {
       result: jobTitle,
       status,
       failure,
-    } = await this.jobTitleService.deleteJobTitle(Number(id));
+    } = await this.jobTitleService.deleteJobTitle(id);
 
     if (status === ServiceResponseStatus.Failed) {
       switch (failure.reason) {

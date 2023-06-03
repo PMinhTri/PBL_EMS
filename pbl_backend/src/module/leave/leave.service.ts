@@ -7,10 +7,10 @@ import {
   ServiceResponseStatus,
 } from 'src/serviceResponse';
 import { LeaveFailure } from 'src/enumTypes/failure.enum';
-import { LeaveTypes, Leaves } from '@prisma/client';
 import { dateTimeUtils } from 'src/utils/datetime';
 import { Session } from 'src/constant/leaveSession.constant';
 import { LeaveSession } from 'src/enumTypes/leaveSession.enum';
+import { Leave, LeaveType } from '@prisma/client';
 
 @Injectable()
 export class LeaveService {
@@ -18,7 +18,7 @@ export class LeaveService {
 
   private async checkValidLeaveRequest(
     dto: LeaveDto,
-    requestId?: number,
+    requestId?: string,
   ): Promise<{
     valid: boolean;
     failure?: ServiceFailure<LeaveFailure>;
@@ -47,7 +47,7 @@ export class LeaveService {
     }
 
     if (dto.startDate === dto.endDate) {
-      const existedLeaveRequestByDate = await this.prisma.leaves.findMany({
+      const existedLeaveRequestByDate = await this.prisma.leave.findMany({
         where: {
           user: {
             id: dto.userId,
@@ -118,7 +118,7 @@ export class LeaveService {
 
   public async createLeaveRequest(
     dto: LeaveDto,
-  ): Promise<ServiceResponse<Leaves, ServiceFailure<LeaveFailure>>> {
+  ): Promise<ServiceResponse<Leave, ServiceFailure<LeaveFailure>>> {
     const { valid, failure } = await this.checkValidLeaveRequest(dto);
 
     if (!valid) {
@@ -141,14 +141,18 @@ export class LeaveService {
       };
     }
 
-    const leaveRequest = await this.prisma.leaves.create({
+    const leaveRequest = await this.prisma.leave.create({
       data: {
         user: {
           connect: {
             id: dto.userId,
           },
         },
-        leaveType: dto.leaveType,
+        leaveType: {
+          connect: {
+            id: dto.leaveTypeId,
+          },
+        },
         leaveDays: dto.leaveDays,
         startDate: new Date(dto.startDate),
         endDate: new Date(dto.endDate),
@@ -165,10 +169,10 @@ export class LeaveService {
   }
 
   public async updateLeaveRequest(
-    id: number,
+    id: string,
     dto: LeaveDto,
-  ): Promise<ServiceResponse<Leaves, ServiceFailure<LeaveFailure>>> {
-    const existedLeaveRequest = await this.prisma.leaves.findUnique({
+  ): Promise<ServiceResponse<Leave, ServiceFailure<LeaveFailure>>> {
+    const existedLeaveRequest = await this.prisma.leave.findUnique({
       where: {
         id: id,
       },
@@ -208,12 +212,16 @@ export class LeaveService {
       };
     }
 
-    const leaveRequest = await this.prisma.leaves.update({
+    const leaveRequest = await this.prisma.leave.update({
       where: {
         id: id,
       },
       data: {
-        leaveType: dto.leaveType,
+        leaveType: {
+          connect: {
+            id: dto.leaveTypeId,
+          },
+        },
         leaveDays: dto.leaveDays,
         startDate: new Date(dto.startDate),
         endDate: new Date(dto.endDate),
@@ -234,7 +242,7 @@ export class LeaveService {
     balance: number,
   ): Promise<ServiceResponse<string, ServiceFailure<LeaveFailure>>> {
     try {
-      const result = await this.prisma.leaveTypes.create({
+      const result = await this.prisma.leaveType.create({
         data: {
           name: leaveType,
           balance: balance,
@@ -254,14 +262,14 @@ export class LeaveService {
     }
   }
 
-  public async getAllLeaveTypes(): Promise<LeaveTypes[]> {
-    return this.prisma.leaveTypes.findMany();
+  public async getAllLeaveTypes(): Promise<LeaveType[]> {
+    return this.prisma.leaveType.findMany();
   }
 
   public async getRemainingBalance(
-    userId: number,
+    userId: string,
   ): Promise<ServiceResponse<number, ServiceFailure<LeaveFailure>>> {
-    const allLeaveRequest = await this.prisma.leaves.findMany({
+    const allLeaveRequest = await this.prisma.leave.findMany({
       where: {
         user: {
           id: userId,
@@ -269,17 +277,8 @@ export class LeaveService {
       },
     });
 
-    if (allLeaveRequest.length === 0 || allLeaveRequest === null) {
-      return {
-        status: ServiceResponseStatus.Failed,
-        failure: {
-          reason: LeaveFailure.LEAVE_TYPE_NOT_FOUND,
-        },
-      };
-    }
-
     const balance = (
-      await this.prisma.leaveTypes.findFirst({
+      await this.prisma.leaveType.findFirst({
         where: {
           name: 'Annual',
         },
@@ -299,9 +298,9 @@ export class LeaveService {
   }
 
   public async cancelLeaveRequest(
-    id: number,
-  ): Promise<ServiceResponse<Leaves, ServiceFailure<LeaveFailure>>> {
-    const existedLeaveRequest = await this.prisma.leaves.findUnique({
+    id: string,
+  ): Promise<ServiceResponse<Leave, ServiceFailure<LeaveFailure>>> {
+    const existedLeaveRequest = await this.prisma.leave.findUnique({
       where: {
         id: id,
       },
@@ -316,7 +315,7 @@ export class LeaveService {
       };
     }
 
-    const leaveRequest = await this.prisma.leaves.update({
+    const leaveRequest = await this.prisma.leave.update({
       where: {
         id: id,
       },
@@ -332,9 +331,9 @@ export class LeaveService {
   }
 
   public async removeLeaveRequest(
-    id: number,
-  ): Promise<ServiceResponse<Leaves, ServiceFailure<LeaveFailure>>> {
-    const existedLeaveRequest = await this.prisma.leaves.findUnique({
+    id: string,
+  ): Promise<ServiceResponse<Leave, ServiceFailure<LeaveFailure>>> {
+    const existedLeaveRequest = await this.prisma.leave.findUnique({
       where: {
         id: id,
       },
@@ -349,7 +348,7 @@ export class LeaveService {
       };
     }
 
-    const leaveRequest = await this.prisma.leaves.delete({
+    const leaveRequest = await this.prisma.leave.delete({
       where: {
         id: id,
       },
@@ -361,14 +360,14 @@ export class LeaveService {
     };
   }
 
-  public async getAllLeaveRequest(): Promise<Leaves[]> {
-    return this.prisma.leaves.findMany();
+  public async getAllLeaveRequest(): Promise<Leave[]> {
+    return this.prisma.leave.findMany();
   }
 
   public async getLeaveRequestByUserId(
-    userId: number,
-  ): Promise<ServiceResponse<Leaves[], ServiceFailure<LeaveFailure>>> {
-    const existedLeaveRequest = await this.prisma.leaves.findMany({
+    userId: string,
+  ): Promise<ServiceResponse<Leave[], ServiceFailure<LeaveFailure>>> {
+    const existedLeaveRequest = await this.prisma.leave.findMany({
       where: {
         user: {
           id: userId,
@@ -392,9 +391,9 @@ export class LeaveService {
   }
 
   public async getLeaveRequestById(
-    id: number,
-  ): Promise<ServiceResponse<Leaves, ServiceFailure<LeaveFailure>>> {
-    const existedLeaveRequest = await this.prisma.leaves.findUnique({
+    id: string,
+  ): Promise<ServiceResponse<Leave, ServiceFailure<LeaveFailure>>> {
+    const existedLeaveRequest = await this.prisma.leave.findUnique({
       where: {
         id: id,
       },

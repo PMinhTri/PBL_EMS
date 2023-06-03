@@ -25,7 +25,7 @@ export class JobTitleService {
   }
 
   public async getJobTitleById(
-    id: number,
+    id: string,
   ): Promise<ServiceResponse<JobTitle, ServiceFailure<JobTitleFailure>>> {
     const jobTitle = await this.prisma.jobTitle.findUnique({
       where: {
@@ -84,7 +84,7 @@ export class JobTitleService {
   }
 
   public async deleteJobTitle(
-    id: number,
+    id: string,
   ): Promise<ServiceResponse<JobTitle, ServiceFailure<JobTitleFailure>>> {
     const jobTitle = await this.prisma.jobTitle.findUnique({
       where: {

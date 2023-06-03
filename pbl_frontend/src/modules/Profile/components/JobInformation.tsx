@@ -1,7 +1,20 @@
 import { DatePicker, Input, Select } from "antd";
 import React from "react";
+import { employeeStatusOptions } from "../../../constants/constantVariables";
+import { JobTitle } from "../../../types/jobTitleTypes";
+import { JobTitleAction } from "../../../actions/jobTitleAction";
 
 const JobInformation: React.FunctionComponent = () => {
+  const [jobTitles, setJobTitles] = React.useState<JobTitle[]>([]);
+
+  React.useEffect(() => {
+    const fetchedData = async () => {
+      setJobTitles(await JobTitleAction.getAllJobTitles());
+    };
+
+    fetchedData();
+  });
+
   return (
     <>
       <div className="border-[2px] mx-2 rounded-md shadow-lg">
@@ -19,11 +32,19 @@ const JobInformation: React.FunctionComponent = () => {
           </div>
           <div className="flex flex-row items-center m-2">
             <div className="m-2 w-36 font-bold">Trạng thái:</div>
-            <Select className="w-full" />
+            <Select className="w-full" options={employeeStatusOptions} />
           </div>
           <div className="flex flex-row items-center m-2">
             <div className="m-2 w-36 font-bold">Chức vụ:</div>
-            <Select className="w-full" />
+            <Select
+              className="w-full"
+              options={jobTitles.map((jobTitle) => {
+                return {
+                  label: jobTitle.name,
+                  value: jobTitle.id,
+                };
+              })}
+            />
           </div>
           <div className="flex flex-row items-center m-2">
             <div className="m-2 w-36 font-bold">Loại hợp đồng:</div>

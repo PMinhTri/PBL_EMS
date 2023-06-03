@@ -11,12 +11,10 @@ datasource db {
 }
 
 model User {
-  id          Int        @id @default(autoincrement())
+  id          String     @id @default(uuid())
   email       String     @unique
   password    String
   fullName    String?
-  firstName   String?
-  lastName    String?
   gender      String?
   dateOfBirth DateTime?
   phoneNumber String?
@@ -25,81 +23,84 @@ model User {
   citizenId   String?
   nationality String?
   status      String?
-  education   Education?
+  avatar      String?
+  education   Education? @relation(fields: [educationId], references: [id])
 
-  roleId Int
-  role   Role    @relation(fields: [roleId], references: [id])
-  avatar String?
-
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
   jobInformation JobInformation?
-  timeKeeping    TimeSheet[]
-  Payroll        Payroll[]
-  HealthCare     Insurance?
-  Leaves         Leaves[]
-  educationId    Int?
+
+  leave     Leave[]
+  timeSheet TimeSheet[]
+  payroll   Payroll[]
+
+  insurance Insurance[]
+
+  roleId String
+  role   Role   @relation(fields: [roleId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  educationId String?
 }
 
 model JobInformation {
-  id                Int            @id @default(autoincrement())
-  userId            Int            @unique
-  user              User           @relation(fields: [userId], references: [id])
-  contractType      String?
+  id                String         @id @default(uuid())
+  userId            String         @unique
+  user              User?          @relation(fields: [userId], references: [id])
+  contractId        String?        @unique
+  contractType      Contract?      @relation(fields: [contractId], references: [id])
   contractStartDate DateTime?
   contractEndDate   DateTime?
   joinDate          DateTime?
   employeeStatus    String?
   jobHistory        String?
-  jobTitleId        Int?           @unique
+  jobTitleId        String?        @unique
   jobTitle          JobTitle?      @relation(fields: [jobTitleId], references: [id])
   workingSkill      WorkingSkill[]
-  departmentId      Int?           @unique
+  departmentId      String?        @unique
   department        Department?    @relation(fields: [departmentId], references: [id])
-  project           Project[]
+  // project           Project[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model JobTitle {
-  id             Int              @id @default(autoincrement())
+  id             String           @id @default(uuid())
   name           String
   JobInformation JobInformation[]
 }
 
 model WorkingSkill {
-  id               Int             @id @default(autoincrement())
-  jobInformationId Int?            @unique
-  jobInformation   JobInformation? @relation(fields: [jobInformationId], references: [id])
-  name             String
-  description      String?
+  id             String           @id @default(uuid())
+  jobInformation JobInformation[]
+  name           String
+  description    String?
 }
 
 model Department {
-  id             Int              @id @default(autoincrement())
+  id             String           @id @default(uuid())
   name           String
   JobInformation JobInformation[]
 }
 
 model TimeSheet {
-  id            Int     @id @default(autoincrement())
-  userId        Int
-  user          User    @relation(fields: [userId], references: [id])
-  checkInDate       Int?
-  checkOutDate      Int?
-  hoursWorked   Float?
-  otHoursWorked Float?
-  status        String?
-  month         Int?
-  year          Int?
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  overtime    Boolean? @default(false)
+  session     String
+  hoursWorked Float
+  status      String
+  date        Int
+  month       Int
+  year        Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Role {
-  id   Int    @id @default(autoincrement())
+  id   String @id @default(uuid())
   name String
   User User[]
 
@@ -108,13 +109,13 @@ model Role {
 }
 
 model Payroll {
-  id          Int     @id @default(autoincrement())
-  userId      Int
+  id          String  @id @default(uuid())
+  userId      String
   user        User    @relation(fields: [userId], references: [id])
-  month       Int?
-  year        Int?
-  basicSalary Float?
-  totalSalary Float?
+  month       Int
+  year        Int
+  basicSalary Float
+  totalSalary Float
   additional  Float?
   status      String?
 
@@ -122,24 +123,22 @@ model Payroll {
   updatedAt DateTime @updatedAt
 }
 
-model Project {
-  id             Int              @id @default(autoincrement())
-  name           String
-  description    String?
-  progress       String?
-  status         String?
-  startDate      DateTime?
-  endDate        DateTime?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  jobInformation JobInformation[]
-}
+// model Project {
+//   id             String           @id @default(uuid())
+//   name           String
+//   description    String?
+//   progress       String?
+//   status         String?
+//   startDate      DateTime?
+//   endDate        DateTime?
+//   createdAt      DateTime         @default(now())
+//   updatedAt      DateTime         @updatedAt
+//   jobInformation JobInformation[]
+// }
 
 model Insurance {
-  id              Int      @id @default(autoincrement())
-  userId          Int      @unique
-  user            User     @relation(fields: [userId], references: [id])
-  insuranceId     Int
+  id              String   @id @default(uuid())
+  user            User[]
   provideDate     DateTime
   expiredDate     DateTime
   provideLocation String?
@@ -147,34 +146,41 @@ model Insurance {
   updatedAt       DateTime @updatedAt
 }
 
-model Leaves {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  session   String
-  status    String
-  leaveType String
-  leaveDays Float
-  startDate DateTime
-  endDate   DateTime
-  reason    String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Leave {
+  id          String     @id @default(uuid())
+  userId      String     @unique
+  user        User       @relation(fields: [userId], references: [id])
+  session     String
+  status      String
+  leaveTypeId String?
+  leaveType   LeaveType? @relation(fields: [leaveTypeId], references: [id])
+  leaveDays   Float
+  startDate   DateTime
+  endDate     DateTime
+  reason      String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
 
-model LeaveTypes {
-  id      Int    @id @default(autoincrement())
+model LeaveType {
+  id      String  @id @default(uuid())
   name    String
   balance Float
+  Leave   Leave[]
 }
 
 model Education {
-  id          Int     @id @default(autoincrement())
-  userId      Int     @unique
-  user        User    @relation(fields: [userId], references: [id])
+  id          String  @id @default(uuid())
+  user        User[]
   grade       String?
   university  String?
   major       String?
   certificate String?
   degree      String?
+}
+
+model Contract {
+  id             String           @id @default(uuid())
+  type           String
+  JobInformation JobInformation[]
 }

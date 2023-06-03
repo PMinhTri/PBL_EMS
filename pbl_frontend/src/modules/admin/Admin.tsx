@@ -14,18 +14,17 @@ import {
   BiGroup,
   // BiMessageDetail,
   BiTask,
+  BiWrench,
 } from "react-icons/bi";
 
 const Admin: React.FunctionComponent = () => {
   const adminSideBarItems = [
-    { name: "Dashboard", icon: <BiGridAlt />, path: "/admin/dashboard" },
-    { name: "Employees", icon: <BiGroup />, path: "/admin/employees" },
-    { name: "Time Sheet", icon: <BiTask />, path: "/admin/time-sheet" },
-    { name: "Leave", icon: <BiCalendarAlt />, path: "/admin/leaves" },
-    { name: "Payroll", icon: <BiDollarCircle />, path: "/admin/payroll" },
-    // { name: "Projects", icon: <BiBarChartAlt2 />, path: "#" },
-    { name: "Calendar", icon: <BiCalendar />, path: "#" },
-    // { name: "Message", icon: <BiMessageDetail />, path: "#" },
+    { name: "Thống kê", icon: <BiGridAlt />, path: "/admin/dashboard" },
+    { name: "Nhân viên", icon: <BiGroup />, path: "/admin/employees" },
+    { name: "Chấm công", icon: <BiTask />, path: "/admin/time-sheet" },
+    { name: "Nghỉ phép", icon: <BiCalendarAlt />, path: "/admin/leaves" },
+    { name: "Lương", icon: <BiDollarCircle />, path: "/admin/payroll" },
+    { name: "Thiết lập", icon: <BiWrench />, path: "#" },
   ];
   return (
     <Container>

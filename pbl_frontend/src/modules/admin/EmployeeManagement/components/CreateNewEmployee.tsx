@@ -3,6 +3,11 @@ import { Input, Select } from "antd";
 import { Role } from "../../../../types/roleTypes";
 import { RoleAction } from "../../../../actions/roleAction";
 import { CreateNewUserInformation } from "../../../../types/userTypes";
+import { EmployeeStatus, Gender } from "../../../../constants/enum";
+import {
+  employeeStatusOptions,
+  genderOptions,
+} from "../../../../constants/constantVariables";
 
 export type Props = {
   onChange: (value: CreateNewUserInformation) => void;
@@ -43,28 +48,6 @@ const CreateNewEmployee: React.FunctionComponent<Props> = (props: Props) => {
     },
   ];
 
-  const genderOptions = [
-    {
-      label: "Nam",
-      value: "Nam",
-    },
-    {
-      label: "Nữ",
-      value: "Nữ",
-    },
-  ];
-
-  const statusOptions = [
-    {
-      label: "Hoạt động",
-      value: "Hoạt động",
-    },
-    {
-      label: "Không hoạt động",
-      value: "Không hoạt động",
-    },
-  ];
-
   React.useEffect(() => {
     const fetchData = async () => {
       const roles = await RoleAction.getAllRoles();
@@ -80,7 +63,15 @@ const CreateNewEmployee: React.FunctionComponent<Props> = (props: Props) => {
     }
 
     if (item === "Trạng thái") {
-      return statusOptions;
+      return employeeStatusOptions.filter((status) => {
+        if (status.value !== EmployeeStatus.Resigned) {
+          return {
+            label: status.label,
+            value: status.value,
+            disabled: true,
+          };
+        }
+      });
     }
 
     if (item === "Vai trò") {

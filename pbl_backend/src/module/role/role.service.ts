@@ -48,7 +48,7 @@ export class RoleService {
   }
 
   public async getById(
-    id: number,
+    id: string,
   ): Promise<ServiceResponse<Role, ServiceFailure<RoleFailure>>> {
     const role = await this.prisma.role.findUnique({
       where: {
@@ -72,7 +72,7 @@ export class RoleService {
   }
 
   public async deleteRole(
-    id: number,
+    id: string,
   ): Promise<ServiceResponse<Role, ServiceFailure<RoleFailure>>> {
     const role = await this.prisma.role.findUnique({
       where: {
