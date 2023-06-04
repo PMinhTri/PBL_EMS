@@ -65,7 +65,11 @@ export class UserService {
         password: hashedPassword,
         gender: dto.gender,
         status: dto.status,
-        roleId: dto.roleId,
+        role: {
+          connect: {
+            id: dto.roleId,
+          },
+        },
       },
 
       select: {
@@ -217,6 +221,9 @@ export class UserService {
       where: {
         id: id,
       },
+      include: {
+        jobInformation: true,
+      },
     });
 
     if (!user) {
@@ -227,6 +234,12 @@ export class UserService {
         },
       };
     }
+
+    await this.prisma.jobInformation.deleteMany({
+      where: {
+        userId: id,
+      },
+    });
 
     await this.prisma.user.delete({
       where: {

@@ -85,7 +85,7 @@ export class JobTitleService {
 
   public async deleteJobTitle(
     id: string,
-  ): Promise<ServiceResponse<JobTitle, ServiceFailure<JobTitleFailure>>> {
+  ): Promise<ServiceResponse<null, ServiceFailure<JobTitleFailure>>> {
     const jobTitle = await this.prisma.jobTitle.findUnique({
       where: {
         id: id,
@@ -101,15 +101,42 @@ export class JobTitleService {
       };
     }
 
-    await this.prisma.jobTitle.delete({
-      where: {
-        id: id,
-      },
+    await this.prisma.$transaction(async () => {
+      // Find jobInformation records that reference the workingSkill
+      const jobInformation = await this.prisma.jobInformation.findMany({
+        where: {
+          jobTitle: {
+            id: id,
+          },
+        },
+      });
+
+      // Update each jobInformation record to disconnect the workingSkill
+      await Promise.all(
+        jobInformation.map((jobInformation) =>
+          this.prisma.jobInformation.update({
+            where: {
+              id: jobInformation.id,
+            },
+            data: {
+              jobTitle: {
+                disconnect: true,
+              },
+            },
+          }),
+        ),
+      );
+
+      await this.prisma.workingSkill.delete({
+        where: {
+          id: id,
+        },
+      });
     });
 
     return {
       status: ServiceResponseStatus.Success,
-      result: jobTitle,
+      result: null,
     };
   }
 }

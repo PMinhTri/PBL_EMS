@@ -107,30 +107,30 @@ export class JobInformationController {
     return res.send(SuccessResult(jobInformation));
   }
 
-  // @Patch(':id')
-  // public async updateJobInformation(
-  //   @Param('id') id: string,
-  //   @Body() dto: JobInformationDto,
-  //   @Res() res: IResponse,
-  // ): Promise<IResponse> {
-  //   const {
-  //     result: jobInformation,
-  //     status,
-  //     failure,
-  //   } = await this.jobInformationService.updateJobInformation(id, dto);
+  @Patch(':id')
+  public async updateJobInformation(
+    @Param('id') id: string,
+    @Body() dto: JobInformationDto,
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const {
+      result: jobInformation,
+      status,
+      failure,
+    } = await this.jobInformationService.updateJobInformation(id, dto);
 
-  //   if (status === ServiceResponseStatus.Failed) {
-  //     switch (failure.reason) {
-  //       case JobInformationFailure.JOB_INFORMATION_NOT_FOUND:
-  //         return res.send(
-  //           BadRequestResult({
-  //             reason: failure.reason,
-  //             message: `Job Information not found`,
-  //           }),
-  //         );
-  //     }
-  //   }
+    if (status === ServiceResponseStatus.Failed) {
+      switch (failure.reason) {
+        case JobInformationFailure.JOB_INFORMATION_NOT_FOUND:
+          return res.send(
+            BadRequestResult({
+              reason: failure.reason,
+              message: `Job Information not found`,
+            }),
+          );
+      }
+    }
 
-  //   return res.send(SuccessResult(jobInformation));
-  // }
+    return res.send(SuccessResult(jobInformation));
+  }
 }

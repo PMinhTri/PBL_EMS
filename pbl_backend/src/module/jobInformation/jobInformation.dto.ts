@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Contract, Department, JobTitle, WorkingSkill } from '@prisma/client';
 import { IsDateString, IsNotEmpty, IsString } from 'class-validator';
 
 export class JobInformationDto {
@@ -9,7 +8,7 @@ export class JobInformationDto {
   userId: string;
 
   @IsString()
-  contractType: Contract;
+  contractTypeId: string;
 
   @IsDateString()
   contractStartDate: Date;
@@ -27,12 +26,14 @@ export class JobInformationDto {
   @ApiProperty({ type: String, required: true, nullable: false })
   employeeStatus: string;
 
-  jobTitle: JobTitle;
+  @IsString()
+  jobTitleId: string;
 
   @IsString()
   jobHistory: string;
 
-  workingSkills: WorkingSkill[];
+  workingSkillId: string[];
 
-  department: Department;
+  @IsString()
+  departmentId: string;
 }

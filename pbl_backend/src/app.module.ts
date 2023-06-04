@@ -20,6 +20,7 @@ import { LeaveModule } from './module/leave/leave.module';
 import { WorkingSkillModule } from './module/workingSkill/workingSkill.module';
 import { TimeSheetModule } from './module/timeSheet/timeSheet.module';
 import { EducationModule } from './module/education/education.module';
+import { ContractModule } from './module/contract/contract.module';
 @Module({
   imports: [
     AuthModule,
@@ -35,6 +36,7 @@ import { EducationModule } from './module/education/education.module';
     MailModule,
     WorkingSkillModule,
     EducationModule,
+    ContractModule,
     PrismaModule,
   ],
   providers: [

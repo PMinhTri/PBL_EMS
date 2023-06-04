@@ -35,7 +35,11 @@ export class JobInformationService {
 
     const jobInformation = await this.prisma.jobInformation.create({
       data: {
-        userId: dto.userId,
+        user: {
+          connect: {
+            id: dto.userId,
+          },
+        },
         joinDate: dto.joinDate,
         employeeStatus: dto.employeeStatus,
       },
@@ -50,7 +54,14 @@ export class JobInformationService {
   public async getAllJobInformation(): Promise<
     ServiceResponse<JobInformation[], ServiceFailure<JobInformationFailure>>
   > {
-    const jobInformation = await this.prisma.jobInformation.findMany();
+    const jobInformation = await this.prisma.jobInformation.findMany({
+      include: {
+        contractType: true,
+        jobTitle: true,
+        department: true,
+        workingSkill: true,
+      },
+    });
 
     return {
       status: ServiceResponseStatus.Success,
@@ -110,55 +121,61 @@ export class JobInformationService {
     };
   }
 
-  // public async updateJobInformation(
-  //   id: string,
-  //   dto: JobInformationDto,
-  // ): Promise<
-  //   ServiceResponse<JobInformation, ServiceFailure<JobInformationFailure>>
-  // > {
-  //   const existingJobInformation = await this.prisma.jobInformation.findUnique({
-  //     where: {
-  //       id,
-  //     },
-  //   });
+  public async updateJobInformation(
+    id: string,
+    dto: Omit<JobInformationDto, 'userId'>,
+  ): Promise<
+    ServiceResponse<JobInformation, ServiceFailure<JobInformationFailure>>
+  > {
+    const existingJobInformation = await this.prisma.jobInformation.findUnique({
+      where: {
+        id,
+      },
+    });
 
-  //   if (!existingJobInformation) {
-  //     return {
-  //       status: ServiceResponseStatus.Failed,
-  //       failure: {
-  //         reason: JobInformationFailure.JOB_INFORMATION_NOT_FOUND,
-  //       },
-  //     };
-  //   }
+    if (!existingJobInformation) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: JobInformationFailure.JOB_INFORMATION_NOT_FOUND,
+        },
+      };
+    }
 
-  //   const jobInformation = await this.prisma.jobInformation.update({
-  //     where: {
-  //       id,
-  //     },
-  //     data: {
-  //       userId: dto.userId,
-  //       contractType: dto.contractType,
-  //       contractStartDate: dto.contractStartDate,
-  //       contractEndDate: dto.contractEndDate,
-  //       joinDate: dto.joinDate,
-  //       employeeStatus: dto.employeeStatus,
-  //       jobHistory: dto.jobHistory,
-  //       workingSkill: {
-  //         upsert: dto.workingSkills?.map((workingSkill) => ({
-  //           where: { id: workingSkill.id },
-  //           create: workingSkill,
-  //           update: workingSkill,
-  //         })),
-  //       },
-  //     },
-  //     include: {
-  //       workingSkill: true,
-  //     },
-  //   });
+    const jobInformation = await this.prisma.jobInformation.update({
+      where: {
+        id,
+      },
+      data: {
+        contractType: {
+          connect: {
+            id: dto.contractTypeId,
+          },
+        },
+        contractStartDate: new Date(dto.contractStartDate),
+        contractEndDate: new Date(dto.contractEndDate),
+        joinDate: new Date(dto.joinDate),
+        employeeStatus: dto.employeeStatus,
+        jobHistory: dto.jobHistory,
+        jobTitle: {
+          connect: {
+            id: dto.jobTitleId,
+          },
+        },
+        department: {
+          connect: {
+            id: dto.departmentId,
+          },
+        },
+        workingSkill: {
+          connect: dto.workingSkillId.map((id) => ({ id })),
+        },
+      },
+    });
 
-  //   return {
-  //     status: ServiceResponseStatus.Success,
-  //     result: jobInformation,
-  //   };
-  // }
+    return {
+      status: ServiceResponseStatus.Success,
+      result: jobInformation,
+    };
+  }
 }
