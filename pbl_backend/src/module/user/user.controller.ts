@@ -66,7 +66,6 @@ export class UserController {
     @Body() payload: UpdateInformationInput,
     @Res() res: IResponse,
   ): Promise<IResponse> {
-    console.log(payload);
     const { email, userInformation } = payload;
     const { status, failure } =
       await this.userService.updatePersonalInformation(email, userInformation);

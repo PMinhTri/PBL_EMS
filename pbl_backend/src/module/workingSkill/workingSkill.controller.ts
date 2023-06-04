@@ -18,9 +18,9 @@ export class WorkingSkillController {
 
   @Get('')
   public async getAllWorkingSkill(@Res() res: IResponse): Promise<IResponse> {
-    const workingSkill = await this.workingSkillService.getAllWorkingSkill();
+    const { result } = await this.workingSkillService.getAllWorkingSkill();
 
-    return res.send(SuccessResult(workingSkill));
+    return res.send(SuccessResult(result));
   }
 
   @Get('/:id')

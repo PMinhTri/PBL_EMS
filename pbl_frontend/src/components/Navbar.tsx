@@ -67,7 +67,7 @@ const SelectContent: React.FunctionComponent = () => {
 
 const Navbar: React.FunctionComponent = () => {
   return (
-    <div className="shadow-md w-full h-12 fixed bg-blue-800 top-0 left-0">
+    <div className="shadow-md w-full h-12 fixed bg-blue-800 top-0 left-0 z-50">
       <div className="flex flex-row md:flex-row items-center justify-between md:px-10 px-7m mx-2">
         <div
           className="font-bold text-2xl cursor-pointer flex font-[Poppins] 

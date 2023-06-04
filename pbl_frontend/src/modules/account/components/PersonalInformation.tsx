@@ -116,12 +116,20 @@ const PersonalInformation: React.FunctionComponent = () => {
               <div key={index} className="flex flex-row  items-center m-2">
                 <div className="m-2 w-36 font-bold">{item.label}:</div>
                 {isDisabled ? (
-                  <div>{dayjs(item.value).format("DD/MM/YYYY")}</div>
+                  <div>
+                    {item.value !== null
+                      ? dayjs(item.value).format("DD/MM/YYYY")
+                      : ""}
+                  </div>
                 ) : (
                   <Space className="w-full">
                     <DatePicker
                       disabled={isDisabled}
-                      defaultValue={dayjs(item.value)}
+                      defaultValue={
+                        item.value !== null
+                          ? dayjs(item.value)
+                          : dayjs(new Date())
+                      }
                       onChange={(date) =>
                         setUserInfo({
                           ...userInfo,

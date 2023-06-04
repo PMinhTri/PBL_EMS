@@ -13,7 +13,7 @@ export const createNewUser = async (data: CreateNewUserInformation) => {
   return response;
 };
 
-export const getUserById = async (id: number) => {
+export const getUserById = async (id: string) => {
   const response: {
     statusCode: number;
     payload: UserDetailInformation;
@@ -44,7 +44,7 @@ export const updateUserInformation = async (
   return response;
 };
 
-export const deleteUser = async (id: number) => {
+export const deleteUser = async (id: string) => {
   const response: {
     statusCode: number;
     payload: UserDetailInformation[];

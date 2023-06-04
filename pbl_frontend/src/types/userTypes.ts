@@ -1,12 +1,12 @@
 export type UserAuthInfo = {
-  id: number;
+  id: string;
   email: string;
   fullName: string;
   role: string;
 };
 
 export type UserDetailInformation = {
-  id: number;
+  id: string;
   email: string;
   fullName: string;
   firstName: string;
@@ -26,7 +26,7 @@ export type UserDetailInformation = {
 };
 
 export type UserInformationForAdmin = {
-  id: number;
+  id: string;
   fullName: string;
   jobTitle: string;
   email: string;

@@ -31,7 +31,7 @@ export const UserAction = {
 
     return decodeTokenData;
   },
-  getUserInfo: async (id: number) => {
+  getUserInfo: async (id: string) => {
     const response = await getUserById(id);
 
     if (response.statusCode === 200) {
@@ -61,7 +61,7 @@ export const UserAction = {
     handleError(response);
   },
 
-  deleteUser: async (id: number) => {
+  deleteUser: async (id: string) => {
     const response = await deleteUser(id);
 
     if (response.statusCode === 200) {

@@ -19,7 +19,7 @@ import showNotification from "../../../utils/notification";
 import GridViewMode from "./components/GridViewMode";
 
 const titleTable = [
-  "ID",
+  "STT",
   "Họ và tên",
   "Giới tính",
   "Chức vụ",
@@ -88,7 +88,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
     }
   };
 
-  const handleDeleteUser = async (userId: number) => {
+  const handleDeleteUser = async (userId: string) => {
     try {
       await UserAction.deleteUser(userId);
     } catch (err) {
@@ -263,8 +263,8 @@ const EmployeeManagement: React.FunctionComponent = () => {
             </div>
           )}
           {viewMode === "Danh sách" && (
-            <div className="w-full">
-              <div className="flex overflow-y-auto max-h-[180px] scrollbar">
+            <div>
+              <div className="flex max-h-40 overflow-x-auto overflow-y-auto scrollbar">
                 <table className="w-full">
                   <thead className="bg-blue-600 text-white rounded-t-md sticky top-0">
                     <tr>
@@ -276,69 +276,65 @@ const EmployeeManagement: React.FunctionComponent = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {employeeList
-                      .sort((a, b) => a.id - b.id)
-                      .map((item, index) => (
-                        <tr
-                          key={index}
-                          className="border-[2px] h-12 bg-slate-100"
-                        >
-                          <td className="text-center border-[2px]">
-                            {item.id}
-                          </td>
-                          <td className="text-center border-[2px]">
-                            {item.fullName}
-                          </td>
-                          <td className="text-center border-[2px]">
-                            {item.gender}
-                          </td>
-                          <td className="text-center border-[2px]"></td>
-                          <td className="text-center border-[2px]">
-                            {item.email}
-                          </td>
-                          <td className="text-center border-[2px]">
-                            {item.phoneNumber}
-                          </td>
-                          <td className="text-center border-[2px]"></td>
-                          <td className="text-center border-[2px]"></td>
-                          <td className="text-center border-[2px]">
-                            {item.status}
-                          </td>
-                          <td className="flex justify-center items-center gap-2 flex-row p-4">
-                            <div className="flex justify-center items-center text-lg cursor-pointer text-orange-600">
-                              <BiEditAlt />
-                            </div>
-                            <div
-                              onClick={() => {
-                                setIsModalDeleteOpen(true);
-                              }}
-                              className="flex justify-center items-center text-lg cursor-pointer text-red-600"
-                            >
-                              <BiTrashAlt />
-                            </div>
-                            <Modal
-                              title="Bạn muốn xóa nhân viên này?"
-                              open={isModalDeleteOpen}
-                              width={400}
-                              onCancel={() => setIsModalDeleteOpen(false)}
-                              footer={[
-                                <button
-                                  onClick={() => setIsModalDeleteOpen(false)}
-                                  className="w-24 ml-2 rounded-md h-8 bg-red-500 text-white cursor-pointer"
-                                >
-                                  Hủy
-                                </button>,
-                                <Button
-                                  onClick={() => handleDeleteUser(item.id)}
-                                  className="ml-2 w-24 rounded-md h-8 bg-blue-500 text-white cursor-pointer"
-                                >
-                                  Xóa
-                                </Button>,
-                              ]}
-                            ></Modal>
-                          </td>
-                        </tr>
-                      ))}
+                    {employeeList.map((item, index) => (
+                      <tr
+                        key={index}
+                        className="border-[2px] h-12 bg-slate-100"
+                      >
+                        <td className="text-center border-[2px]">{index}</td>
+                        <td className="text-center border-[2px]">
+                          {item.fullName}
+                        </td>
+                        <td className="text-center border-[2px]">
+                          {item.gender}
+                        </td>
+                        <td className="text-center border-[2px]"></td>
+                        <td className="text-center border-[2px]">
+                          {item.email}
+                        </td>
+                        <td className="text-center border-[2px]">
+                          {item.phoneNumber}
+                        </td>
+                        <td className="text-center border-[2px]"></td>
+                        <td className="text-center border-[2px]"></td>
+                        <td className="text-center border-[2px]">
+                          {item.status}
+                        </td>
+                        <td className="flex justify-center items-center gap-2 flex-row p-4">
+                          <div className="flex justify-center items-center text-lg cursor-pointer text-orange-600">
+                            <BiEditAlt />
+                          </div>
+                          <div
+                            onClick={() => {
+                              setIsModalDeleteOpen(true);
+                            }}
+                            className="flex justify-center items-center text-lg cursor-pointer text-red-600"
+                          >
+                            <BiTrashAlt />
+                          </div>
+                          <Modal
+                            title="Bạn muốn xóa nhân viên này?"
+                            open={isModalDeleteOpen}
+                            width={400}
+                            onCancel={() => setIsModalDeleteOpen(false)}
+                            footer={[
+                              <button
+                                onClick={() => setIsModalDeleteOpen(false)}
+                                className="w-24 ml-2 rounded-md h-8 bg-red-500 text-white cursor-pointer"
+                              >
+                                Hủy
+                              </button>,
+                              <Button
+                                onClick={() => handleDeleteUser(item.id)}
+                                className="ml-2 w-24 rounded-md h-8 bg-blue-500 text-white cursor-pointer"
+                              >
+                                Xóa
+                              </Button>,
+                            ]}
+                          ></Modal>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>

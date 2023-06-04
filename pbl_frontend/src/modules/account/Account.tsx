@@ -61,8 +61,8 @@ const Account = () => {
           <div>...loading</div>
         ) : (
           <div className="m-2 grid grid-cols-4 gap-4 mt-4 w-full">
-            <div className="col-span-1 rounded-md shadow-md w-full flex flex-col">
-              <div className="w-full flex flex-row justify-between items-center border-[2px] p-4">
+            <div className="col-span-1 rounded-md shadow-md w-full h-[600px] border-2 flex flex-col">
+              <div className="w-full flex flex-row justify-between items-center h-32 border-b-[2px] p-4">
                 <div className="flex items-center">
                   <div className="w-16 h-16 rounded-full bg-gray-300 flex-shrink-0 mr-4"></div>
                   <div>
@@ -74,9 +74,13 @@ const Account = () => {
                     </div>
                   </div>
                 </div>
-                <Button className="ml-4" icon={<ArrowUpOutlined />}>
+                <button
+                  className="ml-2 border flex flex-row justify-between items-center border-blue-600 rounded-md px-2 py-1 
+                  bg-white text-blue-600 hover:bg-blue-600 hover:text-white transition-colors duration-300"
+                >
+                  <ArrowUpOutlined />
                   Upload
-                </Button>
+                </button>
               </div>
             </div>
             <div className="col-span-2 w-full">
