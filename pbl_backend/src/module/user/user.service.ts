@@ -162,6 +162,7 @@ export class UserService {
             name: true,
           },
         },
+        jobInformation: true,
       },
     });
 

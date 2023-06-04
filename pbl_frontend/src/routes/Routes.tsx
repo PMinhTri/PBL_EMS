@@ -53,9 +53,8 @@ const Routes: React.FunctionComponent = () => {
     if (auth.isAuthenticated) {
       if (userBasicInfo.role === RoleEnum.ADMIN) {
         window.location.href = "/admin/dashboard";
-      }
-      if (userBasicInfo.role === RoleEnum.EMPLOYEE) {
-        window.location.href = "/employee";
+      } else {
+        window.location.href = "/employee/time-sheet";
       }
     }
   }, [token, setUserBasicInfo, userBasicInfo.role, auth.isAuthenticated]);

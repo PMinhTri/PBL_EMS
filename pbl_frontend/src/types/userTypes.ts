@@ -1,3 +1,5 @@
+import { JobInformation } from "./jobInformationTypes";
+
 export type UserAuthInfo = {
   id: string;
   email: string;
@@ -23,6 +25,7 @@ export type UserDetailInformation = {
   role: {
     name: string;
   };
+  jobInformation?: JobInformation;
 };
 
 export type UserInformationForAdmin = {

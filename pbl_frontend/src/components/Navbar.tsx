@@ -66,13 +66,19 @@ const SelectContent: React.FunctionComponent = () => {
 };
 
 const Navbar: React.FunctionComponent = () => {
+  const user = useRecoilValue(userAuthState);
+
   return (
     <div className="shadow-md w-full h-12 fixed bg-blue-800 top-0 left-0 z-50">
       <div className="flex flex-row md:flex-row items-center justify-between md:px-10 px-7m mx-2">
         <div
           className="font-bold text-2xl cursor-pointer flex font-[Poppins] 
         text-white mb-4 md:mb-0"
-          onClick={() => (window.location.href = "/")}
+          onClick={() => {
+            if (user.role === "Admin")
+              window.location.href = "/admin/dashboard";
+            else window.location.href = "/employee/time-sheet";
+          }}
         >
           HR Management System
         </div>

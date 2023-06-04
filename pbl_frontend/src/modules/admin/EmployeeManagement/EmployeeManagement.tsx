@@ -66,6 +66,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
   React.useEffect(() => {
     const fetchData = async () => {
       const employees = await UserAction.getAllEmployees();
+
       setEmployeeList(employees);
       setIsLoading(false);
     };
@@ -281,7 +282,9 @@ const EmployeeManagement: React.FunctionComponent = () => {
                         key={index}
                         className="border-[2px] h-12 bg-slate-100"
                       >
-                        <td className="text-center border-[2px]">{index}</td>
+                        <td className="text-center border-[2px]">
+                          {index + 1}
+                        </td>
                         <td className="text-center border-[2px]">
                           {item.fullName}
                         </td>
