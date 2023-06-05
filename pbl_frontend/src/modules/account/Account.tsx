@@ -1,24 +1,29 @@
 import React from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { userInfoState } from "../../recoil/atoms/user";
 import { UserAction } from "../../actions/userAction";
 import userSelector from "../../recoil/selectors/user";
 import Container from "../../components/Container";
 import Navbar from "../../components/Navbar";
 import ContentWrapper from "../../components/ContentWrapper";
-import { Button } from "antd";
 import PersonalInformation from "./components/PersonalInformation";
-import JobInformation from "./components/JobInformation";
 import { ArrowUpOutlined } from "@ant-design/icons";
+import JobInformationContainer from "./components/JobInformation";
+import { jobInformationState } from "../../recoil/atoms/jobInformation";
+import { JobInformationAction } from "../../actions/jobInformationAction";
+import { defaultJobInformation } from "../../constants/constantVariables";
+import ChangePassword from "./components/ChangePassword";
 
 enum ProfileType {
   PERSONAL = "Thông tin cá nhân",
   WORK = "Thông tin công việc",
+  CHANGE_PASSWORD = "Đổi mật khẩu",
 }
 
 const Account = () => {
   const { userAuthInfo } = useRecoilValue(userSelector);
   const [userInfo, setUserInfo] = useRecoilState(userInfoState);
+  const setJobInformation = useSetRecoilState(jobInformationState);
   const [isLoading, setIsLoading] = React.useState(true);
   const [profileType, setProfileType] = React.useState(ProfileType.PERSONAL);
   const [activeKey, setActiveKey] = React.useState({
@@ -31,12 +36,16 @@ const Account = () => {
       const response = await UserAction.getUserInfo(userAuthInfo.id);
       if (response?.id) {
         setUserInfo(response);
+        setJobInformation(
+          (await JobInformationAction.getByUserId(userAuthInfo.id)) ||
+            defaultJobInformation
+        );
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [userAuthInfo.id, setUserInfo]);
+  }, [userAuthInfo.id, setUserInfo, setJobInformation]);
 
   const optionsButton = [
     {
@@ -48,7 +57,7 @@ const Account = () => {
       icon: "",
     },
     {
-      name: "Hồ sơ",
+      name: ProfileType.CHANGE_PASSWORD,
       icon: "",
     },
   ];
@@ -85,7 +94,10 @@ const Account = () => {
             </div>
             <div className="col-span-2 w-full">
               {profileType === ProfileType.PERSONAL && <PersonalInformation />}
-              {profileType === ProfileType.WORK && <JobInformation />}
+              {profileType === ProfileType.WORK && <JobInformationContainer />}
+              {profileType === ProfileType.CHANGE_PASSWORD && (
+                <ChangePassword />
+              )}
             </div>
             <div className="col-span-1 w-full">
               <div className="flex flex-col gap-2 rounded-md items-start w-full border-[2px] shadow-md">

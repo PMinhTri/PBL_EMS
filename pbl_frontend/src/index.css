@@ -31,3 +31,9 @@
 .scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: #555; /* Set the color of the scrollbar thumb on hover */
 }
+
+.ant-select-selection--multiple {
+  white-space: nowrap;
+  height: 30px;
+  overflow: auto;
+}

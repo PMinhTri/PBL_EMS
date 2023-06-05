@@ -104,6 +104,12 @@ export class JobInformationService {
       where: {
         userId: userId,
       },
+      include: {
+        contractType: true,
+        department: true,
+        jobTitle: true,
+        workingSkill: true,
+      },
     });
 
     if (!jobInformation) {
@@ -168,7 +174,9 @@ export class JobInformationService {
           },
         },
         workingSkill: {
-          connect: dto.workingSkillId.map((id) => ({ id })),
+          connect: dto.workingSkill?.map((skill) => ({
+            id: skill,
+          })),
         },
       },
     });

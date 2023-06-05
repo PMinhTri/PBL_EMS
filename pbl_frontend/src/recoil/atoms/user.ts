@@ -4,7 +4,7 @@ import { UserAuthInfo, UserDetailInformation } from "../../types/userTypes";
 export const userAuthState = atom<UserAuthInfo>({
   key: "userState",
   default: {
-    id: 0,
+    id: "",
     email: "",
     fullName: "",
     role: "",
@@ -14,7 +14,7 @@ export const userAuthState = atom<UserAuthInfo>({
 export const userInfoState = atom<UserDetailInformation>({
   key: "userInfoState",
   default: {
-    id: 0,
+    id: "",
     email: "",
     fullName: "",
     firstName: "",

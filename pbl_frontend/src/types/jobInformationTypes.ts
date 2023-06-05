@@ -14,9 +14,8 @@ export type JobInformation = {
   jobHistory?: string;
   jobTitleId: string;
   departmentId: string;
-  workingSkill?: string[];
+  workingSkill?: WorkingSkill[];
   contractType?: Contract;
   department?: Department;
   jobTitle?: JobTitle;
-  workingSkills?: WorkingSkill[];
 };

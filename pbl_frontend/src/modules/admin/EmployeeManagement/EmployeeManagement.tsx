@@ -16,7 +16,13 @@ import EmployeeSort from "./components/EmployeeSort";
 import EmployeeFilter from "./components/EmployeeFilter";
 import CreateNewEmployee from "./components/CreateNewEmployee";
 import showNotification from "../../../utils/notification";
-import GridViewMode from "./components/GridViewMode";
+import { useRecoilState } from "recoil";
+import { jobTitleState } from "../../../recoil/atoms/jobTitle";
+import { departmentState } from "../../../recoil/atoms/department";
+import { JobTitleAction } from "../../../actions/jobTitleAction";
+import { DepartmentAction } from "../../../actions/departmentAction";
+import { JobInformationAction } from "../../../actions/jobInformationAction";
+import dayjs from "dayjs";
 
 const titleTable = [
   "STT",
@@ -49,11 +55,8 @@ const EmployeeManagement: React.FunctionComponent = () => {
 
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [isModalDeleteOpen, setIsModalDeleteOpen] = React.useState(false);
-  const [viewMode, setViewMode] = React.useState("Danh sách");
-
-  const handleChangeViewMode = (mode: string) => {
-    setViewMode(mode);
-  };
+  const [jobTitles, setJobTitles] = useRecoilState(jobTitleState);
+  const [departments, setDepartments] = useRecoilState(departmentState);
 
   const handleSearchEmployee = (value: string) => {
     const searchResult = employeeList.filter((employee) =>
@@ -66,6 +69,8 @@ const EmployeeManagement: React.FunctionComponent = () => {
   React.useEffect(() => {
     const fetchData = async () => {
       const employees = await UserAction.getAllEmployees();
+      setJobTitles(await JobTitleAction.getAllJobTitles());
+      setDepartments(await DepartmentAction.getAllDepartments());
 
       setEmployeeList(employees);
       setIsLoading(false);
@@ -84,7 +89,16 @@ const EmployeeManagement: React.FunctionComponent = () => {
     ) {
       showNotification("error", "Vui lòng điền đầy đủ thông tin");
     } else {
-      await UserAction.createNewUser(newEmployee);
+      const response = await UserAction.createNewUser(newEmployee);
+
+      if (response?.id) {
+        await JobInformationAction.create({
+          userId: response.id,
+          joinDate: dayjs(new Date()).format("YYYY-MM-DD"),
+          employeeStatus: newEmployee.status,
+        });
+      }
+
       window.location.reload();
     }
   };
@@ -125,20 +139,6 @@ const EmployeeManagement: React.FunctionComponent = () => {
                   Sắp xếp
                 </Button>
               </Popover>
-              <Space className="w-[100%]">
-                <Select
-                  size="middle"
-                  defaultValue={"Danh sách"}
-                  style={{ width: 120 }}
-                  optionLabelProp="view mode"
-                  allowClear
-                  onSelect={handleChangeViewMode}
-                  options={[
-                    { label: "Danh sách", value: "Danh sách" },
-                    { label: "Lưới", value: "Lưới" },
-                  ]}
-                />
-              </Space>
             </Space>
           </div>
           <div>
@@ -251,98 +251,91 @@ const EmployeeManagement: React.FunctionComponent = () => {
         </div>
       ) : (
         <div className="w-full px-2 py-2 h-screen overflow-auto">
-          {viewMode === "Lưới" && (
-            <div className="grid grid-cols-4 gap-4">
-              {employeeList.map((item, index) => (
-                <div
-                  key={index}
-                  className="border-[2px] justify-center items-center p-4 rounded-lg shadow-md"
-                >
-                  <GridViewMode data={item} />
-                </div>
-              ))}
-            </div>
-          )}
-          {viewMode === "Danh sách" && (
-            <div>
-              <div className="flex max-h-40 overflow-x-auto overflow-y-auto scrollbar">
-                <table className="w-full">
-                  <thead className="bg-blue-600 text-white rounded-t-md sticky top-0">
-                    <tr>
-                      {titleTable.map((item, index) => (
-                        <th key={index} className="text-center h-12">
-                          {item}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {employeeList.map((item, index) => (
-                      <tr
-                        key={index}
-                        className="border-[2px] h-12 bg-slate-100"
-                      >
-                        <td className="text-center border-[2px]">
-                          {index + 1}
-                        </td>
-                        <td className="text-center border-[2px]">
-                          {item.fullName}
-                        </td>
-                        <td className="text-center border-[2px]">
-                          {item.gender}
-                        </td>
-                        <td className="text-center border-[2px]"></td>
-                        <td className="text-center border-[2px]">
-                          {item.email}
-                        </td>
-                        <td className="text-center border-[2px]">
-                          {item.phoneNumber}
-                        </td>
-                        <td className="text-center border-[2px]"></td>
-                        <td className="text-center border-[2px]"></td>
-                        <td className="text-center border-[2px]">
-                          {item.status}
-                        </td>
-                        <td className="flex justify-center items-center gap-2 flex-row p-4">
-                          <div className="flex justify-center items-center text-lg cursor-pointer text-orange-600">
-                            <BiEditAlt />
-                          </div>
-                          <div
-                            onClick={() => {
-                              setIsModalDeleteOpen(true);
-                            }}
-                            className="flex justify-center items-center text-lg cursor-pointer text-red-600"
-                          >
-                            <BiTrashAlt />
-                          </div>
-                          <Modal
-                            title="Bạn muốn xóa nhân viên này?"
-                            open={isModalDeleteOpen}
-                            width={400}
-                            onCancel={() => setIsModalDeleteOpen(false)}
-                            footer={[
-                              <button
-                                onClick={() => setIsModalDeleteOpen(false)}
-                                className="w-24 ml-2 rounded-md h-8 bg-red-500 text-white cursor-pointer"
-                              >
-                                Hủy
-                              </button>,
-                              <Button
-                                onClick={() => handleDeleteUser(item.id)}
-                                className="ml-2 w-24 rounded-md h-8 bg-blue-500 text-white cursor-pointer"
-                              >
-                                Xóa
-                              </Button>,
-                            ]}
-                          ></Modal>
-                        </td>
-                      </tr>
+          <div>
+            <div className="flex max-h-80 overflow-x-auto overflow-y-auto scrollbar">
+              <table className="w-full">
+                <thead className="bg-blue-600 text-white rounded-t-md sticky top-0">
+                  <tr>
+                    {titleTable.map((item, index) => (
+                      <th key={index} className="text-center h-12">
+                        {item}
+                      </th>
                     ))}
-                  </tbody>
-                </table>
-              </div>
+                  </tr>
+                </thead>
+                <tbody>
+                  {employeeList.map((item, index) => (
+                    <tr key={index} className="border-[2px] h-12 bg-slate-100">
+                      <td className="text-center border-[2px]">{index + 1}</td>
+                      <td className="text-center border-[2px]">
+                        {item.fullName}
+                      </td>
+                      <td className="text-center border-[2px]">
+                        {item.gender}
+                      </td>
+                      <td className="text-center border-[2px]">
+                        {
+                          jobTitles.find(
+                            (job) => job.id === item.jobInformation?.jobTitleId
+                          )?.name
+                        }
+                      </td>
+                      <td className="text-center border-[2px]">{item.email}</td>
+                      <td className="text-center border-[2px]">
+                        {item.phoneNumber}
+                      </td>
+                      <td className="text-center border-[2px]">
+                        {
+                          departments.find(
+                            (department) =>
+                              department.id ===
+                              item.jobInformation?.departmentId
+                          )?.name
+                        }
+                      </td>
+                      <td className="text-center border-[2px]"></td>
+                      <td className="text-center border-[2px]">
+                        {item.status}
+                      </td>
+                      <td className="flex justify-center items-center gap-2 flex-row p-4">
+                        <div className="flex justify-center items-center text-lg cursor-pointer text-orange-600">
+                          <BiEditAlt />
+                        </div>
+                        <div
+                          onClick={() => {
+                            setIsModalDeleteOpen(true);
+                          }}
+                          className="flex justify-center items-center text-lg cursor-pointer text-red-600"
+                        >
+                          <BiTrashAlt />
+                        </div>
+                        <Modal
+                          title="Bạn muốn xóa nhân viên này?"
+                          open={isModalDeleteOpen}
+                          width={400}
+                          onCancel={() => setIsModalDeleteOpen(false)}
+                          footer={[
+                            <button
+                              onClick={() => setIsModalDeleteOpen(false)}
+                              className="w-24 ml-2 rounded-md h-8 bg-red-500 text-white cursor-pointer"
+                            >
+                              Hủy
+                            </button>,
+                            <Button
+                              onClick={() => handleDeleteUser(item.id)}
+                              className="ml-2 w-24 rounded-md h-8 bg-blue-500 text-white cursor-pointer"
+                            >
+                              Xóa
+                            </Button>,
+                          ]}
+                        ></Modal>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          )}
+          </div>
         </div>
       )}
     </div>

@@ -84,7 +84,7 @@ export const $patch = async (endpoint: string, data: any, option?: any) => {
   };
 
   try {
-    const response: AxiosResponse<any> = await axios.put(
+    const response: AxiosResponse<any> = await axios.patch(
       `${REACT_APP_API_URL}${endpoint}`,
       data,
       config

@@ -1,5 +1,10 @@
 import { JobInformation } from "../types/jobInformationTypes";
-import { getAllJobInformation, getJobInformationByUserId } from "../api/jobInformation";
+import {
+  createJobInformation,
+  getAllJobInformation,
+  getJobInformationByUserId,
+  updateJobInformation,
+} from "../api/jobInformation";
 import { handleError } from "../utils/errorHandler";
 
 export const JobInformationAction = {
@@ -13,7 +18,7 @@ export const JobInformationAction = {
       return response.payload;
     }
 
-    handleError(response);
+    return null;
   },
 
   getAll: async () => {
@@ -24,6 +29,27 @@ export const JobInformationAction = {
 
     if (response.statusCode === 200) {
       return response.payload;
+    }
+
+    handleError(response);
+  },
+
+  create: async (payload: {
+    userId: string;
+    joinDate: string;
+    employeeStatus: string;
+  }) => {
+    const response = await createJobInformation(payload);
+
+    return response.payload;
+  },
+
+  update: async (id: string, payload: JobInformation) => {
+    const response = await updateJobInformation(id, payload);
+
+    if (response.statusCode === 200) {
+      const { payload } = response;
+      return payload;
     }
 
     handleError(response);

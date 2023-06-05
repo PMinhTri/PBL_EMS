@@ -40,3 +40,36 @@ export const genderOptions = [
     value: Gender.Female,
   },
 ];
+
+export const defaultJobInformation = {
+  id: "",
+  userId: "",
+  contractId: "",
+  contractStartDate: new Date(),
+  contractEndDate: new Date(),
+  joinDate: new Date(),
+  employeeStatus: "",
+  jobHistory: "",
+  jobTitleId: "",
+  departmentId: "",
+  workingSkill: [],
+  contractType: {
+    id: "",
+    type: "",
+  },
+  department: {
+    id: "",
+    name: "",
+  },
+  jobTitle: {
+    id: "",
+    name: "",
+  },
+  workingSkills: [
+    {
+      id: "",
+      name: "",
+      description: "",
+    },
+  ],
+};
