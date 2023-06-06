@@ -5,7 +5,7 @@ import { Button, Select, Space } from "antd";
 const EmployeeSort: React.FunctionComponent = () => {
   const options = [
     { label: "Id", value: "Id" },
-    { label: "Họ và tên", value: "Họ và tên" },
+    { label: "Họ và tên", value: "fullName" },
     { label: "Email", value: "Email" },
   ];
   return (

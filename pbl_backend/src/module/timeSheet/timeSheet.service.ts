@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { OTTimeSheetDto, TimeSheetDto } from './timeSheet.dto';
 import {
   ServiceFailure,
   ServiceResponse,
@@ -8,8 +7,147 @@ import {
 } from 'src/serviceResponse';
 import { TimeSheet } from '@prisma/client';
 import { TimeSheetFailure } from 'src/enumTypes/failure.enum';
+import { TimeSheetDto } from './timeSheet.dto';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class TimeSheetService {
   constructor(private prisma: PrismaService) {}
+
+  public async createTimeSheet(
+    dto: TimeSheetDto,
+  ): Promise<ServiceResponse<TimeSheet, ServiceFailure<TimeSheetFailure>>> {
+    const extractDate = dayjs(dto.date).format('DD/MM/YYYY');
+    const [date, month, year] = extractDate.split('/').map(Number);
+
+    const existingTimeSheet = await this.prisma.timeSheet.findFirst({
+      where: {
+        userId: dto.userId,
+        session: dto.session,
+        date: date,
+        month: month,
+        year: year,
+      },
+    });
+
+    if (existingTimeSheet) {
+      if (existingTimeSheet.status === 'Đã chấm') {
+        return {
+          status: ServiceResponseStatus.Failed,
+          failure: {
+            reason: TimeSheetFailure.TIME_SHEET_ALREADY_EXISTS,
+          },
+        };
+      }
+    }
+
+    const timeSheet = await this.prisma.timeSheet.create({
+      data: {
+        userId: dto.userId,
+        session: dto.session,
+        status: dto.status,
+        hoursWorked: dto.hoursWorked,
+        date: date,
+        month: month,
+        year: year,
+        overtime: dto.overtime,
+      },
+    });
+
+    return {
+      status: ServiceResponseStatus.Success,
+      result: timeSheet,
+    };
+  }
+
+  public async getAllTimeSheetByUserId(
+    userId: string,
+  ): Promise<ServiceResponse<TimeSheet[], ServiceFailure<TimeSheetFailure>>> {
+    const timeSheets = await this.prisma.timeSheet.findMany({
+      where: {
+        userId: userId,
+      },
+    });
+
+    return {
+      status: ServiceResponseStatus.Success,
+      result: timeSheets,
+    };
+  }
+
+  public async getAllTimeSheetByUserIdAndMonth(
+    userId: string,
+    month: number,
+    year: number,
+  ): Promise<ServiceResponse<TimeSheet[], ServiceFailure<TimeSheetFailure>>> {
+    const timeSheets = await this.prisma.timeSheet.findMany({
+      where: {
+        userId: userId,
+        month: month,
+        year: year,
+      },
+    });
+
+    if (!timeSheets) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: TimeSheetFailure.TIME_SHEET_NOT_FOUND,
+        },
+      };
+    }
+
+    return {
+      status: ServiceResponseStatus.Success,
+      result: timeSheets,
+    };
+  }
+
+  public async deleteAllTimeSheetByUserId(
+    userId: string,
+  ): Promise<ServiceResponse<TimeSheet[], ServiceFailure<TimeSheetFailure>>> {
+    await this.prisma.timeSheet.deleteMany({
+      where: {
+        userId: userId,
+      },
+    });
+
+    return {
+      status: ServiceResponseStatus.Success,
+      result: null,
+    };
+  }
+
+  public async totalWorkloadOfUser(
+    userId: string,
+    month: number,
+    year: number,
+  ): Promise<ServiceResponse<number, ServiceFailure<TimeSheetFailure>>> {
+    const timeSheets = await this.prisma.timeSheet.findMany({
+      where: {
+        userId: userId,
+        month: month,
+        year: year,
+      },
+    });
+
+    if (!timeSheets) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: TimeSheetFailure.TIME_SHEET_NOT_FOUND,
+        },
+      };
+    }
+
+    const totalWorkload =
+      timeSheets.reduce((acc, curr) => {
+        return acc + curr.hoursWorked;
+      }, 0) / 8;
+
+    return {
+      status: ServiceResponseStatus.Success,
+      result: totalWorkload,
+    };
+  }
 }

@@ -24,6 +24,11 @@ export class ChangePasswordDto {
   @IsNotEmpty()
   @ApiProperty({ type: String, required: true, nullable: false })
   @IsString()
+  oldPassword: string;
+
+  @IsNotEmpty()
+  @ApiProperty({ type: String, required: true, nullable: false })
+  @IsString()
   password: string;
 
   @IsNotEmpty()

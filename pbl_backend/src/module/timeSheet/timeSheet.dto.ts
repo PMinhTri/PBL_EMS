@@ -1,31 +1,40 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import {
+  IsBoolean,
+  IsDateString,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 
 export class TimeSheetDto {
   @IsNotEmpty()
-  @IsNumber()
+  @IsString()
   @ApiProperty({ type: 'number' })
-  userId: number;
+  userId: string;
 
   @IsNotEmpty()
-  @ApiProperty({ type: 'number' })
-  @IsNumber()
-  checkInDate: number;
+  @IsString()
+  @ApiProperty({ type: 'string' })
+  session: string;
 
   @IsNotEmpty()
   @IsNumber()
   @ApiProperty({ type: 'number' })
   hoursWorked: number;
 
-  @IsNumber()
   @IsNotEmpty()
-  @ApiProperty({ type: 'number' })
-  month: number;
+  @IsString()
+  @ApiProperty({ type: 'string' })
+  status: string;
 
-  @IsNumber()
   @IsNotEmpty()
-  @ApiProperty({ type: 'number' })
-  year: number;
+  @IsDateString()
+  @ApiProperty({ type: 'string' })
+  date: string;
+
+  @IsBoolean()
+  overtime?: boolean;
 }
 
 export class OTTimeSheetDto {

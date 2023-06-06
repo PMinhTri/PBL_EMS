@@ -11,7 +11,7 @@ const showNotification = (
     description: description,
     message: message,
     placement: "topRight",
-    duration: 3,
+    duration: 2,
   });
 };
 

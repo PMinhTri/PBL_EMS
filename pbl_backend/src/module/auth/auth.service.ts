@@ -111,6 +111,17 @@ export class AuthService {
       };
     }
 
+    const matchPassword = await verifyPassword(user.password, dto.oldPassword);
+
+    if (!matchPassword) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: AuthenticationFailure.INCORRECT_PASSWORD,
+        },
+      };
+    }
+
     if (dto.password !== dto.confirmPassword) {
       return {
         status: ServiceResponseStatus.Failed,

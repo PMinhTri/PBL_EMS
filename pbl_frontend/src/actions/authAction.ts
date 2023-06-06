@@ -1,5 +1,5 @@
-import { LoginAPI } from "../api/auth";
-import { AuthPayload } from "../types/authTypes";
+import { LoginAPI, changePassword } from "../api/auth";
+import { AuthPayload, ChangePasswordPayload } from "../types/authTypes";
 import { handleError } from "../utils/errorHandler";
 
 export const AuthAction = {
@@ -25,5 +25,15 @@ export const AuthAction = {
       token: "",
       isAuthenticated: false,
     };
+  },
+  changePassword: async (payload: ChangePasswordPayload) => {
+    const response = await changePassword(payload);
+
+    if (response.statusCode === 200) {
+      const { payload } = response;
+      return payload;
+    }
+
+    handleError(response);
   },
 };

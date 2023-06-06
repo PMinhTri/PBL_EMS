@@ -14,3 +14,10 @@ export type AuthState = {
   token: string;
   isAuthenticated: boolean;
 };
+
+export type ChangePasswordPayload = {
+  email: string;
+  oldPassword: string;
+  password: string;
+  confirmPassword: string;
+};

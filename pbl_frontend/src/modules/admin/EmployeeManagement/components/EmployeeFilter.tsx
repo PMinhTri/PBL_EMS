@@ -1,6 +1,63 @@
+import React from "react";
 import { Button, Select, Space } from "antd";
+import { JobTitle } from "../../../../types/jobTitleTypes";
+import { Department } from "../../../../types/departmentTypes";
+import { JobTitleAction } from "../../../../actions/jobTitleAction";
+import { DepartmentAction } from "../../../../actions/departmentAction";
 
 const EmployeeFilter: React.FunctionComponent = () => {
+  const [jobTitle, setJobTitle] = React.useState<JobTitle[]>([]);
+  const [department, setDepartment] = React.useState<Department[]>([]);
+  const [jobTitleOptions, setJobTitleOptions] = React.useState<
+    {
+      label: string;
+      value: string;
+    }[]
+  >([
+    {
+      label: "All",
+      value: "all",
+    },
+  ]);
+
+  const [departmentOptions, setDepartmentOptions] = React.useState<
+    {
+      label: string;
+      value: string;
+    }[]
+  >([
+    {
+      label: "All",
+      value: "all",
+    },
+  ]);
+
+  React.useEffect(() => {
+    const fetchDate = async () => {
+      const jobTitle = await JobTitleAction.getAllJobTitles();
+      const department = await DepartmentAction.getAllDepartments();
+
+      setJobTitle(jobTitle);
+      setDepartment(department);
+
+      setJobTitleOptions([
+        ...jobTitle.map((item) => ({
+          label: item.name,
+          value: item.name,
+        })),
+      ]);
+
+      setDepartmentOptions([
+        ...department.map((item) => ({
+          label: item.name,
+          value: item.name,
+        })),
+      ]);
+    };
+
+    fetchDate();
+  });
+
   const listFilter = [
     {
       label: "gender",
@@ -23,38 +80,12 @@ const EmployeeFilter: React.FunctionComponent = () => {
     {
       label: "jobTitle",
       name: "Chức vụ",
-      options: [
-        {
-          label: "All",
-          value: "all",
-        },
-        {
-          label: "Kỹ sư",
-          value: "Kỹ sư",
-        },
-        {
-          label: "Văn phòng",
-          value: "Văn phòng",
-        },
-      ],
+      options: jobTitleOptions,
     },
     {
       label: "department",
       name: "Chi nhánh",
-      options: [
-        {
-          label: "All",
-          value: "all",
-        },
-        {
-          label: "Sioux Ha Noi",
-          value: "Sioux Ha Noi",
-        },
-        {
-          label: "Sioux Da Nang",
-          value: "Sioux Da Nang",
-        },
-      ],
+      options: departmentOptions,
     },
   ];
   return (

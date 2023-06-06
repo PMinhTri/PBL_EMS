@@ -43,6 +43,9 @@ const EmployeeManagement: React.FunctionComponent = () => {
     UserDetailInformation[]
   >([]);
   const [searchText, setSearchText] = React.useState<string>("");
+  const [employeeSearched, setEmployeeSearched] = React.useState<
+    UserDetailInformation[]
+  >([]);
 
   const [newEmployee, setNewEmployee] =
     React.useState<CreateNewUserInformation>({
@@ -59,11 +62,20 @@ const EmployeeManagement: React.FunctionComponent = () => {
   const [departments, setDepartments] = useRecoilState(departmentState);
 
   const handleSearchEmployee = (value: string) => {
-    const searchResult = employeeList.filter((employee) =>
-      employee.fullName.toLowerCase().includes(value.toLowerCase())
-    );
-    console.log(searchResult);
-    // setEmployeeList(searchResult);
+    if (value === "") {
+      setEmployeeSearched([]);
+      return;
+    } else {
+      const searchResult = employeeList.filter((employee) =>
+        employee.fullName.toLowerCase().includes(value.toLowerCase())
+      );
+
+      if (!searchResult.length) {
+        showNotification("error", "Không tìm thấy nhân viên");
+      }
+
+      setEmployeeSearched(searchResult);
+    }
   };
 
   React.useEffect(() => {
@@ -148,6 +160,11 @@ const EmployeeManagement: React.FunctionComponent = () => {
                 onChange={(e) => {
                   setSearchText(e.target.value);
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearchEmployee(searchText);
+                  }
+                }}
                 allowClear
               />
               <Button
@@ -156,11 +173,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
                 icon={<SearchOutlined />}
                 size="middle"
                 onClick={() => {
-                  if (searchText === "") {
-                    setEmployeeList(employeeList);
-                  } else {
-                    handleSearchEmployee(searchText);
-                  }
+                  handleSearchEmployee(searchText);
                 }}
               >
                 Search
@@ -264,74 +277,92 @@ const EmployeeManagement: React.FunctionComponent = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {employeeList.map((item, index) => (
-                    <tr key={index} className="border-[2px] h-12 bg-slate-100">
-                      <td className="text-center border-[2px]">{index + 1}</td>
-                      <td className="text-center border-[2px]">
-                        {item.fullName}
-                      </td>
-                      <td className="text-center border-[2px]">
-                        {item.gender}
-                      </td>
-                      <td className="text-center border-[2px]">
-                        {
-                          jobTitles.find(
-                            (job) => job.id === item.jobInformation?.jobTitleId
-                          )?.name
-                        }
-                      </td>
-                      <td className="text-center border-[2px]">{item.email}</td>
-                      <td className="text-center border-[2px]">
-                        {item.phoneNumber}
-                      </td>
-                      <td className="text-center border-[2px]">
-                        {
-                          departments.find(
-                            (department) =>
-                              department.id ===
-                              item.jobInformation?.departmentId
-                          )?.name
-                        }
-                      </td>
-                      <td className="text-center border-[2px]"></td>
-                      <td className="text-center border-[2px]">
-                        {item.status}
-                      </td>
-                      <td className="flex justify-center items-center gap-2 flex-row p-4">
-                        <div className="flex justify-center items-center text-lg cursor-pointer text-orange-600">
-                          <BiEditAlt />
-                        </div>
-                        <div
-                          onClick={() => {
-                            setIsModalDeleteOpen(true);
-                          }}
-                          className="flex justify-center items-center text-lg cursor-pointer text-red-600"
-                        >
-                          <BiTrashAlt />
-                        </div>
-                        <Modal
-                          title="Bạn muốn xóa nhân viên này?"
-                          open={isModalDeleteOpen}
-                          width={400}
-                          onCancel={() => setIsModalDeleteOpen(false)}
-                          footer={[
-                            <button
-                              onClick={() => setIsModalDeleteOpen(false)}
-                              className="w-24 ml-2 rounded-md h-8 bg-red-500 text-white cursor-pointer"
-                            >
-                              Hủy
-                            </button>,
-                            <Button
-                              onClick={() => handleDeleteUser(item.id)}
-                              className="ml-2 w-24 rounded-md h-8 bg-blue-500 text-white cursor-pointer"
-                            >
-                              Xóa
-                            </Button>,
-                          ]}
-                        ></Modal>
-                      </td>
-                    </tr>
-                  ))}
+                  {employeeList
+                    .filter((employee) => {
+                      if (employeeSearched.length === 0) {
+                        return true; // Return all employees if employeeSearched is empty
+                      } else {
+                        return employeeSearched.some(
+                          (item) => item.id === employee.id
+                        );
+                      }
+                    })
+                    .map((item, index) => (
+                      <tr
+                        key={index}
+                        className="border-[2px] h-12 bg-slate-100"
+                      >
+                        <td className="text-center border-[2px]">
+                          {index + 1}
+                        </td>
+                        <td className="text-center border-[2px]">
+                          {item.fullName}
+                        </td>
+                        <td className="text-center border-[2px]">
+                          {item.gender}
+                        </td>
+                        <td className="text-center border-[2px]">
+                          {
+                            jobTitles.find(
+                              (job) =>
+                                job.id === item.jobInformation?.jobTitleId
+                            )?.name
+                          }
+                        </td>
+                        <td className="text-center border-[2px]">
+                          {item.email}
+                        </td>
+                        <td className="text-center border-[2px]">
+                          {item.phoneNumber}
+                        </td>
+                        <td className="text-center border-[2px]">
+                          {
+                            departments.find(
+                              (department) =>
+                                department.id ===
+                                item.jobInformation?.departmentId
+                            )?.name
+                          }
+                        </td>
+                        <td className="text-center border-[2px]"></td>
+                        <td className="text-center border-[2px]">
+                          {item.status}
+                        </td>
+                        <td className="flex justify-center items-center gap-2 flex-row p-4">
+                          <div className="flex justify-center items-center text-lg cursor-pointer text-orange-600">
+                            <BiEditAlt />
+                          </div>
+                          <div
+                            onClick={() => {
+                              setIsModalDeleteOpen(true);
+                            }}
+                            className="flex justify-center items-center text-lg cursor-pointer text-red-600"
+                          >
+                            <BiTrashAlt />
+                          </div>
+                          <Modal
+                            title="Bạn muốn xóa nhân viên này?"
+                            open={isModalDeleteOpen}
+                            width={400}
+                            onCancel={() => setIsModalDeleteOpen(false)}
+                            footer={[
+                              <button
+                                onClick={() => setIsModalDeleteOpen(false)}
+                                className="w-24 ml-2 rounded-md h-8 bg-red-500 text-white cursor-pointer"
+                              >
+                                Hủy
+                              </button>,
+                              <Button
+                                onClick={() => handleDeleteUser(item.id)}
+                                className="ml-2 w-24 rounded-md h-8 bg-blue-500 text-white cursor-pointer"
+                              >
+                                Xóa
+                              </Button>,
+                            ]}
+                          ></Modal>
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
