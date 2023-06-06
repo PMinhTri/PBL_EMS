@@ -1,64 +1,341 @@
 import React from "react";
-import { Calendar } from "antd";
+import { Calendar, Popover } from "antd";
 import type { Dayjs } from "dayjs";
 import type { CellRenderInfo } from "rc-picker/lib/interface";
 import "moment/locale/vi";
-import locale from "antd/es/date-picker/locale/vi_VN";
+import dayjs from "dayjs";
+import showNotification from "../../../../utils/notification";
+import { TimeSheetAction } from "../../../../actions/timeSheetAction";
+import { useRecoilValue } from "recoil";
+import userSelector from "../../../../recoil/selectors/user";
+import { TimeSheet } from "../../../../types/timeSheet";
 
-const getDataForDay = (value: Dayjs) => {
-  if (value.day() === 0 || value.day() === 6) {
-    return [];
-  }
-  const arrMorning = [1, 2, 3, 4, 5, 6, 7, 10, 11, 12];
-  const arrAfternoon = [8, 9, 15, 29];
-
-  const data = [
-    {
-      content: (
-        <>
-          <div
-            onClick={() => {
-              if (arrMorning.includes(value.date())) {
-                console.log("sáng");
-              }
-            }}
-            className={`w-full flex flex-col h-10 justify-center items-center ${
-              arrMorning.includes(value.date())
-                ? `bg-slate-200 hover:bg-slate-300 focus:bg-slate-300`
-                : `bg-green-200 hover:bg-green-300 focus:bg-green-300`
-            } text-sm border rounded-sm`}
-          >
-            <div className="w-full flex flex-row justify-between px-2">
-              <span>Ca sáng</span>
-            </div>
-            <span>8:00-12:00</span>
-          </div>
-          <div
-            onClick={() => {
-              if (arrAfternoon.includes(value.date())) {
-                console.log("sáng");
-              }
-            }}
-            className={`w-full flex flex-col h-10 justify-center items-center ${
-              arrAfternoon.includes(value.date())
-                ? `bg-slate-200 hover:bg-slate-300 focus:bg-slate-300`
-                : `bg-green-200 hover:bg-green-300 focus:bg-green-300`
-            } text-sm border rounded-sm `}
-          >
-            <div className="w-full flex flex-row justify-between px-2">
-              <span>Ca chiều</span>
-            </div>
-            <span>13:30-17:30</span>
-          </div>
-        </>
-      ),
-    },
-  ];
-
-  return data;
+type MorningPopoverProps = {
+  date: Date;
+  status?: string;
 };
 
-const CalendarContainer: React.FunctionComponent = () => {
+type AfternoonPopoverProps = {
+  date: Date;
+  status?: string;
+};
+
+const MorningPopover: React.FunctionComponent<MorningPopoverProps> = (
+  props: MorningPopoverProps
+) => {
+  const { date, status } = props;
+  const { userAuthInfo } = useRecoilValue(userSelector);
+
+  const [currentTime, setCurrentTime] = React.useState<string>("");
+
+  const handleCheckIn = async () => {
+    const date = new Date();
+
+    date.setHours(
+      Number(currentTime.split(":")[0]),
+      Number(currentTime.split(":")[1]),
+      0
+    ); // Set the date to the current time
+    const deadlineTime = new Date();
+    deadlineTime.setHours(12, 15, 0); // Set the deadline time to 12:15:00
+
+    if (dayjs(date).toDate() > deadlineTime) {
+      // Time is over 12:15:00, show notification
+      showNotification("error", "Đã quá thời gian chấm công cho ca sáng");
+      return;
+    }
+
+    try {
+      await TimeSheetAction.create({
+        userId: userAuthInfo?.id,
+        session: "sáng",
+        hoursWorked: 4,
+        status: "Đã chấm công",
+        timeIn: currentTime,
+        date: dayjs(date).format("YYYY-MM-DD"),
+        overtime: false,
+      });
+      showNotification("success", "You have checked in successfully");
+    } catch (error) {
+      showNotification("error", "Chấm công thất bại! Vui lòng thử lại sau");
+    }
+  };
+
+  React.useMemo(() => {
+    const interval = setInterval(() => {
+      const date = new Date();
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      const seconds = String(date.getSeconds()).padStart(2, "0");
+      const time = `${hours}:${minutes}:${seconds}`;
+
+      setCurrentTime(time);
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  return (
+    <div className="w-48 flex flex-col gap-2">
+      <div className="w-full flex flex-col gap-2 justify-between px-2">
+        <div className="w-full flex flex-row justify-between">
+          <span>Ca sáng</span>
+          <span>{dayjs(date).format("DD-MM-YYYY")}</span>
+        </div>
+        <div className="flex flex-row justify-center">
+          <div className="flex flex-row justify-center">
+            {status ? <span>Đã chấm công</span> : <span>{currentTime}</span>}
+          </div>
+        </div>
+      </div>
+
+      {!status && (
+        <div>
+          <button
+            onClick={handleCheckIn}
+            className="w-full h-8 bg-green-200 hover:bg-green-300 focus:bg-green-300 text-sm border rounded-sm"
+          >
+            Chấm công
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const AfternoonPopover: React.FunctionComponent<AfternoonPopoverProps> = (
+  props: AfternoonPopoverProps
+) => {
+  const { date, status } = props;
+  const { userAuthInfo } = useRecoilValue(userSelector);
+
+  const [currentTime, setCurrentTime] = React.useState<string>("");
+
+  const handleCheckIn = async () => {
+    const date = new Date();
+
+    date.setHours(
+      Number(currentTime.split(":")[0]),
+      Number(currentTime.split(":")[1]),
+      0
+    ); // Set the date to the current time
+    const deadlineTime = new Date();
+    deadlineTime.setHours(17, 45, 0);
+
+    if (dayjs(date).toDate() > deadlineTime) {
+      // Time is over 12:15:00, show notification
+      showNotification("error", "Đã quá thời gian chấm công cho ca chiều");
+      return;
+    }
+
+    try {
+      await TimeSheetAction.create({
+        userId: userAuthInfo?.id,
+        session: "chiều",
+        hoursWorked: 4,
+        status: "Đã chấm công",
+        timeIn: currentTime,
+        date: dayjs(date).format("YYYY-MM-DD"),
+        overtime: false,
+      });
+      showNotification("success", "Bạn đã thực hiện chấm công thành công!");
+    } catch (error) {
+      showNotification("error", "Chấm công thất bại! Vui lòng thử lại sau");
+    }
+  };
+
+  React.useMemo(() => {
+    const interval = setInterval(() => {
+      const date = new Date();
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      const seconds = String(date.getSeconds()).padStart(2, "0");
+      const time = `${hours}:${minutes}:${seconds}`;
+
+      setCurrentTime(time);
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  return (
+    <div className="w-48 flex flex-col gap-2">
+      <div className="w-full flex flex-col gap-2 justify-between px-2">
+        <div className="w-full flex flex-row justify-between">
+          <span>Ca chiều</span>
+          <span>{dayjs(date).format("DD-MM-YYYY")}</span>
+        </div>
+        <div className="flex flex-row justify-center">
+          {status ? <span>Đã chấm công</span> : <span>{currentTime}</span>}
+        </div>
+      </div>
+
+      {!status && (
+        <div>
+          <button
+            onClick={handleCheckIn}
+            className="w-full h-8 bg-green-200 hover:bg-green-300 focus:bg-green-300 text-sm border rounded-sm"
+          >
+            Chấm công
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+type Props = {
+  onSelect: (value: Dayjs) => void;
+};
+
+const CalendarContainer: React.FunctionComponent<Props> = (props: Props) => {
+  const { onSelect } = props;
+
+  const [timeSheet, setTimeSheet] = React.useState<TimeSheet[]>([]);
+  const [arrMorning, setArrMorning] = React.useState<number[]>([]);
+  const [arrAfternoon, setArrAfternoon] = React.useState<number[]>([]);
+
+  const [currentDate, setCurrentDate] = React.useState<Dayjs>(dayjs());
+
+  const { userAuthInfo } = useRecoilValue(userSelector);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const timeSheets = await TimeSheetAction.getByUser(
+        userAuthInfo?.id,
+        currentDate.month() + 1,
+        currentDate.year()
+      );
+
+      setTimeSheet(timeSheets);
+
+      setArrMorning(
+        timeSheets
+          .filter((timeSheet) => timeSheet.session === "sáng")
+          .map((timeSheet) => timeSheet.date)
+      );
+
+      setArrAfternoon(
+        timeSheets
+          .filter((timeSheet) => timeSheet.session === "chiều")
+          .map((timeSheet) => timeSheet.date)
+      );
+    };
+
+    fetchData();
+  }, [currentDate, timeSheet, userAuthInfo?.id]);
+
+  const getDataForDay = (value: Dayjs) => {
+    if (value.day() === 0 || value.day() === 6) {
+      return [];
+    }
+
+    const data = [
+      {
+        content: (
+          <>
+            <Popover
+              placement="top"
+              content={
+                <MorningPopover
+                  date={value.toDate()}
+                  status={
+                    timeSheet.find(
+                      (item) =>
+                        item.date === value.date() && item.session === "sáng"
+                    )?.status
+                  }
+                />
+              }
+              trigger={"click"}
+            >
+              <div
+                className={`w-full flex flex-col h-10 justify-center items-center ${
+                  arrMorning.includes(value.date())
+                    ? `bg-green-200 hover:bg-green-300 focus:bg-green-300`
+                    : `bg-slate-200 hover:bg-slate-300 focus:bg-slate-300`
+                } text-sm border rounded-sm`}
+              >
+                <div className="w-full flex flex-row justify-between px-2">
+                  <span>Ca sáng</span>
+                </div>
+                {timeSheet.find(
+                  (item) =>
+                    item.date === value.date() && item.session === "sáng"
+                ) && (
+                  <div
+                    className="
+                  w-full flex flex-row justify-between px-2 text-xs
+                  "
+                  >
+                    <span>Chấm công lúc</span>
+                    {
+                      timeSheet.find(
+                        (item) =>
+                          item.date === value.date() && item.session === "sáng"
+                      )?.timeIn
+                    }
+                  </div>
+                )}
+              </div>
+            </Popover>
+            <Popover
+              placement="top"
+              content={
+                <AfternoonPopover
+                  date={value.toDate()}
+                  status={
+                    timeSheet.find(
+                      (item) =>
+                        item.date === value.date() && item.session === "chiều"
+                    )?.status
+                  }
+                />
+              }
+              trigger={"click"}
+            >
+              <div
+                className={`w-full flex flex-col h-10 justify-center items-center ${
+                  arrAfternoon.includes(value.date())
+                    ? `bg-green-200 hover:bg-green-300 focus:bg-green-300`
+                    : `bg-slate-200 hover:bg-slate-300 focus:bg-slate-300`
+                } text-sm border rounded-sm `}
+              >
+                <div className="w-full flex flex-row justify-between px-2">
+                  <span>Ca chiều</span>
+                </div>
+                {timeSheet.find(
+                  (item) =>
+                    item.date === value.date() && item.session === "chiều"
+                ) && (
+                  <div
+                    className="
+                  w-full flex flex-row justify-between px-2 text-xs
+                  "
+                  >
+                    <span>Chấm công lúc</span>
+                    {
+                      timeSheet.find(
+                        (item) =>
+                          item.date === value.date() && item.session === "chiều"
+                      )?.timeIn
+                    }
+                  </div>
+                )}
+              </div>
+            </Popover>
+          </>
+        ),
+      },
+    ];
+
+    return data;
+  };
+
   const dateCellRender = (value: Dayjs) => {
     const listData = getDataForDay(value);
     return (
@@ -79,9 +356,13 @@ const CalendarContainer: React.FunctionComponent = () => {
 
   return (
     <Calendar
-      locale={locale}
       className="border-[2px]"
+      onSelect={(value) => {
+        setCurrentDate(value);
+        onSelect(value);
+      }}
       cellRender={cellRender}
+      mode="month"
     />
   );
 };

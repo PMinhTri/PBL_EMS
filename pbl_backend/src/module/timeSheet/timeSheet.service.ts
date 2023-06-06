@@ -20,6 +20,27 @@ export class TimeSheetService {
     const extractDate = dayjs(dto.date).format('DD/MM/YYYY');
     const [date, month, year] = extractDate.split('/').map(Number);
 
+    const existingLeave = await this.prisma.leave.findFirst({
+      where: {
+        userId: dto.userId,
+        startDate: {
+          lte: new Date(dto.date),
+        },
+        endDate: {
+          gte: new Date(dto.date),
+        },
+      },
+    });
+
+    if (existingLeave) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: TimeSheetFailure.REQUEST_ON_LEAVE_DATE,
+        },
+      };
+    }
+
     const existingTimeSheet = await this.prisma.timeSheet.findFirst({
       where: {
         userId: dto.userId,
@@ -47,6 +68,7 @@ export class TimeSheetService {
         session: dto.session,
         status: dto.status,
         hoursWorked: dto.hoursWorked,
+        timeIn: dto.timeIn,
         date: date,
         month: month,
         year: year,
@@ -148,6 +170,40 @@ export class TimeSheetService {
     return {
       status: ServiceResponseStatus.Success,
       result: totalWorkload,
+    };
+  }
+
+  public async totalOvertimeOfUser(
+    userId: string,
+    month: number,
+    year: number,
+  ): Promise<ServiceResponse<number, ServiceFailure<TimeSheetFailure>>> {
+    const overtime = await this.prisma.timeSheet.findMany({
+      where: {
+        userId: userId,
+        month: month,
+        year: year,
+        overtime: true,
+      },
+    });
+
+    if (!overtime) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: TimeSheetFailure.TIME_SHEET_NOT_FOUND,
+        },
+      };
+    }
+
+    const totalOvertime =
+      overtime.reduce((acc, curr) => {
+        return acc + curr.hoursWorked;
+      }, 0) / 8;
+
+    return {
+      status: ServiceResponseStatus.Success,
+      result: totalOvertime,
     };
   }
 }

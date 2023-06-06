@@ -268,4 +268,35 @@ export class LeaveController {
 
     return res.send(SuccessResult(leaveRequest));
   }
+
+  @Patch('leave-types/update/:id')
+  public async updateLeaveType(
+    @Param('id') id: string,
+    @Body() payload: { name: string; balance: number },
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const {
+      result: leaveType,
+      status,
+      failure,
+    } = await this.leaveService.editLeaveType(
+      id,
+      payload.name,
+      payload.balance,
+    );
+
+    if (status === 'Failed') {
+      switch (failure.reason) {
+        case 'LEAVE_TYPE_NOT_FOUND':
+          return res.send(
+            NotFoundResult({
+              reason: failure.reason,
+              message: 'Leave type not found',
+            }),
+          );
+      }
+    }
+
+    return res.send(SuccessResult(leaveType));
+  }
 }

@@ -91,6 +91,7 @@ model TimeSheet {
   session     String
   hoursWorked Float
   status      String
+  timeIn      String
   date        Int
   month       Int
   year        Int

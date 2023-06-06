@@ -413,4 +413,33 @@ export class LeaveService {
       status: ServiceResponseStatus.Success,
     };
   }
+
+  public async editLeaveType(
+    id: string,
+    leaveType: string,
+    balance: number,
+  ): Promise<ServiceResponse<string, ServiceFailure<LeaveFailure>>> {
+    try {
+      const result = await this.prisma.leaveType.update({
+        where: {
+          id: id,
+        },
+        data: {
+          name: leaveType,
+          balance: Number(balance),
+        },
+      });
+      return {
+        result: result.name,
+        status: ServiceResponseStatus.Success,
+      };
+    } catch (error) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: LeaveFailure.LEAVE_ALREADY_EXISTS,
+        },
+      };
+    }
+  }
 }

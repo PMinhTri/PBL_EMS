@@ -29,6 +29,11 @@ export class TimeSheetDto {
   status: string;
 
   @IsNotEmpty()
+  @IsString()
+  @ApiProperty({ type: 'string' })
+  timeIn: string;
+
+  @IsNotEmpty()
   @IsDateString()
   @ApiProperty({ type: 'string' })
   date: string;

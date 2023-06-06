@@ -25,12 +25,20 @@ export class TimeSheetController {
       await this.timeSheetService.createTimeSheet(dto);
 
     if (status === ServiceResponseStatus.Failed) {
-      return res.send(
-        BadRequestResult({
-          reason: failure.reason,
-          message: 'Bạn đã thực hiện chấm công cho ca làm việc này!',
-        }),
-      );
+      switch (failure.reason) {
+        case 'REQUEST_ON_LEAVE_DATE':
+          return res.send(
+            BadRequestResult({
+              message: 'Không thể chấm công trong ngày nghỉ!',
+            }),
+          );
+        case 'TIME_SHEET_ALREADY_EXISTS':
+          return res.send(
+            BadRequestResult({
+              message: 'Đã chấm công!',
+            }),
+          );
+      }
     }
 
     return res.send(SuccessResult(result));
@@ -69,6 +77,30 @@ export class TimeSheetController {
     @Res() res: IResponse,
   ): Promise<IResponse> {
     const { result, status } = await this.timeSheetService.totalWorkloadOfUser(
+      userId,
+      Number(month),
+      Number(year),
+    );
+
+    if (status === ServiceResponseStatus.Failed) {
+      return res.send(
+        BadRequestResult({
+          message: 'Không tìm thấy thông tin chấm công!',
+        }),
+      );
+    }
+
+    return res.send(SuccessResult(result));
+  }
+
+  @Get('overtime')
+  public async getOvertimeByUserIdAndMonth(
+    @Query('userId') userId: string,
+    @Query('month') month: number,
+    @Query('year') year: number,
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const { result, status } = await this.timeSheetService.totalOvertimeOfUser(
       userId,
       Number(month),
       Number(year),
