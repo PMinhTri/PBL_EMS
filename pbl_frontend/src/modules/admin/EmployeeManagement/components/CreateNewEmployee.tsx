@@ -22,7 +22,7 @@ const CreateNewEmployee: React.FunctionComponent<Props> = (props: Props) => {
       fullName: "",
       gender: "",
       status: "",
-      roleId: 1,
+      roleId: "",
     });
 
   const titleFields = [
@@ -113,7 +113,7 @@ const CreateNewEmployee: React.FunctionComponent<Props> = (props: Props) => {
                     )?.id;
                     setCreateNewUserInformation({
                       ...createNewUserInformation,
-                      roleId: roleId || 1,
+                      roleId: roleId || "",
                     });
                   } else {
                     setCreateNewUserInformation({

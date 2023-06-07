@@ -43,7 +43,7 @@ export type CreateNewUserInformation = {
   fullName: string;
   gender: string;
   status: string;
-  roleId: number;
+  roleId: string;
 };
 
 export type UpdateUserInformation = {

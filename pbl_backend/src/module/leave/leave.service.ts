@@ -9,7 +9,6 @@ import {
 import { LeaveFailure } from 'src/enumTypes/failure.enum';
 import { dateTimeUtils } from 'src/utils/datetime';
 import { Session } from 'src/constant/leaveSession.constant';
-import { LeaveSession } from 'src/enumTypes/leaveSession.enum';
 import { Leave, LeaveType } from '@prisma/client';
 import { LeaveStatus } from 'src/enumTypes/leave.enum';
 import * as dayjs from 'dayjs';
@@ -55,7 +54,7 @@ export class LeaveService {
           user: {
             id: dto.userId,
           },
-          status: LeaveStatus.Pending,
+          status: LeaveStatus.Pending || LeaveStatus.Approved,
         },
         select: {
           id: true,
@@ -109,7 +108,7 @@ export class LeaveService {
           user: {
             id: dto.userId,
           },
-          status: LeaveStatus.Pending,
+          status: LeaveStatus.Pending || LeaveStatus.Approved,
         },
       });
 
@@ -304,9 +303,8 @@ export class LeaveService {
       where: {
         user: {
           id: userId,
-          isDeleted: false,
-          status: LeaveStatus.Cancelled,
         },
+        status: LeaveStatus.Pending || LeaveStatus.Approved,
       },
     });
 

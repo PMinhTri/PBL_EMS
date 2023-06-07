@@ -1,5 +1,5 @@
 import React from "react";
-import { LeaveRequest } from "../../../../types/leave";
+import { LeaveRequest, LeaveType } from "../../../../types/leave";
 import { LeaveAction } from "../../../../actions/leaveAction";
 import { useRecoilValue } from "recoil";
 import userSelector from "../../../../recoil/selectors/user";
@@ -14,6 +14,7 @@ const RequestHistory: React.FunctionComponent = () => {
   const [requestHistoryData, setRequestHistoryData] = React.useState<
     LeaveRequest[]
   >([]);
+  const [leaveType, setLeaveType] = React.useState<LeaveType[]>([]);
 
   const [isOpenCancelModal, setIsOpenCancelModal] = React.useState(false);
 
@@ -22,6 +23,7 @@ const RequestHistory: React.FunctionComponent = () => {
       const leaveRequests = await LeaveAction.getLeaveRequestsByUser(
         userAuthInfo.id
       );
+      setLeaveType(await LeaveAction.getLeaveType());
       setRequestHistoryData(leaveRequests ?? []);
     };
 
@@ -35,7 +37,7 @@ const RequestHistory: React.FunctionComponent = () => {
       showNotification("success", "Hủy yêu cầu thành công");
 
       setTimeout(() => {
-        window.location.reload();
+        window.location.href = "/employee/time-sheet";
       }, 1000);
     } catch (err) {
       showNotification("error", "Hủy yêu cầu nghỉ phép thất bại");
@@ -50,9 +52,10 @@ const RequestHistory: React.FunctionComponent = () => {
           <tr>
             <th className="py-3 px-4 text-center border-b">Ngày bắt đầu</th>
             <th className="py-3 px-4 text-center border-b">Ngày kết thúc</th>
+            <th className="py-3 px-4 text-center border-b">Loại phép</th>
             <th className="py-3 px-4 text-center border-b">Số ngày nghỉ</th>
             <th className="py-3 px-4 text-center border-b">Buổi</th>
-            <th className="py-3 px-8 text-center border-b">Lý do</th>
+            <th className="py-3 px-4 text-center border-b">Lý do</th>
             <th className="py-3 px-4 text-center border-b">Trạng thái</th>
             <th className="py-3 px-4 text-center border-b">Hành động</th>
           </tr>
@@ -65,6 +68,9 @@ const RequestHistory: React.FunctionComponent = () => {
               </td>
               <td className="py-3 px-4 text-center border-b">
                 {dayjs(item.endDate).format("DD/MM/YYYY")}
+              </td>
+              <td className="py-3 px-4 text-center border-b">
+                {leaveType.find((type) => type.id === item.leaveTypeId)?.name}
               </td>
               <td className="py-3 px-4 text-center border-b">
                 {item.leaveDays}

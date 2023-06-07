@@ -36,12 +36,19 @@ const MorningPopover: React.FunctionComponent<MorningPopoverProps> = (
       Number(currentTime.split(":")[1]),
       0
     ); // Set the date to the current time
-    const deadlineTime = new Date();
-    deadlineTime.setHours(12, 15, 0); // Set the deadline time to 12:15:00
+    const deadlineEndTime = new Date();
+    deadlineEndTime.setHours(12, 15, 0); // Set the deadline time to 12:15:00
 
-    if (dayjs(date).toDate() > deadlineTime) {
+    const deadlineStartTime = new Date();
+    deadlineStartTime.setHours(7, 30, 0);
+    if (
+      !(
+        dayjs(date).toDate() > deadlineStartTime &&
+        dayjs(date).toDate() < deadlineEndTime
+      )
+    ) {
       // Time is over 12:15:00, show notification
-      showNotification("error", "Đã quá thời gian chấm công cho ca sáng");
+      showNotification("error", "Không phải thời gian chấm công cho ca sáng");
       return;
     }
 

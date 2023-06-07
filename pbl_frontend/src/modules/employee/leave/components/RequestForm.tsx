@@ -97,7 +97,7 @@ export const RequestForm: React.FunctionComponent = () => {
         showNotification("success", "Tạo yêu cầu thành công!");
 
         setTimeout(() => {
-          window.location.reload();
+          window.location.href = "/employee/time-sheet";
         }, 2000);
       }
     }

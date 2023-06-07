@@ -3,6 +3,8 @@ import { BsCalendar2Check, BsCalendarPlus, BsCalendarX } from "react-icons/bs";
 import { TimeSheetAction } from "../../../../actions/timeSheetAction";
 import { useRecoilValue } from "recoil";
 import userSelector from "../../../../recoil/selectors/user";
+import { LeaveRequest } from "../../../../types/leave";
+import { LeaveAction } from "../../../../actions/leaveAction";
 
 type Props = {
   month: number;
@@ -14,6 +16,7 @@ const MyTimeSheetStats: React.FunctionComponent<Props> = (props: Props) => {
 
   const [totalWorkload, setTotalWorkload] = React.useState<number>(0);
   const { userAuthInfo } = useRecoilValue(userSelector);
+  const [leaveRequest, setLeaveRequest] = React.useState<LeaveRequest[]>([]);
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -21,6 +24,10 @@ const MyTimeSheetStats: React.FunctionComponent<Props> = (props: Props) => {
         userAuthInfo.id,
         month,
         year
+      );
+
+      setLeaveRequest(
+        (await LeaveAction.getAllLeaveRequestByUserId(userAuthInfo.id)) ?? []
       );
 
       setTotalWorkload(workload);
@@ -51,7 +58,9 @@ const MyTimeSheetStats: React.FunctionComponent<Props> = (props: Props) => {
       <div className="flex flex-col w-full h-32 bg-white border shadow-md rounded-md">
         <span className="px-4 text-xl">Số ngày nghỉ:</span>
         <div className="w-full flex flex-row justify-between items-center py-8 px-4">
-          <span className="text-2xl font-bold">10</span>
+          <span className="text-2xl font-bold">
+            {leaveRequest.filter((item) => item.status === "APPROVED").length}
+          </span>
           <div className="text-xl text-red-600">
             <BsCalendarX />
           </div>
