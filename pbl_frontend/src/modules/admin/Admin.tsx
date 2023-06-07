@@ -6,13 +6,10 @@ import ContentWrapper from "../../components/ContentWrapper";
 import Sidebar from "../../components/Sidebar";
 import PageWrapper from "../../components/PageWrapper";
 import {
-  // BiBarChartAlt2,
-  BiCalendar,
   BiCalendarAlt,
   BiDollarCircle,
   BiGridAlt,
   BiGroup,
-  // BiMessageDetail,
   BiTask,
   BiWrench,
 } from "react-icons/bi";
@@ -24,7 +21,7 @@ const Admin: React.FunctionComponent = () => {
     { name: "Chấm công", icon: <BiTask />, path: "/admin/time-sheet" },
     { name: "Nghỉ phép", icon: <BiCalendarAlt />, path: "/admin/leaves" },
     { name: "Lương", icon: <BiDollarCircle />, path: "/admin/payroll" },
-    { name: "Thiết lập", icon: <BiWrench />, path: "#" },
+    { name: "Thiết lập", icon: <BiWrench />, path: "/admin/setting" },
   ];
   return (
     <Container>

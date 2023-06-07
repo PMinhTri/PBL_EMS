@@ -11,6 +11,9 @@ import { dateTimeUtils } from 'src/utils/datetime';
 import { Session } from 'src/constant/leaveSession.constant';
 import { LeaveSession } from 'src/enumTypes/leaveSession.enum';
 import { Leave, LeaveType } from '@prisma/client';
+import { LeaveStatus } from 'src/enumTypes/leave.enum';
+import * as dayjs from 'dayjs';
+import { intersection } from 'lodash';
 
 @Injectable()
 export class LeaveService {
@@ -46,34 +49,32 @@ export class LeaveService {
       }
     }
 
-    if (dto.startDate === dto.endDate) {
+    if (dayjs(dto.startDate).isSame(dto.endDate)) {
       const existedLeaveRequestByDate = await this.prisma.leave.findMany({
         where: {
           user: {
             id: dto.userId,
           },
-          startDate: new Date(dto.startDate),
-          endDate: new Date(dto.endDate),
+          status: LeaveStatus.Pending,
         },
         select: {
           id: true,
           session: true,
           leaveDays: true,
+          startDate: true,
+          endDate: true,
         },
       });
 
-      if (dto.session === LeaveSession.FullDay) {
-        return {
-          valid: false,
-          failure: {
-            reason: LeaveFailure.LEAVE_REQUEST_OVERLAP,
-          },
-        };
-      }
-
-      for (const leave of existedLeaveRequestByDate) {
+      for (const leave of existedLeaveRequestByDate.filter((leaveRequest) =>
+        dayjs(leaveRequest.startDate).isSame(dayjs(leaveRequest.endDate)),
+      )) {
         if (leave.id === requestId) continue;
-        if (leave.session === dto.session) {
+        if (
+          (dayjs(dto.startDate).isSame(leave.endDate) ||
+            dayjs(dto.startDate).isSame(leave.startDate)) &&
+          Session[dto.session] + Session[leave.session] > 1
+        ) {
           return {
             valid: false,
             failure: {
@@ -81,11 +82,36 @@ export class LeaveService {
             },
           };
         }
+
+        for (const leave of existedLeaveRequestByDate.filter((leaveRequest) =>
+          dayjs(leaveRequest.startDate).isBefore(dayjs(leaveRequest.endDate)),
+        )) {
+          if (leave.id === requestId) continue;
+
+          const overlapped = intersection(
+            dateTimeUtils.getDatesWithCondition(leave.startDate, leave.endDate),
+            dateTimeUtils.getDatesWithCondition(dto.startDate, dto.endDate),
+          );
+
+          if (overlapped.length) {
+            return {
+              valid: false,
+              failure: {
+                reason: LeaveFailure.LEAVE_REQUEST_OVERLAP,
+              },
+            };
+          }
+        }
       }
     } else {
-      const { result: allLeaveRequest } = await this.getLeaveRequestByUserId(
-        dto.userId,
-      );
+      const allLeaveRequest = await this.prisma.leave.findMany({
+        where: {
+          user: {
+            id: dto.userId,
+          },
+          status: LeaveStatus.Pending,
+        },
+      });
 
       const allDatesRequested = [];
 
@@ -98,10 +124,12 @@ export class LeaveService {
         allDatesRequested.push(...dates);
       }
 
-      if (
-        allDatesRequested.includes(dto.startDate) ||
-        allDatesRequested.includes(dto.endDate)
-      ) {
+      const overlapped = intersection(
+        allDatesRequested,
+        dateTimeUtils.getDatesWithCondition(dto.startDate, dto.endDate),
+      );
+
+      if (overlapped.length) {
         return {
           valid: false,
           failure: {
@@ -130,6 +158,7 @@ export class LeaveService {
 
     const { result: remainingLeaveDays } = await this.getRemainingBalance(
       dto.userId,
+      dto.leaveTypeId,
     );
 
     if (remainingLeaveDays < dto.leaveDays) {
@@ -158,7 +187,7 @@ export class LeaveService {
         endDate: new Date(dto.endDate),
         session: dto.session,
         reason: dto.reason,
-        status: 'Pending',
+        status: LeaveStatus.Pending,
       },
     });
 
@@ -201,6 +230,7 @@ export class LeaveService {
 
     const { result: remainingLeaveDays } = await this.getRemainingBalance(
       dto.userId,
+      dto.leaveTypeId,
     );
 
     if (remainingLeaveDays + existedLeaveRequest.leaveDays < dto.leaveDays) {
@@ -268,25 +298,35 @@ export class LeaveService {
 
   public async getRemainingBalance(
     userId: string,
+    leaveTypeId: string,
   ): Promise<ServiceResponse<number, ServiceFailure<LeaveFailure>>> {
     const allLeaveRequest = await this.prisma.leave.findMany({
       where: {
         user: {
           id: userId,
+          isDeleted: false,
+          status: LeaveStatus.Cancelled,
         },
       },
     });
 
-    const balance = (
-      await this.prisma.leaveType.findFirst({
-        where: {
-          name: 'Annual',
+    const balance = await this.prisma.leaveType.findFirst({
+      where: {
+        id: leaveTypeId,
+      },
+    });
+
+    if (!balance) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: LeaveFailure.LEAVE_NOT_FOUND,
         },
-      })
-    ).balance;
+      };
+    }
 
     const remainingLeaveDays =
-      balance -
+      balance.balance -
       allLeaveRequest.reduce((acc, curr) => {
         return acc + curr.leaveDays;
       }, 0);
@@ -299,6 +339,7 @@ export class LeaveService {
 
   public async cancelLeaveRequest(
     id: string,
+    status: string,
   ): Promise<ServiceResponse<Leave, ServiceFailure<LeaveFailure>>> {
     const existedLeaveRequest = await this.prisma.leave.findUnique({
       where: {
@@ -320,7 +361,8 @@ export class LeaveService {
         id: id,
       },
       data: {
-        status: 'Cancelled',
+        status: status,
+        isDeleted: true,
       },
     });
 
@@ -441,5 +483,16 @@ export class LeaveService {
         },
       };
     }
+  }
+
+  public async deleteAllLeaveRequests(): Promise<
+    ServiceResponse<null, ServiceFailure<LeaveFailure>>
+  > {
+    return this.prisma.leave.deleteMany().then(() => {
+      return {
+        status: ServiceResponseStatus.Success,
+        result: null,
+      };
+    });
   }
 }

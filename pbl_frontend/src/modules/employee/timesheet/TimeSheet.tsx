@@ -2,6 +2,7 @@ import React from "react";
 import MyTimeSheetStats from "./components/MyTimeSheetStats";
 import CalendarContainer from "./components/CalendarContainer";
 import dayjs, { Dayjs } from "dayjs";
+import HistoryTimeSheet from "./components/HistoryTimeSheet";
 
 const TimeSheetPage: React.FunctionComponent = () => {
   const [currentDate, setCurrentDate] = React.useState<Dayjs>(dayjs());
@@ -16,6 +17,7 @@ const TimeSheetPage: React.FunctionComponent = () => {
           month={currentDate.month() + 1}
           year={currentDate.year()}
         />
+        <HistoryTimeSheet />
       </div>
       <footer className="bg-gray-200 mt-8 py-4 px-2 text-center text-gray-600"></footer>
     </div>

@@ -5,21 +5,13 @@ import Navbar from "../../components/Navbar";
 import ContentWrapper from "../../components/ContentWrapper";
 import Sidebar from "../../components/Sidebar";
 import PageWrapper from "../../components/PageWrapper";
-import {
-  BiCalendar,
-  BiCalendarAlt,
-  BiDollarCircle,
-  BiMessageDetail,
-  BiTask,
-} from "react-icons/bi";
+import { BiCalendarAlt, BiDollarCircle, BiTask } from "react-icons/bi";
 
 export const Employee: React.FunctionComponent = () => {
   const employeeSideBarItems = [
-    { name: "Time Sheet", icon: <BiTask />, path: "/employee/time-sheet" },
-    { name: "Leave", icon: <BiCalendarAlt />, path: "/employee/leaves" },
-    { name: "Payroll", icon: <BiDollarCircle />, path: "#" },
-    { name: "Calendar", icon: <BiCalendar />, path: "#" },
-    { name: "Message", icon: <BiMessageDetail />, path: "" },
+    { name: "Chấm công", icon: <BiTask />, path: "/employee/time-sheet" },
+    { name: "Nghỉ phép", icon: <BiCalendarAlt />, path: "/employee/leaves" },
+    { name: "Lương", icon: <BiDollarCircle />, path: "#" },
   ];
   return (
     <Container>

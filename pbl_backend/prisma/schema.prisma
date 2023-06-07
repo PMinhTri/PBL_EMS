@@ -34,12 +34,14 @@ model User {
 
   insurance Insurance[]
 
-  roleId String
-  role   Role   @relation(fields: [roleId], references: [id])
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  roleId      String
+  role        Role    @relation(fields: [roleId], references: [id])
   educationId String?
+
+  isDeleted Boolean? @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model JobInformation {
@@ -60,6 +62,8 @@ model JobInformation {
   department        Department?    @relation(fields: [departmentId], references: [id])
   // project           Project[]
 
+  isDeleted Boolean? @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -67,6 +71,7 @@ model JobInformation {
 model JobTitle {
   id             String           @id @default(uuid())
   name           String
+  isDeleted      Boolean?         @default(false)
   JobInformation JobInformation[]
 }
 
@@ -74,12 +79,15 @@ model WorkingSkill {
   id             String           @id @default(uuid())
   jobInformation JobInformation[]
   name           String
-  description    String?
+
+  isDeleted   Boolean? @default(false)
+  description String?
 }
 
 model Department {
   id             String           @id @default(uuid())
   name           String
+  isDeleted      Boolean          @default(false)
   JobInformation JobInformation[]
 }
 
@@ -96,6 +104,8 @@ model TimeSheet {
   month       Int
   year        Int
 
+  isDeleted Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -104,6 +114,8 @@ model Role {
   id   String @id @default(uuid())
   name String
   User User[]
+
+  isDeleted Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -119,6 +131,8 @@ model Payroll {
   totalSalary Float
   additional  Float?
   status      String?
+
+  isDeleted Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -149,7 +163,7 @@ model Insurance {
 
 model Leave {
   id          String     @id @default(uuid())
-  userId      String     @unique
+  userId      String
   user        User       @relation(fields: [userId], references: [id])
   session     String
   status      String
@@ -159,6 +173,7 @@ model Leave {
   startDate   DateTime
   endDate     DateTime
   reason      String?
+  isDeleted   Boolean?   @default(false)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 }
@@ -183,5 +198,6 @@ model Education {
 model Contract {
   id             String           @id @default(uuid())
   type           String
+  isDeleted      Boolean?         @default(false)
   JobInformation JobInformation[]
 }

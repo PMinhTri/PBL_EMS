@@ -1,5 +1,5 @@
 export enum LeaveSession {
-  Morning = 'Morning',
-  Afternoon = 'Afternoon',
-  FullDay = 'FullDay',
+  Morning = 'Sáng',
+  Afternoon = 'Chiều',
+  FullDay = 'Cả ngày',
 }

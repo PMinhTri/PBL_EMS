@@ -125,8 +125,13 @@ const AfternoonPopover: React.FunctionComponent<AfternoonPopoverProps> = (
     deadlineTime.setHours(17, 45, 0);
 
     if (dayjs(date).toDate() > deadlineTime) {
-      // Time is over 12:15:00, show notification
       showNotification("error", "Đã quá thời gian chấm công cho ca chiều");
+      return;
+    }
+
+    deadlineTime.setHours(12, 30, 0);
+    if (dayjs(date).toDate() < deadlineTime) {
+      showNotification("error", "Chưa đến thời gian chấm công cho ca chiều");
       return;
     }
 
@@ -196,8 +201,8 @@ const CalendarContainer: React.FunctionComponent<Props> = (props: Props) => {
   const { onSelect } = props;
 
   const [timeSheet, setTimeSheet] = React.useState<TimeSheet[]>([]);
-  const [arrMorning, setArrMorning] = React.useState<number[]>([]);
-  const [arrAfternoon, setArrAfternoon] = React.useState<number[]>([]);
+  const [arrMorning, setArrMorning] = React.useState<string[]>([]);
+  const [arrAfternoon, setArrAfternoon] = React.useState<string[]>([]);
 
   const [currentDate, setCurrentDate] = React.useState<Dayjs>(dayjs());
 
@@ -216,13 +221,19 @@ const CalendarContainer: React.FunctionComponent<Props> = (props: Props) => {
       setArrMorning(
         timeSheets
           .filter((timeSheet) => timeSheet.session === "sáng")
-          .map((timeSheet) => timeSheet.date)
+          .map(
+            (timeSheet) =>
+              `${timeSheet.date}-${timeSheet.month}-${timeSheet.year}`
+          )
       );
 
       setArrAfternoon(
         timeSheets
           .filter((timeSheet) => timeSheet.session === "chiều")
-          .map((timeSheet) => timeSheet.date)
+          .map(
+            (timeSheet) =>
+              `${timeSheet.date}-${timeSheet.month}-${timeSheet.year}`
+          )
       );
     };
 
@@ -246,7 +257,10 @@ const CalendarContainer: React.FunctionComponent<Props> = (props: Props) => {
                   status={
                     timeSheet.find(
                       (item) =>
-                        item.date === value.date() && item.session === "sáng"
+                        `${item.date}-${item.month}-${item.year}` ===
+                          `${value.date()}-${
+                            value.month() + 1
+                          }-${value.year()}` && item.session === "sáng"
                     )?.status
                   }
                 />
@@ -255,7 +269,9 @@ const CalendarContainer: React.FunctionComponent<Props> = (props: Props) => {
             >
               <div
                 className={`w-full flex flex-col h-10 justify-center items-center ${
-                  arrMorning.includes(value.date())
+                  arrMorning.includes(
+                    `${value.date()}-${value.month() + 1}-${value.year()}`
+                  )
                     ? `bg-green-200 hover:bg-green-300 focus:bg-green-300`
                     : `bg-slate-200 hover:bg-slate-300 focus:bg-slate-300`
                 } text-sm border rounded-sm`}
@@ -265,7 +281,9 @@ const CalendarContainer: React.FunctionComponent<Props> = (props: Props) => {
                 </div>
                 {timeSheet.find(
                   (item) =>
-                    item.date === value.date() && item.session === "sáng"
+                    `${item.date}-${item.month}-${item.year}` ===
+                      `${value.date()}-${value.month() + 1}-${value.year()}` &&
+                    item.session === "sáng"
                 ) && (
                   <div
                     className="
@@ -276,7 +294,10 @@ const CalendarContainer: React.FunctionComponent<Props> = (props: Props) => {
                     {
                       timeSheet.find(
                         (item) =>
-                          item.date === value.date() && item.session === "sáng"
+                          `${item.date}-${item.month}-${item.year}` ===
+                            `${value.date()}-${
+                              value.month() + 1
+                            }-${value.year()}` && item.session === "sáng"
                       )?.timeIn
                     }
                   </div>
@@ -291,7 +312,10 @@ const CalendarContainer: React.FunctionComponent<Props> = (props: Props) => {
                   status={
                     timeSheet.find(
                       (item) =>
-                        item.date === value.date() && item.session === "chiều"
+                        `${item.date}-${item.month}-${item.year}` ===
+                          `${value.date()}-${
+                            value.month() + 1
+                          }-${value.year()}` && item.session === "chiều"
                     )?.status
                   }
                 />
@@ -300,7 +324,9 @@ const CalendarContainer: React.FunctionComponent<Props> = (props: Props) => {
             >
               <div
                 className={`w-full flex flex-col h-10 justify-center items-center ${
-                  arrAfternoon.includes(value.date())
+                  arrAfternoon.includes(
+                    `${value.date()}-${value.month() + 1}-${value.year()}`
+                  )
                     ? `bg-green-200 hover:bg-green-300 focus:bg-green-300`
                     : `bg-slate-200 hover:bg-slate-300 focus:bg-slate-300`
                 } text-sm border rounded-sm `}
@@ -310,7 +336,9 @@ const CalendarContainer: React.FunctionComponent<Props> = (props: Props) => {
                 </div>
                 {timeSheet.find(
                   (item) =>
-                    item.date === value.date() && item.session === "chiều"
+                    `${item.date}-${item.month}-${item.year}` ===
+                      `${value.date()}-${value.month() + 1}-${value.year()}` &&
+                    item.session === "chiều"
                 ) && (
                   <div
                     className="
@@ -321,7 +349,10 @@ const CalendarContainer: React.FunctionComponent<Props> = (props: Props) => {
                     {
                       timeSheet.find(
                         (item) =>
-                          item.date === value.date() && item.session === "chiều"
+                          `${item.date}-${item.month}-${item.year}` ===
+                            `${value.date()}-${
+                              value.month() + 1
+                            }-${value.year()}` && item.session === "chiều"
                       )?.timeIn
                     }
                   </div>

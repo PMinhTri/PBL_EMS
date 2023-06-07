@@ -139,16 +139,17 @@ export class LeaveController {
     return res.send(SuccessResult(leaveRequest));
   }
 
-  @Get('/remaining-balance')
+  @Get('/remaining-balance/')
   public async getRemainingBalance(
     @Query('userId') userId: string,
+    @Query('leaveTypeId') leaveTypeId: string,
     @Res() res: IResponse,
   ): Promise<IResponse> {
     const {
       result: remainingLeaveDays,
       status,
       failure,
-    } = await this.leaveService.getRemainingBalance(userId);
+    } = await this.leaveService.getRemainingBalance(userId, leaveTypeId);
 
     if (status === 'Failed') {
       switch (failure.reason) {
@@ -168,13 +169,14 @@ export class LeaveController {
   @Patch('/cancel/:id')
   public async cancelLeaveRequest(
     @Param('id') id: string,
+    @Body() payload: { status: string },
     @Res() res: IResponse,
   ): Promise<IResponse> {
     const {
       result: leaveRequest,
       status,
       failure,
-    } = await this.leaveService.cancelLeaveRequest(id);
+    } = await this.leaveService.cancelLeaveRequest(id, payload.status);
 
     if (status === 'Failed') {
       switch (failure.reason) {
@@ -298,5 +300,15 @@ export class LeaveController {
     }
 
     return res.send(SuccessResult(leaveType));
+  }
+
+  @Delete('/remove-all')
+  public async removeAllLeaveRequest(
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const { result: leaveRequest } =
+      await this.leaveService.deleteAllLeaveRequests();
+
+    return res.send(SuccessResult(leaveRequest));
   }
 }

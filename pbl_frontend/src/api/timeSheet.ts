@@ -2,10 +2,11 @@ import { TimeSheet, TimeSheetPayload } from "../types/timeSheet";
 import { $get, $post } from "../utils/http";
 
 export const createTimeSheet = async (timeSheet: TimeSheetPayload) => {
+  console.log(timeSheet);
   const response: {
     statusCode: number;
     payload: TimeSheet;
-  } = await $post("/time-sheet", timeSheet);
+  } = await $post("/time-sheet/create", timeSheet);
 
   return response;
 };
