@@ -1,5 +1,6 @@
 import {
   createTimeSheet,
+  getAllTimeSheetInMonth,
   getTimeSheetOfUser,
   getTotalWorkload,
 } from "../api/timeSheet";
@@ -25,6 +26,22 @@ export const TimeSheetAction = {
 
   totalWorkload: async (userId: string, month: number, year: number) => {
     const response = await getTotalWorkload(userId, month, year);
+
+    return response.payload;
+  },
+
+  getAllTimeSheetOfUser: async (
+    userId: string,
+    month: number,
+    year: number
+  ) => {
+    const response = await getTimeSheetOfUser(userId, month, year);
+
+    return response.payload;
+  },
+
+  getAllInMonth: async (month: number, year: number) => {
+    const response = await getAllTimeSheetInMonth(month, year);
 
     return response.payload;
   },

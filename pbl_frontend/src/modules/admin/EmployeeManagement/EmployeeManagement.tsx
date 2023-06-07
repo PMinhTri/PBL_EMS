@@ -53,7 +53,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
       fullName: "",
       gender: "",
       status: "",
-      roleId: 1,
+      roleId: "",
     });
 
   const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -97,7 +97,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
       !newEmployee.fullName ||
       !newEmployee.gender ||
       !newEmployee.status ||
-      newEmployee.roleId === 1
+      newEmployee.roleId === ""
     ) {
       showNotification("error", "Vui lòng điền đầy đủ thông tin");
     } else {

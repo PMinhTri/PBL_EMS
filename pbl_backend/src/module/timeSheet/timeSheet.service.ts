@@ -206,4 +206,30 @@ export class TimeSheetService {
       result: totalOvertime,
     };
   }
+
+  public async getAllTimeSheetInMonth(
+    month: number,
+    year: number,
+  ): Promise<ServiceResponse<TimeSheet[], ServiceFailure<TimeSheetFailure>>> {
+    const timeSheets = await this.prisma.timeSheet.findMany({
+      where: {
+        month: month,
+        year: year,
+      },
+    });
+
+    if (!timeSheets) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: TimeSheetFailure.TIME_SHEET_NOT_FOUND,
+        },
+      };
+    }
+
+    return {
+      status: ServiceResponseStatus.Success,
+      result: timeSheets,
+    };
+  }
 }

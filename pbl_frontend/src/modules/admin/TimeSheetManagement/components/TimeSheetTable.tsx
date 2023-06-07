@@ -1,39 +1,53 @@
 import React from "react";
 import { BsFillArrowDownCircleFill } from "react-icons/bs";
+import { UserAction } from "../../../../actions/userAction";
+import { UserDetailInformation } from "../../../../types/userTypes";
+import { TimeSheet } from "../../../../types/timeSheet";
+import { TimeSheetAction } from "../../../../actions/timeSheetAction";
+import { useRecoilValue } from "recoil";
+import userSelector from "../../../../recoil/selectors/user";
 
 const TimeSheetTable: React.FunctionComponent = () => {
-  const [selectedYear, setSelectedYear] = React.useState<number>(2023);
-  const [selectedMonth, setSelectedMonth] = React.useState<number>(5);
+  const { userAuthInfo } = useRecoilValue(userSelector);
+  const [selectedYear, setSelectedYear] = React.useState<number>(
+    new Date().getFullYear()
+  );
+  const [selectedMonth, setSelectedMonth] = React.useState<number>(
+    new Date().getMonth() + 1
+  );
+  const [employeeList, setEmployeeList] = React.useState<
+    UserDetailInformation[]
+  >([]);
+  const [totalWorkLoad, setTotalWorkLoad] = React.useState<number[]>([]);
+
+  const [timeSheet, setTimeSheet] = React.useState<TimeSheet[]>([]);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const employees = await UserAction.getAllEmployees();
+      setTimeSheet(
+        await TimeSheetAction.getAllInMonth(selectedMonth, selectedYear)
+      );
+      setEmployeeList(employees);
+    };
+
+    fetchData();
+  }, [selectedMonth, selectedYear, userAuthInfo.id]);
 
   const generateDaysArray = () => {
     const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
     return Array.from({ length: daysInMonth }, (_, index) => index + 1);
   };
 
-  const daysOfWeek = ["CN", "Th.2", "Th.3", "Th.4", "Th.5", "Th.6", "Th.7"];
+  const getWorkLoadValue = (userId: string, day: number) => {
+    const value = timeSheet.find(
+      (timeSheet) => timeSheet.userId === userId && timeSheet.date === day
+    )?.hoursWorked;
 
-  const employeeData = [
-    { id: 1, name: "John Doe" },
-    { id: 2, name: "Jane Smith" },
-    { id: 3, name: "Mike Johnson" },
-    { id: 4, name: "Mary Williams" },
-    { id: 5, name: "David Brown" },
-    { id: 6, name: "Sarah Jones" },
-    { id: 7, name: "Paul Miller" },
-    { id: 8, name: "Lisa Davis" },
-    { id: 9, name: "Mark Garcia" },
-    { id: 10, name: "Karen Rodriguez" },
-    { id: 11, name: "Robert Wilson" },
-    { id: 12, name: "Helen Martinez" },
-    { id: 13, name: "Daniel Anderson" },
-    { id: 14, name: "Elizabeth Taylor" },
-    { id: 15, name: "William Thomas" },
-    { id: 16, name: "Susan Hernandez" },
-    { id: 17, name: "Donald Moore" },
-    { id: 18, name: "Margaret Martin" },
-    { id: 19, name: "Joseph Jackson" },
-    { id: 20, name: "Sandra Thompson" },
-  ];
+    return value ? value / 8 : 0;
+  };
+
+  const daysOfWeek = ["CN", "Th.2", "Th.3", "Th.4", "Th.5", "Th.6", "Th.7"];
 
   return (
     <div className="w-full p-6 rounded-md flex flex-col bg-white">
@@ -137,14 +151,14 @@ const TimeSheetTable: React.FunctionComponent = () => {
           </div>
         </div>
         <div className="flex flex-col w-full h-5/6">
-          {employeeData.map((employee) => (
+          {employeeList.map((employee, index) => (
             <div key={employee.id} className="flex w-full h-16">
               <div className="flex flex-row sticky bg-white border-r border-slate-400 left-0 z-10">
                 <div className="flex border w-8 justify-center items-center">
-                  {employee.id}
+                  {index}
                 </div>
                 <div className="flex border w-48 justify-center items-center">
-                  {employee.name}
+                  {employee.fullName}
                 </div>
               </div>
               <div className="flex flex-row z-1">
@@ -164,7 +178,7 @@ const TimeSheetTable: React.FunctionComponent = () => {
 
                   return (
                     <div key={day} className={inputClass}>
-                      {/* Add input fields here */}
+                      {getWorkLoadValue(employee.id, day)}
                     </div>
                   );
                 })}

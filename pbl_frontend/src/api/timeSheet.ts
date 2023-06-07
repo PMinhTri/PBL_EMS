@@ -38,3 +38,25 @@ export const getTotalWorkload = async (
 
   return response;
 };
+
+export const getAllTimeSheetOfUser = async (
+  userId: string,
+  month: number,
+  year: number
+) => {
+  const response: {
+    statusCode: number;
+    payload: TimeSheet[];
+  } = await $get(`/time-sheet/?userId=${userId}&month=${month}&year=${year}`);
+
+  return response;
+};
+
+export const getAllTimeSheetInMonth = async (month: number, year: number) => {
+  const response: {
+    statusCode: number;
+    payload: TimeSheet[];
+  } = await $get(`/time-sheet/all/?month=${month}&year=${year}`);
+
+  return response;
+};
