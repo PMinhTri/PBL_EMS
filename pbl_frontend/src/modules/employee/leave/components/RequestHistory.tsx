@@ -1,5 +1,9 @@
 import React from "react";
-import { LeaveRequest, LeaveType } from "../../../../types/leaveTypes";
+import {
+  LeaveRequest,
+  LeaveStatus,
+  LeaveType,
+} from "../../../../types/leaveTypes";
 import { LeaveAction } from "../../../../actions/leaveAction";
 import dayjs from "dayjs";
 import { BiEdit } from "react-icons/bi";
@@ -44,7 +48,7 @@ const RequestHistory: React.FunctionComponent<Props> = (props: Props) => {
       showNotification("success", "Hủy yêu cầu thành công");
 
       setTimeout(() => {
-        window.location.href = "/employee/time-sheet";
+        window.location.reload();
       }, 1000);
     } catch (err) {
       showNotification("error", "Hủy yêu cầu nghỉ phép thất bại");
@@ -86,17 +90,19 @@ const RequestHistory: React.FunctionComponent<Props> = (props: Props) => {
               <td className="py-3 px-4 text-center border-b">{item.reason}</td>
               <td className="py-3 px-4 text-center border-b">{item.status}</td>
               <td className="py-3 px-4 text-center border-b">
-                <div className="w-full flex flex-row gap-2 justify-center items-center">
-                  <div className="text-green-500 text-2xl hover:text-green-600 hover:cursor-pointer">
-                    <BiEdit />
+                {item.status === LeaveStatus.Pending && (
+                  <div className="w-full flex flex-row gap-2 justify-center items-center">
+                    <div className="text-green-500 text-2xl hover:text-green-600 hover:cursor-pointer">
+                      <BiEdit />
+                    </div>
+                    <div
+                      className="text-red-500 text-2xl hover:text-red-600 hover:cursor-pointer"
+                      onClick={() => setIsOpenCancelModal(true)}
+                    >
+                      <MdOutlineCancel />
+                    </div>
                   </div>
-                  <div
-                    className="text-red-500 text-2xl hover:text-red-600 hover:cursor-pointer"
-                    onClick={() => setIsOpenCancelModal(true)}
-                  >
-                    <MdOutlineCancel />
-                  </div>
-                </div>
+                )}
               </td>
               <Modal
                 title="Bạn muốn hủy yêu cầu này?"

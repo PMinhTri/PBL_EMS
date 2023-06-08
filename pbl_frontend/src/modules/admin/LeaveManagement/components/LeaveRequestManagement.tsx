@@ -57,7 +57,7 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
       showNotification("success", "Đã từ chối yêu cầu!");
 
       setTimeout(() => {
-        window.location.href = "/admin/leave-management";
+        window.location.reload();
       }, 2000);
     } catch (err) {
       showNotification("error", "Từ chối thất bại!");
@@ -71,7 +71,7 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
       showNotification("success", "Đã duyệt yêu cầu!");
 
       setTimeout(() => {
-        window.location.href = "/admin/leave-management";
+        window.location.reload();
       }, 2000);
     } catch (err) {
       showNotification("error", "Duyệt thất bại!");

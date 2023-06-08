@@ -12,7 +12,7 @@ import { Session } from 'src/constant/leaveSession.constant';
 import { Leave, LeaveType } from '@prisma/client';
 import { LeaveStatus } from 'src/enumTypes/leave.enum';
 import * as dayjs from 'dayjs';
-import { intersection } from 'lodash';
+import { intersection, isEqual } from 'lodash';
 import { LeaveBalance } from './leave.type';
 
 @Injectable()
@@ -55,7 +55,9 @@ export class LeaveService {
           user: {
             id: dto.userId,
           },
-          status: LeaveStatus.Pending || LeaveStatus.Approved,
+          status: {
+            in: [LeaveStatus.Pending, LeaveStatus.Approved],
+          },
         },
         select: {
           id: true,
@@ -66,34 +68,23 @@ export class LeaveService {
         },
       });
 
-      for (const leave of existedLeaveRequestByDate.filter((leaveRequest) =>
+      const existedInOneDay = existedLeaveRequestByDate.filter((leaveRequest) =>
         dayjs(leaveRequest.startDate).isSame(dayjs(leaveRequest.endDate)),
-      )) {
+      );
+
+      for (const leave of existedInOneDay) {
         if (leave.id === requestId) continue;
+
         if (
-          (dayjs(dto.startDate).isSame(leave.endDate) ||
-            dayjs(dto.startDate).isSame(leave.startDate)) &&
-          Session[dto.session] + Session[leave.session] > 1
-        ) {
-          return {
-            valid: false,
-            failure: {
-              reason: LeaveFailure.LEAVE_REQUEST_OVERLAP,
-            },
-          };
-        }
-
-        for (const leave of existedLeaveRequestByDate.filter((leaveRequest) =>
-          dayjs(leaveRequest.startDate).isBefore(dayjs(leaveRequest.endDate)),
-        )) {
-          if (leave.id === requestId) continue;
-
-          const overlapped = intersection(
-            dateTimeUtils.getDatesWithCondition(leave.startDate, leave.endDate),
+          isEqual(
             dateTimeUtils.getDatesWithCondition(dto.startDate, dto.endDate),
-          );
-
-          if (overlapped.length) {
+            dateTimeUtils.getDatesWithCondition(leave.startDate, leave.endDate),
+          )
+        ) {
+          if (
+            dto.session === leave.session ||
+            Session[dto.session] + Session[leave.session] > 1
+          ) {
             return {
               valid: false,
               failure: {
@@ -103,13 +94,37 @@ export class LeaveService {
           }
         }
       }
+
+      const existedInDays = existedLeaveRequestByDate.filter((leaveRequest) =>
+        dayjs(leaveRequest.startDate).isBefore(dayjs(leaveRequest.endDate)),
+      );
+
+      for (const leave of existedInDays) {
+        if (leave.id === requestId) continue;
+
+        const overlapped = intersection(
+          dateTimeUtils.getDatesWithCondition(leave.startDate, leave.endDate),
+          dateTimeUtils.getDatesWithCondition(dto.startDate, dto.endDate),
+        );
+
+        if (overlapped.length) {
+          return {
+            valid: false,
+            failure: {
+              reason: LeaveFailure.LEAVE_REQUEST_OVERLAP,
+            },
+          };
+        }
+      }
     } else {
       const allLeaveRequest = await this.prisma.leave.findMany({
         where: {
           user: {
             id: dto.userId,
           },
-          status: LeaveStatus.Pending || LeaveStatus.Approved,
+          status: {
+            in: [LeaveStatus.Pending, LeaveStatus.Approved],
+          },
         },
       });
 
@@ -318,7 +333,9 @@ export class LeaveService {
         leaveType: {
           id: leaveTypeId,
         },
-        status: LeaveStatus.Pending || LeaveStatus.Approved,
+        status: {
+          in: [LeaveStatus.Pending, LeaveStatus.Approved],
+        },
         AND: [
           {
             startDate: {
@@ -371,7 +388,9 @@ export class LeaveService {
 
     const allLeaveRequest = await this.prisma.leave.findMany({
       where: {
-        status: LeaveStatus.Pending || LeaveStatus.Approved,
+        status: {
+          in: [LeaveStatus.Pending, LeaveStatus.Approved],
+        },
         AND: [
           {
             startDate: {
