@@ -40,8 +40,15 @@ export class LeaveController {
   }
 
   @Get()
-  public async getAllLeaveRequest(@Res() res: IResponse): Promise<IResponse> {
-    const leaveRequests = await this.leaveService.getAllLeaveRequest();
+  public async getAllLeaveRequest(
+    @Query('year') year: number,
+    @Query('month') month: number,
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const leaveRequests = await this.leaveService.getAllLeaveRequest(
+      year,
+      month,
+    );
 
     return res.send(SuccessResult(leaveRequests));
   }
@@ -139,17 +146,29 @@ export class LeaveController {
     return res.send(SuccessResult(leaveRequest));
   }
 
+  @Get('/remaining-balance/all')
+  public async getAllRemainingBalance(
+    @Query('year') year: number,
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const { result: remainingLeaveDays } =
+      await this.leaveService.getAllRemainingBalance(year);
+
+    return res.send(SuccessResult(remainingLeaveDays));
+  }
+
   @Get('/remaining-balance/')
   public async getRemainingBalance(
     @Query('userId') userId: string,
     @Query('leaveTypeId') leaveTypeId: string,
+    @Query('year') year: number,
     @Res() res: IResponse,
   ): Promise<IResponse> {
     const {
       result: remainingLeaveDays,
       status,
       failure,
-    } = await this.leaveService.getRemainingBalance(userId, leaveTypeId);
+    } = await this.leaveService.getRemainingBalance(userId, leaveTypeId, year);
 
     if (status === 'Failed') {
       switch (failure.reason) {

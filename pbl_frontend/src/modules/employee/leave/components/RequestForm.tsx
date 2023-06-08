@@ -1,7 +1,7 @@
 import { DatePicker, Progress } from "antd";
 import React from "react";
 import { LeaveAction } from "../../../../actions/leaveAction";
-import { LeaveRequest, LeaveType } from "../../../../types/leave";
+import { LeaveRequest, LeaveType } from "../../../../types/leaveTypes";
 import dayjs from "dayjs";
 import { getWorkingDay, isWeekend } from "../../../../utils/datetime";
 import showNotification from "../../../../utils/notification";
@@ -30,7 +30,7 @@ export const RequestForm: React.FunctionComponent = () => {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      const leaveTypes = await LeaveAction.getLeaveType();
+      const leaveTypes = await LeaveAction.getAllLeaveType();
       setAllLeaveRequest(
         (await LeaveAction.getAllLeaveRequestByUserId(userAuthInfo.id)) ?? []
       );
@@ -43,9 +43,10 @@ export const RequestForm: React.FunctionComponent = () => {
   }, []);
 
   React.useMemo(async () => {
-    const balance = await LeaveAction.getRemainingBalance(
+    const balance = await LeaveAction.getRemainingBalanceByUser(
       userAuthInfo.id,
-      onSelectLeaveType.id
+      onSelectLeaveType.id,
+      new Date().getFullYear()
     );
 
     setRemaining(balance);

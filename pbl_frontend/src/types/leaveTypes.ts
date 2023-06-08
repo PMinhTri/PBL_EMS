@@ -33,3 +33,14 @@ export enum LeaveStatus {
   Rejected = "Đã từ chối",
   Cancelled = "Đã hủy",
 }
+
+export type LeaveBalance = {
+  userId: string;
+  balance: Balance[];
+};
+
+export type Balance = {
+  leaveTypeId: string;
+  leaveTypeName: string;
+  remainingLeaveDays: number;
+};

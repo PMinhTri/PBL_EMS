@@ -13,6 +13,7 @@ import { Leave, LeaveType } from '@prisma/client';
 import { LeaveStatus } from 'src/enumTypes/leave.enum';
 import * as dayjs from 'dayjs';
 import { intersection } from 'lodash';
+import { LeaveBalance } from './leave.type';
 
 @Injectable()
 export class LeaveService {
@@ -148,6 +149,8 @@ export class LeaveService {
   ): Promise<ServiceResponse<Leave, ServiceFailure<LeaveFailure>>> {
     const { valid, failure } = await this.checkValidLeaveRequest(dto);
 
+    const year = dayjs(dto.startDate).year();
+
     if (!valid) {
       return {
         status: ServiceResponseStatus.Failed,
@@ -158,6 +161,7 @@ export class LeaveService {
     const { result: remainingLeaveDays } = await this.getRemainingBalance(
       dto.userId,
       dto.leaveTypeId,
+      year,
     );
 
     if (remainingLeaveDays < dto.leaveDays) {
@@ -206,6 +210,8 @@ export class LeaveService {
       },
     });
 
+    const year = dayjs(dto.startDate).year();
+
     if (!existedLeaveRequest) {
       return {
         status: ServiceResponseStatus.Failed,
@@ -230,6 +236,7 @@ export class LeaveService {
     const { result: remainingLeaveDays } = await this.getRemainingBalance(
       dto.userId,
       dto.leaveTypeId,
+      year,
     );
 
     if (remainingLeaveDays + existedLeaveRequest.leaveDays < dto.leaveDays) {
@@ -298,13 +305,32 @@ export class LeaveService {
   public async getRemainingBalance(
     userId: string,
     leaveTypeId: string,
+    year: number,
   ): Promise<ServiceResponse<number, ServiceFailure<LeaveFailure>>> {
+    const firstDate = new Date(year, 0, 1);
+    const lastDate = new Date(year, 11, 31);
+
     const allLeaveRequest = await this.prisma.leave.findMany({
       where: {
         user: {
           id: userId,
         },
+        leaveType: {
+          id: leaveTypeId,
+        },
         status: LeaveStatus.Pending || LeaveStatus.Approved,
+        AND: [
+          {
+            startDate: {
+              gte: firstDate,
+            },
+          },
+          {
+            endDate: {
+              lte: lastDate,
+            },
+          },
+        ],
       },
     });
 
@@ -331,6 +357,64 @@ export class LeaveService {
 
     return {
       result: remainingLeaveDays,
+      status: ServiceResponseStatus.Success,
+    };
+  }
+
+  public async getAllRemainingBalance(
+    year: number,
+  ): Promise<ServiceResponse<LeaveBalance[], ServiceFailure<LeaveFailure>>> {
+    const firstDate = new Date(year, 0, 1);
+    const lastDate = new Date(year, 11, 31);
+
+    const users = await this.prisma.user.findMany();
+
+    const allLeaveRequest = await this.prisma.leave.findMany({
+      where: {
+        status: LeaveStatus.Pending || LeaveStatus.Approved,
+        AND: [
+          {
+            startDate: {
+              gte: firstDate,
+            },
+          },
+          {
+            endDate: {
+              lte: lastDate,
+            },
+          },
+        ],
+      },
+    });
+
+    const leaveTypes = await this.prisma.leaveType.findMany();
+
+    const remainingBalance = users.map((user) => {
+      const balance = leaveTypes.map((leaveType) => {
+        const remainingLeaveDays =
+          leaveType.balance -
+          allLeaveRequest.reduce((acc, curr) => {
+            if (curr.userId === user.id && curr.leaveTypeId === leaveType.id) {
+              return acc + curr.leaveDays;
+            }
+            return acc;
+          }, 0);
+
+        return {
+          leaveTypeId: leaveType.id,
+          leaveTypeName: leaveType.name,
+          remainingLeaveDays: remainingLeaveDays,
+        };
+      });
+
+      return {
+        userId: user.id,
+        balance: balance,
+      };
+    });
+
+    return {
+      result: remainingBalance,
       status: ServiceResponseStatus.Success,
     };
   }
@@ -400,8 +484,32 @@ export class LeaveService {
     };
   }
 
-  public async getAllLeaveRequest(): Promise<Leave[]> {
-    return this.prisma.leave.findMany();
+  public async getAllLeaveRequest(
+    year: number,
+    month?: number,
+  ): Promise<Leave[]> {
+    const firstDate = month
+      ? new Date(year, month - 1, 1)
+      : new Date(year, 0, 1);
+    const lastDate = month ? new Date(year, month, 0) : new Date(year, 11, 31);
+
+    return this.prisma.leave.findMany({
+      where: {
+        AND: [
+          {
+            startDate: {
+              gte: firstDate,
+            },
+          },
+          {
+            endDate: {
+              lte: lastDate,
+            },
+          },
+        ],
+        status: LeaveStatus.Pending,
+      },
+    });
   }
 
   public async getLeaveRequestByUserId(

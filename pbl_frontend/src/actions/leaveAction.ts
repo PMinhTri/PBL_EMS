@@ -1,15 +1,17 @@
 import {
   cancelLeaveRequest,
   createLeaveRequest,
+  getAllLeaveRequest,
   getAllLeaveType,
   getLeaveRequestsByUser,
   getRemainingBalance,
+  getRemainingBalanceByUser,
 } from "../api/leave";
-import { LeaveRequest, LeaveRequestPayload, LeaveType } from "../types/leave";
+import { LeaveRequestPayload, LeaveType } from "../types/leaveTypes";
 import { handleError } from "../utils/errorHandler";
 
 export const LeaveAction = {
-  getLeaveType: async (): Promise<LeaveType[]> => {
+  getAllLeaveType: async (): Promise<LeaveType[]> => {
     const response = await getAllLeaveType();
 
     return response.payload;
@@ -35,11 +37,12 @@ export const LeaveAction = {
     handleError(response);
   },
 
-  getRemainingBalance: async (
+  getRemainingBalanceByUser: async (
     userId: string,
-    leaveTypeId: string
+    leaveTypeId: string,
+    year: number
   ): Promise<number> => {
-    const response = await getRemainingBalance(userId, leaveTypeId);
+    const response = await getRemainingBalanceByUser(userId, leaveTypeId, year);
 
     return response.payload;
   },
@@ -62,5 +65,17 @@ export const LeaveAction = {
     }
 
     handleError(response);
+  },
+
+  getAllLeaveRequest: async (month: number, year: number) => {
+    const response = await getAllLeaveRequest(month, year);
+
+    return response.payload;
+  },
+
+  getAllRemainingBalance: async (year: number) => {
+    const response = await getRemainingBalance(year);
+
+    return response.payload;
   },
 };

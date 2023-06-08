@@ -3,7 +3,7 @@ import { BsCalendar2Check, BsCalendarPlus, BsCalendarX } from "react-icons/bs";
 import { TimeSheetAction } from "../../../../actions/timeSheetAction";
 import { useRecoilValue } from "recoil";
 import userSelector from "../../../../recoil/selectors/user";
-import { LeaveRequest } from "../../../../types/leave";
+import { LeaveRequest } from "../../../../types/leaveTypes";
 import { LeaveAction } from "../../../../actions/leaveAction";
 
 type Props = {

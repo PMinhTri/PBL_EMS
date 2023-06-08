@@ -1,16 +1,20 @@
 import React from "react";
-import { LeaveRequest, LeaveType } from "../../../../types/leave";
+import { LeaveRequest, LeaveType } from "../../../../types/leaveTypes";
 import { LeaveAction } from "../../../../actions/leaveAction";
-import { useRecoilValue } from "recoil";
-import userSelector from "../../../../recoil/selectors/user";
 import dayjs from "dayjs";
 import { BiEdit } from "react-icons/bi";
 import { MdOutlineCancel } from "react-icons/md";
 import { Button, Modal } from "antd";
 import showNotification from "../../../../utils/notification";
 
-const RequestHistory: React.FunctionComponent = () => {
-  const { userAuthInfo } = useRecoilValue(userSelector);
+type Props = {
+  userId?: string;
+  month?: number;
+  year: number;
+};
+
+const RequestHistory: React.FunctionComponent<Props> = (props: Props) => {
+  const { userId, month, year } = props;
   const [requestHistoryData, setRequestHistoryData] = React.useState<
     LeaveRequest[]
   >([]);
@@ -20,15 +24,18 @@ const RequestHistory: React.FunctionComponent = () => {
 
   React.useEffect(() => {
     const fetchDate = async () => {
-      const leaveRequests = await LeaveAction.getLeaveRequestsByUser(
-        userAuthInfo.id
-      );
-      setLeaveType(await LeaveAction.getLeaveType());
+      const leaveRequests = userId
+        ? await LeaveAction.getLeaveRequestsByUser(userId)
+        : await LeaveAction.getAllLeaveRequest(
+            month ?? new Date().getMonth() + 1,
+            year
+          );
+      setLeaveType(await LeaveAction.getAllLeaveType());
       setRequestHistoryData(leaveRequests ?? []);
     };
 
     fetchDate();
-  }, [userAuthInfo.id]);
+  }, [month, userId, year]);
 
   const handleCancelRequest = async (id: string) => {
     try {

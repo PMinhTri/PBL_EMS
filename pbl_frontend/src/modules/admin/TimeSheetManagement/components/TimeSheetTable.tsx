@@ -6,6 +6,14 @@ import { TimeSheet } from "../../../../types/timeSheet";
 import { TimeSheetAction } from "../../../../actions/timeSheetAction";
 import { useRecoilValue } from "recoil";
 import userSelector from "../../../../recoil/selectors/user";
+import { LeaveRequest } from "../../../../types/leaveTypes";
+import { LeaveAction } from "../../../../actions/leaveAction";
+import { BiEdit, BiReset } from "react-icons/bi";
+
+const currentYears = Array.from(
+  { length: 5 },
+  (_, index) => new Date().getFullYear() + index
+);
 
 const TimeSheetTable: React.FunctionComponent = () => {
   const { userAuthInfo } = useRecoilValue(userSelector);
@@ -18,15 +26,19 @@ const TimeSheetTable: React.FunctionComponent = () => {
   const [employeeList, setEmployeeList] = React.useState<
     UserDetailInformation[]
   >([]);
-  const [totalWorkLoad, setTotalWorkLoad] = React.useState<number[]>([]);
 
-  const [timeSheet, setTimeSheet] = React.useState<TimeSheet[]>([]);
+  const [leaveRequests, setLeaveRequests] = React.useState<LeaveRequest[]>([]);
+
+  const [timeSheets, setTimeSheets] = React.useState<TimeSheet[]>([]);
 
   React.useEffect(() => {
     const fetchData = async () => {
       const employees = await UserAction.getAllEmployees();
-      setTimeSheet(
+      setTimeSheets(
         await TimeSheetAction.getAllInMonth(selectedMonth, selectedYear)
+      );
+      setLeaveRequests(
+        await LeaveAction.getAllLeaveRequest(selectedMonth, selectedYear)
       );
       setEmployeeList(employees);
     };
@@ -40,7 +52,7 @@ const TimeSheetTable: React.FunctionComponent = () => {
   };
 
   const getWorkLoadValue = (userId: string, day: number) => {
-    const value = timeSheet.find(
+    const value = timeSheets.find(
       (timeSheet) => timeSheet.userId === userId && timeSheet.date === day
     )?.hoursWorked;
 
@@ -62,9 +74,9 @@ const TimeSheetTable: React.FunctionComponent = () => {
               onChange={(e) => setSelectedYear(Number(e.target.value))}
               className="border border-gray-300 rounded px-2 py-1"
             >
-              <option value={2023}>2023</option>
-              <option value={2024}>2024</option>
-              {/* Add more years as needed */}
+              {currentYears.map((year) => (
+                <option value={year}>{year}</option>
+              ))}
             </select>
           </div>
 
@@ -137,7 +149,7 @@ const TimeSheetTable: React.FunctionComponent = () => {
               );
             })}
             <div className="flex border w-28 justify-center items-center text-md font-bold">
-              Số ngày công
+              Số ngày công trong tháng
             </div>
             <div className="flex border w-28 justify-center items-center text-md font-bold">
               Số ngày nghỉ
@@ -183,16 +195,29 @@ const TimeSheetTable: React.FunctionComponent = () => {
                   );
                 })}
                 <div className="flex border w-28 justify-center items-center">
-                  {/* Add input fields here */}
+                  {timeSheets
+                    .filter((timeSheet) => timeSheet.userId === employee.id)
+                    .reduce((acc, curr) => acc + curr.hoursWorked, 0) / 8}
                 </div>
                 <div className="flex border w-28 justify-center items-center">
-                  {/* Add input fields here */}
+                  {leaveRequests
+                    .filter(
+                      (leaveRequest) => leaveRequest.userId === employee.id
+                    )
+                    .reduce((acc, curr) => acc + curr.leaveDays, 0)}
                 </div>
+                <div className="flex border w-28 justify-center items-center"></div>
                 <div className="flex border w-28 justify-center items-center">
-                  {/* Add input fields here */}
-                </div>
-                <div className="flex border w-28 justify-center items-center">
-                  {/* Add input fields here */}
+                  {
+                    <div className="w-full flex flex-row gap-2 justify-center items-center">
+                      <div className="text-green-500 text-2xl hover:text-green-600 hover:cursor-pointer">
+                        <BiEdit />
+                      </div>
+                      <div className="text-slate-500 text-2xl hover:text-slate-600 hover:cursor-pointer">
+                        <BiReset />
+                      </div>
+                    </div>
+                  }
                 </div>
               </div>
             </div>
