@@ -7,6 +7,7 @@ import { getWorkingDay, isWeekend } from "../../../../utils/datetime";
 import showNotification from "../../../../utils/notification";
 import { useRecoilValue } from "recoil";
 import userSelector from "../../../../recoil/selectors/user";
+import { SessionDate } from "../../../../constants/enum";
 
 export const RequestForm: React.FunctionComponent = () => {
   const { userAuthInfo } = useRecoilValue(userSelector);
@@ -40,7 +41,7 @@ export const RequestForm: React.FunctionComponent = () => {
     };
 
     fetchData();
-  }, []);
+  }, [userAuthInfo.id]);
 
   React.useMemo(async () => {
     const balance = await LeaveAction.getRemainingBalanceByUser(
@@ -54,18 +55,21 @@ export const RequestForm: React.FunctionComponent = () => {
 
   const session = React.useMemo(() => {
     if (dayjs(startDate).isSame(endDate, "day")) {
-      return ["Cả ngày", "Sáng", "Chiều"];
+      return [SessionDate.FullDay, SessionDate.Morning, SessionDate.Afternoon];
     } else {
-      return ["Cả ngày"];
+      return [SessionDate.FullDay];
     }
   }, [startDate, endDate]);
 
   const leaveDays = React.useMemo(() => {
     if (dayjs(startDate).isSame(endDate, "day")) {
-      if (onSelectSession === "Cả ngày") {
+      if (onSelectSession === SessionDate.FullDay) {
         return 1;
       } else {
-        if (onSelectSession === "Sáng" || onSelectSession === "Chiều") {
+        if (
+          onSelectSession === SessionDate.Morning ||
+          onSelectSession === SessionDate.Afternoon
+        ) {
           return 0.5;
         } else {
           return 1;

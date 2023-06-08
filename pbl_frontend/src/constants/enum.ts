@@ -9,3 +9,9 @@ export enum Gender {
   Male = "Nam",
   Female = "Nữ",
 }
+
+export enum SessionDate {
+  Morning = "Sáng",
+  Afternoon = "Chiều",
+  FullDay = "Cả ngày",
+}

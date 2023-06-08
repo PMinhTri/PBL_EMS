@@ -15,6 +15,7 @@ const MyTimeSheetStats: React.FunctionComponent<Props> = (props: Props) => {
   const { month, year } = props;
 
   const [totalWorkload, setTotalWorkload] = React.useState<number>(0);
+  const [overtimeWorkload, setOvertimeWorkload] = React.useState<number>(0);
   const { userAuthInfo } = useRecoilValue(userSelector);
   const [leaveRequest, setLeaveRequest] = React.useState<LeaveRequest[]>([]);
 
@@ -29,7 +30,9 @@ const MyTimeSheetStats: React.FunctionComponent<Props> = (props: Props) => {
       setLeaveRequest(
         (await LeaveAction.getAllLeaveRequestByUserId(userAuthInfo.id)) ?? []
       );
-
+      setOvertimeWorkload(
+        await TimeSheetAction.getOvertimeWorkLoad(userAuthInfo.id, month, year)
+      );
       setTotalWorkload(workload);
     };
     fetchData();
@@ -49,7 +52,7 @@ const MyTimeSheetStats: React.FunctionComponent<Props> = (props: Props) => {
       <div className="flex flex-col w-full h-32 bg-white border shadow-md rounded-md">
         <span className="px-4 text-xl">Làm thêm giờ:</span>
         <div className="w-full flex flex-row justify-between items-center py-8 px-4">
-          <span className="text-2xl font-bold">10</span>
+          <span className="text-2xl font-bold">{overtimeWorkload}</span>
           <div className="text-xl text-yellow-600">
             <BsCalendarPlus />
           </div>
@@ -59,7 +62,11 @@ const MyTimeSheetStats: React.FunctionComponent<Props> = (props: Props) => {
         <span className="px-4 text-xl">Số ngày nghỉ:</span>
         <div className="w-full flex flex-row justify-between items-center py-8 px-4">
           <span className="text-2xl font-bold">
-            {leaveRequest.filter((item) => item.status === "APPROVED").length}
+            {leaveRequest
+              .filter((item) => item.status === "APPROVED")
+              .reduce((acc, item) => {
+                return acc + item.leaveDays;
+              }, 0)}
           </span>
           <div className="text-xl text-red-600">
             <BsCalendarX />

@@ -9,6 +9,7 @@ import { TimeSheetAction } from "../../../../actions/timeSheetAction";
 import { useRecoilValue } from "recoil";
 import userSelector from "../../../../recoil/selectors/user";
 import { TimeSheet } from "../../../../types/timeSheet";
+import { SessionDate } from "../../../../constants/enum";
 
 type MorningPopoverProps = {
   date: Date;
@@ -65,7 +66,7 @@ const MorningPopover: React.FunctionComponent<MorningPopoverProps> = (
     try {
       await TimeSheetAction.create({
         userId: userAuthInfo?.id,
-        session: "sáng",
+        session: SessionDate.Morning,
         hoursWorked: 4,
         status: "Đã chấm công",
         timeIn: currentTime,
@@ -247,7 +248,7 @@ const CalendarContainer: React.FunctionComponent<Props> = (props: Props) => {
 
       setArrMorning(
         timeSheets
-          .filter((timeSheet) => timeSheet.session === "sáng")
+          .filter((timeSheet) => timeSheet.session === SessionDate.Morning)
           .map(
             (timeSheet) =>
               `${timeSheet.date}-${timeSheet.month}-${timeSheet.year}`
@@ -287,7 +288,8 @@ const CalendarContainer: React.FunctionComponent<Props> = (props: Props) => {
                         `${item.date}-${item.month}-${item.year}` ===
                           `${value.date()}-${
                             value.month() + 1
-                          }-${value.year()}` && item.session === "sáng"
+                          }-${value.year()}` &&
+                        item.session === SessionDate.Morning
                     )?.status
                   }
                 />
@@ -310,7 +312,7 @@ const CalendarContainer: React.FunctionComponent<Props> = (props: Props) => {
                   (item) =>
                     `${item.date}-${item.month}-${item.year}` ===
                       `${value.date()}-${value.month() + 1}-${value.year()}` &&
-                    item.session === "sáng"
+                    item.session === SessionDate.Morning
                 ) && (
                   <div
                     className="
@@ -324,7 +326,8 @@ const CalendarContainer: React.FunctionComponent<Props> = (props: Props) => {
                           `${item.date}-${item.month}-${item.year}` ===
                             `${value.date()}-${
                               value.month() + 1
-                            }-${value.year()}` && item.session === "sáng"
+                            }-${value.year()}` &&
+                          item.session === SessionDate.Morning
                       )?.timeIn
                     }
                   </div>

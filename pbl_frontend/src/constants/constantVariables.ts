@@ -1,4 +1,4 @@
-import { EmployeeStatus, Gender } from "./enum";
+import { EmployeeStatus, Gender, SessionDate } from "./enum";
 
 export const UserInformation: Record<string, string> = {
   id: "Mã nhân viên",
@@ -128,4 +128,10 @@ export const locale = {
   dateTimeFormat: "YYYY-MM-DD HH:mm:ss",
   weekFormat: "YYYY-wo",
   monthFormat: "YYYY-MM",
+};
+
+export const Session: Record<SessionDate, number> = {
+  [SessionDate.FullDay]: 1,
+  [SessionDate.Morning]: 0.5,
+  [SessionDate.Afternoon]: 0.5,
 };

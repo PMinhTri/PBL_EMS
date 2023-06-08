@@ -56,7 +56,7 @@ const EmployeeFilter: React.FunctionComponent = () => {
     };
 
     fetchDate();
-  });
+  }, []);
 
   const listFilter = [
     {

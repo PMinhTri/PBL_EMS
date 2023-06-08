@@ -89,7 +89,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
     };
 
     fetchData();
-  }, []);
+  }, [setDepartments, setJobTitles]);
 
   const handleCreateNewEmployee = async () => {
     if (
