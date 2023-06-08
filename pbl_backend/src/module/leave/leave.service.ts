@@ -419,6 +419,40 @@ export class LeaveService {
     };
   }
 
+  public async approveLeaveRequest(
+    id: string,
+    status: string,
+  ): Promise<ServiceResponse<Leave, ServiceFailure<LeaveFailure>>> {
+    const existedLeaveRequest = await this.prisma.leave.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!existedLeaveRequest) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: LeaveFailure.LEAVE_NOT_FOUND,
+        },
+      };
+    }
+
+    const leaveRequest = await this.prisma.leave.update({
+      where: {
+        id: id,
+      },
+      data: {
+        status: status,
+      },
+    });
+
+    return {
+      result: leaveRequest,
+      status: ServiceResponseStatus.Success,
+    };
+  }
+
   public async cancelLeaveRequest(
     id: string,
     status: string,
@@ -445,6 +479,37 @@ export class LeaveService {
       data: {
         status: status,
         isDeleted: true,
+      },
+    });
+
+    return {
+      result: leaveRequest,
+      status: ServiceResponseStatus.Success,
+    };
+  }
+
+  public async rejectLeaveRequest(id: string, status: string) {
+    const existedLeaveRequest = await this.prisma.leave.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!existedLeaveRequest) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: LeaveFailure.LEAVE_NOT_FOUND,
+        },
+      };
+    }
+
+    const leaveRequest = await this.prisma.leave.update({
+      where: {
+        id: id,
+      },
+      data: {
+        status: status,
       },
     });
 
@@ -507,7 +572,6 @@ export class LeaveService {
             },
           },
         ],
-        status: LeaveStatus.Pending,
       },
     });
   }

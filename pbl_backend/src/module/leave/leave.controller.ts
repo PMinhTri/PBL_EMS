@@ -14,6 +14,7 @@ import { BadRequestResult, IResponse, SuccessResult } from 'src/httpResponse';
 import { LeaveDto } from './leave.dto';
 import { NotFoundResult } from 'src/httpResponse';
 import { LeaveFailure } from 'src/enumTypes/failure.enum';
+import { ServiceResponseStatus } from 'src/serviceResponse';
 
 @Controller('leave')
 export class LeaveController {
@@ -185,6 +186,33 @@ export class LeaveController {
     return res.send(SuccessResult(remainingLeaveDays));
   }
 
+  @Patch('/approve/:id')
+  public async approveLeaveRequest(
+    @Param('id') id: string,
+    @Body() payload: { status: string },
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const {
+      result: leaveRequest,
+      status,
+      failure,
+    } = await this.leaveService.approveLeaveRequest(id, payload.status);
+
+    if (status === ServiceResponseStatus.Failed) {
+      switch (failure.reason) {
+        case 'LEAVE_NOT_FOUND':
+          return res.send(
+            NotFoundResult({
+              reason: failure.reason,
+              message: 'Leave request not found',
+            }),
+          );
+      }
+    }
+
+    return res.send(SuccessResult(leaveRequest));
+  }
+
   @Patch('/cancel/:id')
   public async cancelLeaveRequest(
     @Param('id') id: string,
@@ -197,7 +225,34 @@ export class LeaveController {
       failure,
     } = await this.leaveService.cancelLeaveRequest(id, payload.status);
 
-    if (status === 'Failed') {
+    if (status === ServiceResponseStatus.Failed) {
+      switch (failure.reason) {
+        case 'LEAVE_NOT_FOUND':
+          return res.send(
+            NotFoundResult({
+              reason: failure.reason,
+              message: 'Leave request not found',
+            }),
+          );
+      }
+    }
+
+    return res.send(SuccessResult(leaveRequest));
+  }
+
+  @Patch('/reject/:id')
+  public async rejectLeaveRequest(
+    @Param('id') id: string,
+    @Body() payload: { status: string },
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const {
+      result: leaveRequest,
+      status,
+      failure,
+    } = await this.leaveService.rejectLeaveRequest(id, payload.status);
+
+    if (status === ServiceResponseStatus.Failed) {
       switch (failure.reason) {
         case 'LEAVE_NOT_FOUND':
           return res.send(

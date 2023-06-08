@@ -29,9 +29,9 @@ const MorningPopover: React.FunctionComponent<MorningPopoverProps> = (
   const [currentTime, setCurrentTime] = React.useState<string>("");
 
   const handleCheckIn = async () => {
-    const date = new Date();
+    const checkInDate = new Date();
 
-    date.setHours(
+    checkInDate.setHours(
       Number(currentTime.split(":")[0]),
       Number(currentTime.split(":")[1]),
       0
@@ -43,11 +43,21 @@ const MorningPopover: React.FunctionComponent<MorningPopoverProps> = (
     deadlineStartTime.setHours(7, 30, 0);
     if (
       !(
-        dayjs(date).toDate() > deadlineStartTime &&
-        dayjs(date).toDate() < deadlineEndTime
+        dayjs(checkInDate).toDate() > deadlineStartTime &&
+        dayjs(checkInDate).toDate() < deadlineEndTime
       )
     ) {
       // Time is over 12:15:00, show notification
+      showNotification("error", "Không phải thời gian chấm công cho ca sáng");
+      return;
+    }
+
+    if (
+      !(
+        dayjs(date).format("YYYY-MM-DD") ===
+        dayjs(new Date()).format("YYYY-MM-DD")
+      )
+    ) {
       showNotification("error", "Không phải thời gian chấm công cho ca sáng");
       return;
     }
@@ -70,10 +80,10 @@ const MorningPopover: React.FunctionComponent<MorningPopoverProps> = (
 
   React.useMemo(() => {
     const interval = setInterval(() => {
-      const date = new Date();
-      const hours = String(date.getHours()).padStart(2, "0");
-      const minutes = String(date.getMinutes()).padStart(2, "0");
-      const seconds = String(date.getSeconds()).padStart(2, "0");
+      const toDay = new Date();
+      const hours = String(toDay.getHours()).padStart(2, "0");
+      const minutes = String(toDay.getMinutes()).padStart(2, "0");
+      const seconds = String(toDay.getSeconds()).padStart(2, "0");
       const time = `${hours}:${minutes}:${seconds}`;
 
       setCurrentTime(time);
@@ -121,9 +131,9 @@ const AfternoonPopover: React.FunctionComponent<AfternoonPopoverProps> = (
   const [currentTime, setCurrentTime] = React.useState<string>("");
 
   const handleCheckIn = async () => {
-    const date = new Date();
+    const checkInDate = new Date();
 
-    date.setHours(
+    checkInDate.setHours(
       Number(currentTime.split(":")[0]),
       Number(currentTime.split(":")[1]),
       0
@@ -131,13 +141,23 @@ const AfternoonPopover: React.FunctionComponent<AfternoonPopoverProps> = (
     const deadlineTime = new Date();
     deadlineTime.setHours(17, 45, 0);
 
-    if (dayjs(date).toDate() > deadlineTime) {
+    if (dayjs(checkInDate).toDate() > deadlineTime) {
       showNotification("error", "Đã quá thời gian chấm công cho ca chiều");
       return;
     }
 
     deadlineTime.setHours(12, 30, 0);
-    if (dayjs(date).toDate() < deadlineTime) {
+    if (dayjs(checkInDate).toDate() < deadlineTime) {
+      showNotification("error", "Chưa đến thời gian chấm công cho ca chiều");
+      return;
+    }
+
+    if (
+      !(
+        dayjs(date).format("YYYY-MM-DD") ===
+        dayjs(new Date()).format("YYYY-MM-DD")
+      )
+    ) {
       showNotification("error", "Chưa đến thời gian chấm công cho ca chiều");
       return;
     }
@@ -160,10 +180,10 @@ const AfternoonPopover: React.FunctionComponent<AfternoonPopoverProps> = (
 
   React.useMemo(() => {
     const interval = setInterval(() => {
-      const date = new Date();
-      const hours = String(date.getHours()).padStart(2, "0");
-      const minutes = String(date.getMinutes()).padStart(2, "0");
-      const seconds = String(date.getSeconds()).padStart(2, "0");
+      const toDay = new Date();
+      const hours = String(toDay.getHours()).padStart(2, "0");
+      const minutes = String(toDay.getMinutes()).padStart(2, "0");
+      const seconds = String(toDay.getSeconds()).padStart(2, "0");
       const time = `${hours}:${minutes}:${seconds}`;
 
       setCurrentTime(time);

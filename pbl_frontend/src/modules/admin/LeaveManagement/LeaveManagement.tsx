@@ -16,7 +16,7 @@ const LeaveManagement: React.FunctionComponent = () => {
     };
 
     fetchEmployeeList();
-  });
+  }, []);
   return (
     <div className="flex flex-col w-full h-full overflow-auto p-4">
       <LeaveRequestManagement employees={employeeList} />

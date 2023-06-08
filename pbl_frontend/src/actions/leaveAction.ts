@@ -1,4 +1,5 @@
 import {
+  approveLeaveRequest,
   cancelLeaveRequest,
   createLeaveRequest,
   getAllLeaveRequest,
@@ -6,6 +7,7 @@ import {
   getLeaveRequestsByUser,
   getRemainingBalance,
   getRemainingBalanceByUser,
+  rejectLeaveRequest,
 } from "../api/leave";
 import { LeaveRequestPayload, LeaveType } from "../types/leaveTypes";
 import { handleError } from "../utils/errorHandler";
@@ -57,8 +59,28 @@ export const LeaveAction = {
     handleError(response);
   },
 
+  approve: async (id: string) => {
+    const response = await approveLeaveRequest(id);
+
+    if (response.statusCode === 200) {
+      return response.payload;
+    }
+
+    handleError(response);
+  },
+
   cancel: async (id: string) => {
     const response = await cancelLeaveRequest(id);
+
+    if (response.statusCode === 200) {
+      return response.payload;
+    }
+
+    handleError(response);
+  },
+
+  reject: async (id: string) => {
+    const response = await rejectLeaveRequest(id);
 
     if (response.statusCode === 200) {
       return response.payload;

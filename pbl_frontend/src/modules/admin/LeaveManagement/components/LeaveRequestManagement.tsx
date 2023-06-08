@@ -4,7 +4,11 @@ import { MdOutlineCancel } from "react-icons/md";
 import { Modal } from "antd";
 import showNotification from "../../../../utils/notification";
 import { LeaveAction } from "../../../../actions/leaveAction";
-import { LeaveRequest, LeaveType } from "../../../../types/leaveTypes";
+import {
+  LeaveRequest,
+  LeaveStatus,
+  LeaveType,
+} from "../../../../types/leaveTypes";
 import dayjs from "dayjs";
 import { UserDetailInformation } from "../../../../types/userTypes";
 
@@ -34,7 +38,9 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
 
   const [leaveType, setLeaveType] = React.useState<LeaveType[]>([]);
 
-  const [isOpenCancelModal, setIsOpenCancelModal] = React.useState(false);
+  const [isOpenApproveModal, setIsOpenApproveModal] = React.useState(false);
+
+  const [isOpenRejectModal, setIsOpenRejectModal] = React.useState(false);
 
   const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedMonth(Number(e.target.value));
@@ -44,19 +50,33 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
     setSelectedYear(Number(e.target.value));
   };
 
-  const handleRejectRequest = async (id: string) => {
+  const handleRejectRequest = React.useCallback(async (id: string) => {
     try {
-      await LeaveAction.cancel(id);
+      await LeaveAction.reject(id);
 
-      showNotification("success", "Hủy yêu cầu thành công");
+      showNotification("success", "Đã từ chối yêu cầu!");
 
       setTimeout(() => {
-        window.location.href = "/employee/time-sheet";
-      }, 1000);
+        window.location.href = "/admin/leave-management";
+      }, 2000);
     } catch (err) {
-      showNotification("error", "Hủy yêu cầu nghỉ phép thất bại");
+      showNotification("error", "Từ chối thất bại!");
     }
-  };
+  }, []);
+
+  const handleApproveRequest = React.useCallback(async (id: string) => {
+    try {
+      await LeaveAction.approve(id);
+
+      showNotification("success", "Đã duyệt yêu cầu!");
+
+      setTimeout(() => {
+        window.location.href = "/admin/leave-management";
+      }, 2000);
+    } catch (err) {
+      showNotification("error", "Duyệt thất bại!");
+    }
+  }, []);
 
   React.useEffect(() => {
     const fetchDate = async () => {
@@ -69,7 +89,7 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
     };
 
     fetchDate();
-  }, [selectedMonth, selectedYear]);
+  }, [selectedMonth, selectedYear, handleRejectRequest, handleApproveRequest]);
 
   return (
     <div className="w-full mt-3 bg-white p-6 rounded-lg shadow-lg">
@@ -166,25 +186,32 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
                       <div className="text-blue-500 text-2xl hover:text-blue-600 hover:cursor-pointer">
                         <BiInfoCircle />
                       </div>
-                      <div className="text-green-500 text-2xl hover:text-green-600 hover:cursor-pointer">
-                        <BiEdit />
-                      </div>
-                      <div
-                        className="text-red-500 text-2xl hover:text-red-600 hover:cursor-pointer"
-                        onClick={() => setIsOpenCancelModal(true)}
-                      >
-                        <MdOutlineCancel />
-                      </div>
+                      {item.status === LeaveStatus.Pending && (
+                        <>
+                          <div
+                            className="text-green-500 text-2xl hover:text-green-600 hover:cursor-pointer"
+                            onClick={() => setIsOpenApproveModal(true)}
+                          >
+                            <BiEdit />
+                          </div>
+                          <div
+                            className="text-red-500 text-2xl hover:text-red-600 hover:cursor-pointer"
+                            onClick={() => setIsOpenRejectModal(true)}
+                          >
+                            <MdOutlineCancel />
+                          </div>
+                        </>
+                      )}
                     </div>
                   </td>
                   <Modal
-                    title="Bạn muốn hủy yêu cầu này?"
-                    open={isOpenCancelModal}
+                    title="Bạn muốn từ chối yêu cầu này?"
+                    open={isOpenRejectModal}
                     width={400}
-                    onCancel={() => setIsOpenCancelModal(false)}
+                    onCancel={() => setIsOpenRejectModal(false)}
                     footer={[
                       <button
-                        onClick={() => setIsOpenCancelModal(false)}
+                        onClick={() => setIsOpenRejectModal(false)}
                         className="w-24 ml-2 rounded-md h-8 bg-red-500 text-white cursor-pointer"
                       >
                         Hủy
@@ -193,7 +220,27 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
                         className="ml-2 w-24 rounded-md h-8 bg-blue-500 text-white cursor-pointer"
                         onClick={() => handleRejectRequest(item.id)}
                       >
-                        Xóa
+                        Từ chối
+                      </button>,
+                    ]}
+                  ></Modal>
+                  <Modal
+                    title="Duyệt yêu cầu này?"
+                    open={isOpenApproveModal}
+                    width={400}
+                    onCancel={() => setIsOpenApproveModal(false)}
+                    footer={[
+                      <button
+                        onClick={() => setIsOpenApproveModal(false)}
+                        className="w-24 ml-2 rounded-md h-8 bg-red-500 text-white cursor-pointer"
+                      >
+                        Hủy
+                      </button>,
+                      <button
+                        className="ml-2 w-24 rounded-md h-8 bg-blue-500 text-white cursor-pointer"
+                        onClick={() => handleApproveRequest(item.id)}
+                      >
+                        Duyệt
                       </button>,
                     ]}
                   ></Modal>

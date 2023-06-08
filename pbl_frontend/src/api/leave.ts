@@ -17,8 +17,6 @@ export const getAllLeaveType = async () => {
 };
 
 export const createLeaveRequest = async (payload: LeaveRequestPayload) => {
-  console.log(payload);
-
   const response: {
     statusCode: number;
     payload: LeaveRequest;
@@ -48,10 +46,6 @@ export const getRemainingBalanceByUser = async (
     `/leave/remaining-balance/?userId=${userId}&leaveTypeId=${leaveTypeId}&year=${year}`
   );
 
-  console.log(
-    `/leave/remaining-balance/?userId=${userId}&leaveTypeId=${leaveTypeId}&year=${year}`
-  );
-
   return response;
 };
 
@@ -64,12 +58,34 @@ export const getByUserId = async (userId: string) => {
   return response;
 };
 
+export const approveLeaveRequest = async (id: string) => {
+  const response: {
+    statusCode: number;
+    payload: LeaveRequest;
+  } = await $patch(`/leave/approve/${id}`, {
+    status: LeaveStatus.Approved,
+  });
+
+  return response;
+};
+
 export const cancelLeaveRequest = async (id: string) => {
   const response: {
     statusCode: number;
     payload: LeaveRequest;
   } = await $patch(`/leave/cancel/${id}`, {
     status: LeaveStatus.Cancelled,
+  });
+
+  return response;
+};
+
+export const rejectLeaveRequest = async (id: string) => {
+  const response: {
+    statusCode: number;
+    payload: LeaveRequest;
+  } = await $patch(`/leave/reject/${id}`, {
+    status: LeaveStatus.Rejected,
   });
 
   return response;
