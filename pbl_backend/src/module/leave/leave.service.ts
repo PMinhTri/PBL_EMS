@@ -388,9 +388,7 @@ export class LeaveService {
 
     const allLeaveRequest = await this.prisma.leave.findMany({
       where: {
-        status: {
-          in: [LeaveStatus.Pending, LeaveStatus.Approved],
-        },
+        status: LeaveStatus.Approved,
         AND: [
           {
             startDate: {

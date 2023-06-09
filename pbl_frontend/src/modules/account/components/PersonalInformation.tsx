@@ -5,6 +5,7 @@ import { userInfoState } from "../../../recoil/atoms/user";
 import dayjs from "dayjs";
 import { UserAction } from "../../../actions/userAction";
 import { genderOptions } from "../../../constants/constantVariables";
+import showNotification from "../../../utils/notification";
 
 const PersonalInformation: React.FunctionComponent = () => {
   const [userInfo, setUserInfo] = useRecoilState(userInfoState);
@@ -59,7 +60,14 @@ const PersonalInformation: React.FunctionComponent = () => {
   ];
 
   const handleSaveInfo = async () => {
+    if (userInfo.fullName === "" || userInfo.citizenId === "") {
+      showNotification("error", "Họ tên và CCCD/CMND không được để trống");
+      return;
+    }
+
     await UserAction.updateUserInfo(userInfo.email, userInfo);
+    showNotification("success", "Cập nhật thông tin thành công");
+    setIsDisabled(!isDisabled);
   };
 
   return (
@@ -211,7 +219,6 @@ const PersonalInformation: React.FunctionComponent = () => {
             <button
               onClick={async () => {
                 await handleSaveInfo();
-                setIsDisabled(!isDisabled);
               }}
               className="m-4 w-24 h-8 rounded-sm border-[1px] bg-green-600 text-white 
                     justify-end hover:text-green-600 hover:bg-white hover:border-green-600"

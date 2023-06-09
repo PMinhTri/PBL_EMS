@@ -57,3 +57,12 @@ export type UpdateUserInformation = {
   nationality: string;
   avatar: string;
 };
+
+export type UserResponse = {
+  id: string;
+  email: string;
+  fullName: string;
+  gender: string;
+  status: string;
+  roleId: string;
+};

@@ -46,16 +46,32 @@ export const updateJobInformation = async (
     statusCode: number;
     payload: JobInformation;
   } = await $patch(`/job-information/${id}`, {
-    userId: payload.userId,
-    contractTypeId: payload.contractId,
-    contractStartDate: dayjs(payload.contractStartDate).format("YYYY-MM-DD"),
-    contractEndDate: dayjs(payload.contractEndDate).format("YYYY-MM-DD"),
     joinDate: dayjs(payload.joinDate).format("YYYY-MM-DD"),
     employeeStatus: payload.employeeStatus,
     jobTitleId: payload.jobTitleId,
     jobHistory: payload.jobHistory,
     workingSkill: payload.workingSkill?.map((skill) => skill.id),
     departmentId: payload.departmentId,
+  });
+
+  return response;
+};
+
+export const updateContract = async (
+  id: string,
+  payload: {
+    contractTypeId: string;
+    contractStartDate: string;
+    contractEndDate: string;
+  }
+) => {
+  const response: {
+    statusCode: number;
+    payload: JobInformation;
+  } = await $patch(`/job-information/${id}/contract`, {
+    contractTypeId: payload.contractTypeId,
+    contractStartDate: dayjs(payload.contractStartDate).format("YYYY-MM-DD"),
+    contractEndDate: dayjs(payload.contractEndDate).format("YYYY-MM-DD"),
   });
 
   return response;

@@ -103,9 +103,9 @@ const EmployeeManagement: React.FunctionComponent = () => {
     } else {
       const response = await UserAction.createNewUser(newEmployee);
 
-      if (response?.id) {
+      if (response?.user.id) {
         await JobInformationAction.create({
-          userId: response.id,
+          userId: response.user.id,
           joinDate: dayjs(new Date()).format("YYYY-MM-DD"),
           employeeStatus: newEmployee.status,
         });

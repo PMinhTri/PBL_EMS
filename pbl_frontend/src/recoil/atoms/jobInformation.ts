@@ -27,12 +27,5 @@ export const jobInformationState = atom<JobInformation>({
       id: "",
       name: "",
     },
-    workingSkills: [
-      {
-        id: "",
-        name: "",
-        description: "",
-      },
-    ],
   },
 });

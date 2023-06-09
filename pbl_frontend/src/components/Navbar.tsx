@@ -7,14 +7,24 @@ import { userAuthState } from "../recoil/atoms/user";
 import { authState } from "../recoil/atoms/auth";
 
 enum NavbarOptions {
-  Account = "Account",
-  Logout = "Logout",
+  Account = "Tài khoản",
+  Admin = "Admin",
+  Employee = "Nhân viên",
+  Logout = "Đăng xuất",
 }
 
 const SelectContent: React.FunctionComponent = () => {
   const setAuth = useSetRecoilState(authState);
   const user = useRecoilValue(userAuthState);
-  const options = [{ value: "Account" }, { value: "Logout" }];
+  const options =
+    user.role === "Admin"
+      ? [
+          { value: "Tài khoản" },
+          { value: "Admin" },
+          { value: "Nhân viên" },
+          { value: "Đăng xuất" },
+        ]
+      : [{ value: "Tài khoản" }, { value: "Đăng xuất" }];
 
   const handleSelected = async (
     e: React.MouseEvent<HTMLLIElement, MouseEvent>
@@ -32,6 +42,14 @@ const SelectContent: React.FunctionComponent = () => {
 
     if (e.currentTarget.textContent === NavbarOptions.Account) {
       window.location.href = "/account";
+    }
+
+    if (e.currentTarget.textContent === NavbarOptions.Admin) {
+      window.location.href = "/admin/dashboard";
+    }
+
+    if (e.currentTarget.textContent === NavbarOptions.Employee) {
+      window.location.href = "/employee/time-sheet";
     }
   };
 
@@ -91,7 +109,7 @@ const Navbar: React.FunctionComponent = () => {
             <Popover
               placement="bottomRight"
               content={<SelectContent />}
-              title={"Account"}
+              title={"Tài khoản"}
               trigger={"click"}
             >
               <button className="border-[1px] border-blue-400 rounded-full justify-center align-center w-8 h-8 ml-4">

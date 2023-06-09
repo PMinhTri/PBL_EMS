@@ -110,7 +110,7 @@ export class JobInformationController {
   @Patch(':id')
   public async updateJobInformation(
     @Param('id') id: string,
-    @Body() dto: JobInformationDto,
+    @Body() dto: Omit<JobInformationDto, 'userId'>,
     @Res() res: IResponse,
   ): Promise<IResponse> {
     const {
@@ -118,6 +118,37 @@ export class JobInformationController {
       status,
       failure,
     } = await this.jobInformationService.updateJobInformation(id, dto);
+
+    if (status === ServiceResponseStatus.Failed) {
+      switch (failure.reason) {
+        case JobInformationFailure.JOB_INFORMATION_NOT_FOUND:
+          return res.send(
+            BadRequestResult({
+              reason: failure.reason,
+              message: `Job Information not found`,
+            }),
+          );
+      }
+    }
+
+    return res.send(SuccessResult(jobInformation));
+  }
+
+  @Patch(':id/contract')
+  public async updateContractType(
+    @Param('id') id: string,
+    @Body()
+    dto: Pick<
+      JobInformationDto,
+      'contractTypeId' | 'contractStartDate' | 'contractEndDate'
+    >,
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const {
+      result: jobInformation,
+      status,
+      failure,
+    } = await this.jobInformationService.updateContract(id, dto);
 
     if (status === ServiceResponseStatus.Failed) {
       switch (failure.reason) {

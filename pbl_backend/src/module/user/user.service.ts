@@ -76,7 +76,6 @@ export class UserService {
         id: true,
         email: true,
         fullName: true,
-        password: true,
         gender: true,
         status: true,
         roleId: true,
@@ -162,7 +161,34 @@ export class UserService {
             name: true,
           },
         },
-        jobInformation: true,
+        jobInformation: {
+          select: {
+            joinDate: true,
+            employeeStatus: true,
+            contractType: {
+              select: {
+                type: true,
+              },
+            },
+            contractStartDate: true,
+            contractEndDate: true,
+            jobTitle: {
+              select: {
+                name: true,
+              },
+            },
+            department: {
+              select: {
+                name: true,
+              },
+            },
+            workingSkill: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
     });
 

@@ -14,11 +14,7 @@ export const JobInformationAction = {
       payload: JobInformation;
     } = await getJobInformationByUserId(userId);
 
-    if (response.statusCode === 200) {
-      return response.payload;
-    }
-
-    return null;
+    return response.payload;
   },
 
   getAll: async () => {

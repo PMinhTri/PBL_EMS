@@ -6,7 +6,7 @@ import { TimeSheet } from "../../../../types/timeSheet";
 import { TimeSheetAction } from "../../../../actions/timeSheetAction";
 import { useRecoilValue } from "recoil";
 import userSelector from "../../../../recoil/selectors/user";
-import { LeaveRequest } from "../../../../types/leaveTypes";
+import { LeaveRequest, LeaveStatus } from "../../../../types/leaveTypes";
 import { LeaveAction } from "../../../../actions/leaveAction";
 import { BiEdit, BiReset } from "react-icons/bi";
 
@@ -202,7 +202,9 @@ const TimeSheetTable: React.FunctionComponent = () => {
                 <div className="flex border w-28 justify-center items-center">
                   {leaveRequests
                     .filter(
-                      (leaveRequest) => leaveRequest.userId === employee.id
+                      (leaveRequest) =>
+                        leaveRequest.userId === employee.id &&
+                        leaveRequest.status === LeaveStatus.Approved
                     )
                     .reduce((acc, curr) => acc + curr.leaveDays, 0)}
                 </div>

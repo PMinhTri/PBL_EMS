@@ -13,15 +13,28 @@ import { useRecoilState } from "recoil";
 import dayjs from "dayjs";
 import { jobInformationState } from "../../../recoil/atoms/jobInformation";
 import { JobInformationAction } from "../../../actions/jobInformationAction";
+import showNotification from "../../../utils/notification";
+import _ from "lodash";
 
 const JobInformationContainer: React.FunctionComponent = () => {
   const [jobInformation, setJobInformation] =
     useRecoilState(jobInformationState);
   const [isDisabled, setIsDisabled] = React.useState(true);
+  const [isContractDisabled, setIsContractDisabled] = React.useState(true);
   const [jobTitles, setJobTitles] = React.useState<JobTitle[]>([]);
   const [contracts, setContracts] = React.useState<Contract[]>([]);
   const [workingSkills, setWorkingSkills] = React.useState<WorkingSkill[]>([]);
   const [departments, setDepartments] = React.useState<Department[]>([]);
+
+  const [contract, setContract] = React.useState<{
+    contractId?: string;
+    contractStartDate?: Date;
+    contractEndDate?: Date;
+  }>({
+    contractId: contracts[0]?.id,
+    contractStartDate: new Date(),
+    contractEndDate: new Date(),
+  });
 
   React.useEffect(() => {
     const fetchedData = async () => {
@@ -34,7 +47,33 @@ const JobInformationContainer: React.FunctionComponent = () => {
   }, []);
 
   const handleSaveJobInformation = async () => {
+    if (
+      !jobInformation.employeeStatus ||
+      !jobInformation.jobTitleId ||
+      !jobInformation.departmentId ||
+      !jobInformation.joinDate
+    ) {
+      showNotification("error", "Vui lòng nhập đầy đủ thông tin công việc");
+      return;
+    }
+
     await JobInformationAction.update(jobInformation.id, jobInformation);
+    showNotification("success", "Cập nhật thông tin công việc thành công");
+    setIsDisabled(!isDisabled);
+  };
+
+  const handleSaveContract = async () => {
+    if (
+      !contract.contractId ||
+      !contract.contractStartDate ||
+      !contract.contractEndDate
+    ) {
+      showNotification("error", "Vui lòng nhập đầy đủ thông tin hợp đồng");
+      return;
+    }
+
+    showNotification("success", "Cập nhật thông tin hợp đồng thành công");
+    setIsContractDisabled(!isContractDisabled);
   };
 
   return (
@@ -165,12 +204,24 @@ const JobInformationContainer: React.FunctionComponent = () => {
                   };
                 })}
                 onChange={(value) => {
-                  setJobInformation({
-                    ...jobInformation,
-                    workingSkill: workingSkills.filter((workingSkill) =>
-                      value.includes(workingSkill.id)
-                    ),
-                  });
+                  if (value.length) {
+                    setJobInformation({
+                      ...jobInformation,
+                      workingSkill: _.uniqBy(
+                        jobInformation.workingSkill?.concat(
+                          workingSkills.filter((workingSkill) =>
+                            value.includes(workingSkill.id)
+                          )
+                        ),
+                        "id"
+                      ),
+                    });
+                  } else {
+                    setJobInformation({
+                      ...jobInformation,
+                      workingSkill: [],
+                    });
+                  }
                 }}
                 allowClear
               />
@@ -181,6 +232,40 @@ const JobInformationContainer: React.FunctionComponent = () => {
             <Select className="w-full" />
           </div>
         </div>
+        <div className="w-full flex flex-row justify-end">
+          {!isDisabled ? (
+            <>
+              <button
+                onClick={() => {
+                  setIsDisabled(!isDisabled);
+                }}
+                className="m-4 w-24 h-8 rounded-sm border-[1px] bg-red-600 text-white 
+                justify-end hover:text-red-600 hover:bg-white hover:border-red-600"
+              >
+                Huỷ
+              </button>
+              <button
+                onClick={async () => {
+                  await handleSaveJobInformation();
+                }}
+                className="m-4 w-24 h-8 rounded-sm border-[1px] bg-green-600 text-white 
+                justify-end hover:text-green-600 hover:bg-white hover:border-green-600"
+              >
+                Lưu
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => {
+                setIsDisabled(!isDisabled);
+              }}
+              className="m-4 w-24 h-8 rounded-sm border-[1px] bg-blue-600 text-white 
+                  justify-end hover:text-blue-600 hover:bg-white hover:border-blue-600"
+            >
+              Cập nhật
+            </button>
+          )}
+        </div>
       </div>
       <div className="border-[2px] mt-4 mx-2 rounded-md shadow-lg">
         <div className="flex flex-row pl-4 py-2 rounded-t-md items-center text-white text-lg bg-blue-600 font-bold">
@@ -189,7 +274,7 @@ const JobInformationContainer: React.FunctionComponent = () => {
         <div className="grid grid-cols-2">
           <div className="flex flex-row items-center m-2">
             <div className="m-2 w-36 font-bold">Loại hợp đồng:</div>
-            {isDisabled ? (
+            {isContractDisabled ? (
               <div>{jobInformation.contractType?.type}</div>
             ) : (
               <Select
@@ -209,6 +294,10 @@ const JobInformationContainer: React.FunctionComponent = () => {
                       (contract) => contract.id === value
                     ),
                   });
+                  setContract({
+                    ...contract,
+                    contractId: value,
+                  });
                 }}
                 allowClear
               />
@@ -216,14 +305,20 @@ const JobInformationContainer: React.FunctionComponent = () => {
           </div>
           <div className="flex flex-row items-center m-2">
             <div className="m-2 w-36 font-bold">Ngày ký:</div>
-            {isDisabled ? (
+            {isContractDisabled ? (
               <div>
-                {dayjs(jobInformation.contractStartDate).format("YYYY-MM-DD")}
+                {jobInformation.contractStartDate
+                  ? dayjs(jobInformation.contractStartDate).format("YYYY-MM-DD")
+                  : ""}
               </div>
             ) : (
               <DatePicker
                 className="w-full"
-                defaultValue={dayjs(jobInformation.contractStartDate)}
+                defaultValue={
+                  jobInformation.contractStartDate
+                    ? dayjs(jobInformation.contractStartDate)
+                    : dayjs(new Date())
+                }
                 onChange={(date) => {
                   setJobInformation({
                     ...jobInformation,
@@ -231,20 +326,30 @@ const JobInformationContainer: React.FunctionComponent = () => {
                       ? date.toDate()
                       : dayjs(new Date()).toDate(),
                   });
+                  setContract({
+                    ...contract,
+                    contractStartDate: date?.toDate(),
+                  });
                 }}
               />
             )}
           </div>
           <div className="flex flex-row items-center m-2">
             <div className="m-2 w-36 font-bold">Ngày kết thúc:</div>
-            {isDisabled ? (
+            {isContractDisabled ? (
               <div>
-                {dayjs(jobInformation.contractEndDate).format("YYYY-MM-DD")}
+                {jobInformation.contractEndDate
+                  ? dayjs(jobInformation.contractEndDate).format("YYYY-MM-DD")
+                  : ""}
               </div>
             ) : (
               <DatePicker
                 className="w-full"
-                defaultValue={dayjs(jobInformation.contractEndDate)}
+                defaultValue={
+                  jobInformation.contractEndDate
+                    ? dayjs(jobInformation.contractEndDate)
+                    : dayjs(new Date())
+                }
                 onChange={(date) => {
                   setJobInformation({
                     ...jobInformation,
@@ -252,46 +357,49 @@ const JobInformationContainer: React.FunctionComponent = () => {
                       ? date.toDate()
                       : dayjs(new Date()).toDate(),
                   });
+                  setContract({
+                    ...contract,
+                    contractEndDate: date?.toDate(),
+                  });
                 }}
               />
             )}
           </div>
         </div>
-      </div>
-      <div className="w-full flex flex-row justify-end">
-        {!isDisabled ? (
-          <>
+        <div className="w-full flex flex-row justify-end">
+          {!isContractDisabled ? (
+            <>
+              <button
+                onClick={() => {
+                  setIsContractDisabled(!isContractDisabled);
+                }}
+                className="m-4 w-24 h-8 rounded-sm border-[1px] bg-red-600 text-white 
+                justify-end hover:text-red-600 hover:bg-white hover:border-red-600"
+              >
+                Huỷ
+              </button>
+              <button
+                onClick={async () => {
+                  await handleSaveContract();
+                }}
+                className="m-4 w-24 h-8 rounded-sm border-[1px] bg-green-600 text-white 
+                justify-end hover:text-green-600 hover:bg-white hover:border-green-600"
+              >
+                Lưu
+              </button>
+            </>
+          ) : (
             <button
               onClick={() => {
-                setIsDisabled(!isDisabled);
+                setIsContractDisabled(!isContractDisabled);
               }}
-              className="m-4 w-24 h-8 rounded-sm border-[1px] bg-red-600 text-white 
-                justify-end hover:text-red-600 hover:bg-white hover:border-red-600"
-            >
-              Huỷ
-            </button>
-            <button
-              onClick={async () => {
-                await handleSaveJobInformation();
-                setIsDisabled(!isDisabled);
-              }}
-              className="m-4 w-24 h-8 rounded-sm border-[1px] bg-green-600 text-white 
-                justify-end hover:text-green-600 hover:bg-white hover:border-green-600"
-            >
-              Lưu
-            </button>
-          </>
-        ) : (
-          <button
-            onClick={() => {
-              setIsDisabled(!isDisabled);
-            }}
-            className="m-4 w-24 h-8 rounded-sm border-[1px] bg-blue-600 text-white 
+              className="m-4 w-24 h-8 rounded-sm border-[1px] bg-blue-600 text-white 
                   justify-end hover:text-blue-600 hover:bg-white hover:border-blue-600"
-          >
-            Cập nhật
-          </button>
-        )}
+            >
+              Cập nhật
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

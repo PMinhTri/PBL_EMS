@@ -2,13 +2,14 @@ import {
   CreateNewUserInformation,
   UpdateUserInformation,
   UserDetailInformation,
+  UserResponse,
 } from "../types/userTypes";
 import { $delete, $get, $post } from "../utils/http";
 
 export const createNewUser = async (data: CreateNewUserInformation) => {
   const response: {
     statusCode: number;
-    payload: UserDetailInformation;
+    payload: { user: UserResponse; password: string };
   } = await $post(`/users/create`, data);
   return response;
 };
