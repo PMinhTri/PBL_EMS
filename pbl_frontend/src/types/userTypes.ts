@@ -1,3 +1,4 @@
+import { Education } from "./eductionTypes";
 import { JobInformation } from "./jobInformationTypes";
 
 export type UserAuthInfo = {
@@ -25,6 +26,8 @@ export type UserDetailInformation = {
   role: {
     name: string;
   };
+  educationId: string;
+  education?: Education;
   jobInformation?: JobInformation;
 };
 
@@ -56,6 +59,7 @@ export type UpdateUserInformation = {
   city: string;
   nationality: string;
   avatar: string;
+  educationId: string;
 };
 
 export type UserResponse = {

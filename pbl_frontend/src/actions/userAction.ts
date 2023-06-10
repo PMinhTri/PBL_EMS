@@ -7,8 +7,8 @@ import {
 } from "../api/user";
 import {
   CreateNewUserInformation,
-  UpdateUserInformation,
   UserAuthInfo,
+  UserDetailInformation,
 } from "../types/userTypes";
 import { handleError } from "../utils/errorHandler";
 
@@ -49,7 +49,7 @@ export const UserAction = {
 
   updateUserInfo: async (
     email: string,
-    userInformation: UpdateUserInformation
+    userInformation: UserDetailInformation
   ) => {
     const response = await updateUserInformation(email, userInformation);
 

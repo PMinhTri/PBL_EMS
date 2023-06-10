@@ -16,11 +16,6 @@ import EmployeeSort from "./components/EmployeeSort";
 import EmployeeFilter from "./components/EmployeeFilter";
 import CreateNewEmployee from "./components/CreateNewEmployee";
 import showNotification from "../../../utils/notification";
-import { useRecoilState } from "recoil";
-import { jobTitleState } from "../../../recoil/atoms/jobTitle";
-import { departmentState } from "../../../recoil/atoms/department";
-import { JobTitleAction } from "../../../actions/jobTitleAction";
-import { DepartmentAction } from "../../../actions/departmentAction";
 import { JobInformationAction } from "../../../actions/jobInformationAction";
 import dayjs from "dayjs";
 import EditEmployee from "./components/EditEmployee";
@@ -31,6 +26,7 @@ const titleTable = [
   "Giới tính",
   "Chức vụ",
   "Email",
+  "CCCD/CMND",
   "Số điện thoại",
   "Chi nhánh",
   "Trình độ",
@@ -67,21 +63,17 @@ const EmployeeManagement: React.FunctionComponent = () => {
   }>({ userInfo: {} as UserDetailInformation, isOpen: false });
   const [isOpenCreateModal, setIsOpenCreateModal] = React.useState(false);
   const [isModalDeleteOpen, setIsModalDeleteOpen] = React.useState(false);
-  const [jobTitles, setJobTitles] = useRecoilState(jobTitleState);
-  const [departments, setDepartments] = useRecoilState(departmentState);
 
   React.useEffect(() => {
     const fetchData = async () => {
       const employees = await UserAction.getAllEmployees();
-      setJobTitles(await JobTitleAction.getAllJobTitles());
-      setDepartments(await DepartmentAction.getAllDepartments());
 
       setEmployeeList(employees);
       setIsLoading(false);
     };
 
     fetchData();
-  }, [setDepartments, setJobTitles]);
+  }, []);
 
   const handleSearchEmployee = (value: string) => {
     if (value === "") {
@@ -319,7 +311,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
       ) : (
         <div className="w-full px-2 py-2 h-screen overflow-auto">
           <div>
-            <div className="flex max-h-80 overflow-x-auto overflow-y-auto scrollbar">
+            <div className="flex w-full max-h-80 overflow-x-auto overflow-y-auto scrollbar">
               <table className="w-full">
                 <thead className="bg-blue-600 text-white rounded-t-md sticky top-0">
                   <tr>
@@ -330,7 +322,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
                     ))}
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="overflow-x-auto">
                   {resultEmployeeList.map((item, index) => (
                     <tr key={index} className="border-[2px] h-12 bg-slate-100">
                       <td className="text-center border-[2px]">{index + 1}</td>
@@ -341,26 +333,21 @@ const EmployeeManagement: React.FunctionComponent = () => {
                         {item.gender}
                       </td>
                       <td className="text-center border-[2px]">
-                        {
-                          jobTitles.find(
-                            (job) => job.id === item.jobInformation?.jobTitleId
-                          )?.name
-                        }
+                        {item.jobInformation?.jobTitle?.name}
                       </td>
                       <td className="text-center border-[2px]">{item.email}</td>
+                      <td className="text-center border-[2px]">
+                        {item.citizenId}
+                      </td>
                       <td className="text-center border-[2px]">
                         {item.phoneNumber}
                       </td>
                       <td className="text-center border-[2px]">
-                        {
-                          departments.find(
-                            (department) =>
-                              department.id ===
-                              item.jobInformation?.departmentId
-                          )?.name
-                        }
+                        {item.jobInformation?.department?.name}
                       </td>
-                      <td className="text-center border-[2px]"></td>
+                      <td className="text-center border-[2px]">
+                        {item.education?.grade}
+                      </td>
                       <td className="text-center border-[2px]">
                         {item.status}
                       </td>

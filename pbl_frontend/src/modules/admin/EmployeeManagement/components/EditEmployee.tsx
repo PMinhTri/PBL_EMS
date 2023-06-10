@@ -1,5 +1,10 @@
 import React from "react";
 import { UserDetailInformation } from "../../../../types/userTypes";
+import PersonalInformation from "../../../account/components/PersonalInformation";
+import JobInformationContainer from "../../../account/components/JobInformation";
+import { JobInformation } from "../../../../types/jobInformationTypes";
+import { JobInformationAction } from "../../../../actions/jobInformationAction";
+import { defaultJobInformation } from "../../../../constants/constantVariables";
 
 type Props = {
   userInfo: UserDetailInformation;
@@ -7,9 +12,23 @@ type Props = {
 
 const EditEmployee: React.FunctionComponent<Props> = (props: Props) => {
   const { userInfo } = props;
+  const [jobInformation, setJobInformation] = React.useState<JobInformation>(
+    defaultJobInformation
+  );
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      setJobInformation(await JobInformationAction.getByUserId(userInfo.id));
+    };
+
+    fetchData();
+  }, [userInfo.id]);
 
   return (
-    <div className="p-4 max-h-56 flex flex-col overflow-y-auto gap-4">
+    <div
+      className="p-4 max-h-[480px] flex flex-col overflow-y-auto gap-4 scrollbar
+    border rounded-md"
+    >
       <div className="w-full flex flex-row justify-between items-center h-32 border-b-[2px] p-4">
         <div className="flex items-center gap-4">
           <div className="w-24 h-24 rounded-full bg-gray-300 flex-shrink-0 mr-4"></div>
@@ -24,11 +43,12 @@ const EditEmployee: React.FunctionComponent<Props> = (props: Props) => {
           </div>
         </div>
       </div>
-      <div className="w-full">
-        <div className="w-full px-2 py-2 border rounded-t-md bg-blue-600">
-          <span className="font-bold text-lg text-white">
-            Thông tin cá nhân
-          </span>
+      <div className="w-full flex flex-col gap-4">
+        <div className="w-full">
+          <PersonalInformation userInfo={userInfo} />
+        </div>
+        <div className="w-full">
+          <JobInformationContainer jobInformation={jobInformation} />
         </div>
       </div>
     </div>

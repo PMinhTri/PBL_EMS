@@ -32,14 +32,25 @@ export const getAllEmployees = async () => {
 
 export const updateUserInformation = async (
   email: string,
-  userInformation: UpdateUserInformation
+  userInformation: UserDetailInformation
 ) => {
   const response: {
     statusCode: number;
-    payload: UserDetailInformation[];
+    payload: UserDetailInformation;
   } = await $post(`/users/update-personal-information`, {
     email: email,
-    userInformation: userInformation,
+    userInformation: {
+      fullName: userInformation.fullName,
+      gender: userInformation.gender,
+      dateOfBirth: userInformation.dateOfBirth,
+      phoneNumber: userInformation.phoneNumber,
+      address: userInformation.address,
+      city: userInformation.city,
+      citizenId: userInformation.citizenId,
+      nationality: userInformation.nationality,
+      avatar: userInformation.avatar,
+      educationId: userInformation.educationId,
+    },
   });
 
   return response;
@@ -48,7 +59,7 @@ export const updateUserInformation = async (
 export const deleteUser = async (id: string) => {
   const response: {
     statusCode: number;
-    payload: UserDetailInformation[];
+    payload: UserDetailInformation;
   } = await $delete(`/users/${id}`);
 
   return response;

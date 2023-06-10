@@ -101,7 +101,7 @@ export class UserService {
   public async updatePersonalInformation(
     email: string,
     dto: userInformationDto,
-  ): Promise<ServiceResponse<userInformationDto, ServiceFailure<UserFailure>>> {
+  ): Promise<ServiceResponse<User, ServiceFailure<UserFailure>>> {
     const user = await this.prisma.user.findFirst({
       where: {
         email: email,
@@ -131,6 +131,11 @@ export class UserService {
         city: dto.city,
         nationality: dto.nationality,
         avatar: dto.avatar,
+        education: {
+          connect: {
+            id: dto.educationId,
+          },
+        },
       },
     });
 
@@ -142,7 +147,7 @@ export class UserService {
   public async getAllUsers(): Promise<
     ServiceResponse<userInformationDto[], ServiceFailure<UserFailure>>
   > {
-    const userInformationDto = await this.prisma.user.findMany({
+    const userInformation = await this.prisma.user.findMany({
       select: {
         id: true,
         email: true,
@@ -159,6 +164,11 @@ export class UserService {
         role: {
           select: {
             name: true,
+          },
+        },
+        education: {
+          select: {
+            grade: true,
           },
         },
         jobInformation: {
@@ -185,6 +195,7 @@ export class UserService {
             workingSkill: {
               select: {
                 name: true,
+                description: true,
               },
             },
           },
@@ -194,7 +205,7 @@ export class UserService {
 
     return {
       status: ServiceResponseStatus.Success,
-      result: userInformationDto,
+      result: userInformation,
     };
   }
 
@@ -221,6 +232,40 @@ export class UserService {
         role: {
           select: {
             name: true,
+          },
+        },
+        education: {
+          select: {
+            grade: true,
+          },
+        },
+        jobInformation: {
+          select: {
+            joinDate: true,
+            employeeStatus: true,
+            contractType: {
+              select: {
+                type: true,
+              },
+            },
+            contractStartDate: true,
+            contractEndDate: true,
+            jobTitle: {
+              select: {
+                name: true,
+              },
+            },
+            department: {
+              select: {
+                name: true,
+              },
+            },
+            workingSkill: {
+              select: {
+                name: true,
+                description: true,
+              },
+            },
           },
         },
       },

@@ -72,4 +72,8 @@ export class userInformationDto {
   @IsString()
   @ApiProperty({ type: String, required: false, nullable: true })
   avatar: string;
+
+  @IsString()
+  @ApiProperty({ type: String, required: false, nullable: true })
+  educationId?: string;
 }

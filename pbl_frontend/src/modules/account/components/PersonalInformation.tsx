@@ -1,73 +1,87 @@
 import { DatePicker, Input, Select, Space } from "antd";
 import React from "react";
-import { useRecoilState } from "recoil";
-import { userInfoState } from "../../../recoil/atoms/user";
 import dayjs from "dayjs";
 import { UserAction } from "../../../actions/userAction";
 import { genderOptions } from "../../../constants/constantVariables";
 import showNotification from "../../../utils/notification";
+import { UserDetailInformation } from "../../../types/userTypes";
+import { Education } from "../../../types/eductionTypes";
+import { EducationAction } from "../../../actions/educationAction";
 
-const PersonalInformation: React.FunctionComponent = () => {
-  const [userInfo, setUserInfo] = useRecoilState(userInfoState);
+type Props = {
+  userInfo: UserDetailInformation;
+};
+
+const PersonalInformation: React.FunctionComponent<Props> = (props: Props) => {
+  const { userInfo } = props;
+  const [updateUserInfo, setUpdateUserInfo] =
+    React.useState<UserDetailInformation>(userInfo);
   const [isDisabled, setIsDisabled] = React.useState(true);
+  const [education, setEducation] = React.useState<Education[]>([]);
 
   const inputFields = [
     {
       label: "Họ tên",
       name: "fullName",
-      value: userInfo.fullName,
+      value: updateUserInfo.fullName,
     },
     {
       label: "Giới tính",
       name: "gender",
-      value: userInfo.gender,
+      value: updateUserInfo.gender,
     },
     {
       label: "Ngày sinh",
       name: "dateOfBirth",
-      value: userInfo.dateOfBirth,
+      value: updateUserInfo.dateOfBirth,
     },
     {
       label: "Số điện thoại",
       name: "phoneNumber",
-      value: userInfo.phoneNumber,
+      value: updateUserInfo.phoneNumber,
     },
     {
       label: "Địa chỉ",
       name: "address",
-      value: userInfo.address,
+      value: updateUserInfo.address,
     },
     {
       label: "Thành phố",
       name: "city",
-      value: userInfo.city,
+      value: updateUserInfo.city,
     },
     {
       label: "Quốc tịch",
       name: "nationality",
-      value: userInfo.nationality,
+      value: updateUserInfo.nationality,
     },
     {
       label: "CCCD/CMND",
       name: "citizenId",
-      value: userInfo.citizenId,
-    },
-    {
-      label: "Học vấn",
-      name: "education",
-      value: "",
+      value: updateUserInfo.citizenId,
     },
   ];
 
+  React.useEffect(() => {
+    const fetchData = async () => {
+      setEducation(await EducationAction.getAllEducation());
+    };
+
+    fetchData();
+  }, []);
+
   const handleSaveInfo = async () => {
-    if (userInfo.fullName === "" || userInfo.citizenId === "") {
+    if (updateUserInfo.fullName === "" || updateUserInfo.citizenId === "") {
       showNotification("error", "Họ tên và CCCD/CMND không được để trống");
       return;
     }
 
-    await UserAction.updateUserInfo(userInfo.email, userInfo);
+    await UserAction.updateUserInfo(updateUserInfo.email, updateUserInfo);
     showNotification("success", "Cập nhật thông tin thành công");
     setIsDisabled(!isDisabled);
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   };
 
   return (
@@ -79,17 +93,17 @@ const PersonalInformation: React.FunctionComponent = () => {
         <div className="flex flex-row  items-center m-2">
           <div className="m-2 w-36 font-bold">Họ tên:</div>
           {isDisabled ? (
-            <div>{userInfo.fullName}</div>
+            <div>{updateUserInfo.fullName}</div>
           ) : (
             <Input
               disabled={isDisabled}
               onChange={(e) =>
-                setUserInfo({
-                  ...userInfo,
+                setUpdateUserInfo({
+                  ...updateUserInfo,
                   fullName: e.target.value,
                 })
               }
-              defaultValue={userInfo.fullName}
+              defaultValue={updateUserInfo.fullName}
             />
           )}
         </div>
@@ -107,8 +121,8 @@ const PersonalInformation: React.FunctionComponent = () => {
                     className="w-full"
                     disabled={isDisabled}
                     onChange={(value) =>
-                      setUserInfo({
-                        ...userInfo,
+                      setUpdateUserInfo({
+                        ...updateUserInfo,
                         [item.name]: value,
                       })
                     }
@@ -139,8 +153,8 @@ const PersonalInformation: React.FunctionComponent = () => {
                           : dayjs(new Date())
                       }
                       onChange={(date) =>
-                        setUserInfo({
-                          ...userInfo,
+                        setUpdateUserInfo({
+                          ...updateUserInfo,
                           dateOfBirth: date
                             ? date.toDate()
                             : dayjs(new Date()).toDate(),
@@ -167,10 +181,10 @@ const PersonalInformation: React.FunctionComponent = () => {
                     style={{
                       border: "1px",
                     }}
-                    options={[{ label: "Việt Nam", value: "VN" }]}
+                    options={[{ label: "Việt Nam", value: "Việt Nam" }]}
                     onChange={(value) => {
-                      setUserInfo({
-                        ...userInfo,
+                      setUpdateUserInfo({
+                        ...updateUserInfo,
                         [item.name]: value,
                       });
                     }}
@@ -192,8 +206,8 @@ const PersonalInformation: React.FunctionComponent = () => {
                     typeof item.value === "string" ? item.value : ""
                   }
                   onChange={(e) => {
-                    setUserInfo({
-                      ...userInfo,
+                    setUpdateUserInfo({
+                      ...updateUserInfo,
                       [item.name]: e.target.value,
                     });
                   }}
@@ -203,6 +217,31 @@ const PersonalInformation: React.FunctionComponent = () => {
             </div>
           );
         })}
+        <div className="flex flex-row  items-center m-2">
+          <div className="m-2 w-36 font-bold">Học vấn:</div>
+          {isDisabled ? (
+            <div>{updateUserInfo.education?.grade}</div>
+          ) : (
+            <Select
+              defaultValue={updateUserInfo.education?.id}
+              disabled={isDisabled}
+              className="w-full"
+              style={{
+                border: "1px",
+              }}
+              options={education.map((item) => {
+                return { label: item.grade, value: item.id };
+              })}
+              onChange={(value) => {
+                setUpdateUserInfo({
+                  ...updateUserInfo,
+                  educationId: value,
+                  education: education.find((item) => item.id === value),
+                });
+              }}
+            />
+          )}
+        </div>
       </div>
       <div className="w-full flex flex-row justify-end">
         {!isDisabled ? (

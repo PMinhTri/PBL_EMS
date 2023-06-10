@@ -48,19 +48,18 @@ model JobInformation {
   id                String         @id @default(uuid())
   userId            String         @unique
   user              User?          @relation(fields: [userId], references: [id])
-  contractId        String?        @unique
+  contractId        String?
   contractType      Contract?      @relation(fields: [contractId], references: [id])
   contractStartDate DateTime?
   contractEndDate   DateTime?
   joinDate          DateTime?
   employeeStatus    String?
   jobHistory        String?
-  jobTitleId        String?        @unique
+  jobTitleId        String?
   jobTitle          JobTitle?      @relation(fields: [jobTitleId], references: [id])
   workingSkill      WorkingSkill[]
-  departmentId      String?        @unique
+  departmentId      String?
   department        Department?    @relation(fields: [departmentId], references: [id])
-  // project           Project[]
 
   isDeleted Boolean? @default(false)
 
@@ -138,19 +137,6 @@ model Payroll {
   updatedAt DateTime @updatedAt
 }
 
-// model Project {
-//   id             String           @id @default(uuid())
-//   name           String
-//   description    String?
-//   progress       String?
-//   status         String?
-//   startDate      DateTime?
-//   endDate        DateTime?
-//   createdAt      DateTime         @default(now())
-//   updatedAt      DateTime         @updatedAt
-//   jobInformation JobInformation[]
-// }
-
 model Insurance {
   id              String   @id @default(uuid())
   user            User[]
@@ -186,13 +172,9 @@ model LeaveType {
 }
 
 model Education {
-  id          String  @id @default(uuid())
-  user        User[]
-  grade       String?
-  university  String?
-  major       String?
-  certificate String?
-  degree      String?
+  id    String @id @default(uuid())
+  user  User[]
+  grade String
 }
 
 model Contract {

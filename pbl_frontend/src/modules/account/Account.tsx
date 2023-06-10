@@ -1,5 +1,5 @@
 import React from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { userInfoState } from "../../recoil/atoms/user";
 import { UserAction } from "../../actions/userAction";
 import userSelector from "../../recoil/selectors/user";
@@ -23,7 +23,8 @@ enum ProfileType {
 const Account = () => {
   const { userAuthInfo } = useRecoilValue(userSelector);
   const [userInfo, setUserInfo] = useRecoilState(userInfoState);
-  const setJobInformation = useSetRecoilState(jobInformationState);
+  const [jobInformation, setJobInformation] =
+    useRecoilState(jobInformationState);
   const [isLoading, setIsLoading] = React.useState(true);
   const [profileType, setProfileType] = React.useState(ProfileType.PERSONAL);
   const [activeKey, setActiveKey] = React.useState({
@@ -93,8 +94,12 @@ const Account = () => {
               </div>
             </div>
             <div className="col-span-2 w-full">
-              {profileType === ProfileType.PERSONAL && <PersonalInformation />}
-              {profileType === ProfileType.WORK && <JobInformationContainer />}
+              {profileType === ProfileType.PERSONAL && (
+                <PersonalInformation userInfo={userInfo} />
+              )}
+              {profileType === ProfileType.WORK && (
+                <JobInformationContainer jobInformation={jobInformation} />
+              )}
               {profileType === ProfileType.CHANGE_PASSWORD && (
                 <ChangePassword />
               )}

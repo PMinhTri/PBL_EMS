@@ -31,5 +31,6 @@ export const userInfoState = atom<UserDetailInformation>({
     role: {
       name: "",
     },
+    educationId: "",
   },
 });

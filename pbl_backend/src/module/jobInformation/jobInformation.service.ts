@@ -9,7 +9,6 @@ import { JobInformationDto } from './jobInformation.dto';
 import { JobInformationFailure } from 'src/enumTypes/failure.enum';
 import { JobInformation } from '@prisma/client';
 import * as dayjs from 'dayjs';
-import { intersection } from 'lodash';
 
 @Injectable()
 export class JobInformationService {

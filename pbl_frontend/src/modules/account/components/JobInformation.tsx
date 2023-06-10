@@ -9,16 +9,23 @@ import { WorkingSkill } from "../../../types/workingSkillTypes";
 import { Department } from "../../../types/departmentTypes";
 import { WorkingSkillAction } from "../../../actions/workingSkillAction";
 import { DepartmentAction } from "../../../actions/departmentAction";
-import { useRecoilState } from "recoil";
 import dayjs from "dayjs";
-import { jobInformationState } from "../../../recoil/atoms/jobInformation";
 import { JobInformationAction } from "../../../actions/jobInformationAction";
 import showNotification from "../../../utils/notification";
 import _ from "lodash";
+import { JobInformation } from "../../../types/jobInformationTypes";
 
-const JobInformationContainer: React.FunctionComponent = () => {
-  const [jobInformation, setJobInformation] =
-    useRecoilState(jobInformationState);
+type Props = {
+  jobInformation: JobInformation;
+};
+
+const JobInformationContainer: React.FunctionComponent<Props> = (
+  props: Props
+) => {
+  const { jobInformation } = props;
+
+  const [updateJobInformation, setUpdateJobInformation] =
+    React.useState<JobInformation>(jobInformation);
   const [isDisabled, setIsDisabled] = React.useState(true);
   const [isContractDisabled, setIsContractDisabled] = React.useState(true);
   const [jobTitles, setJobTitles] = React.useState<JobTitle[]>([]);
@@ -44,22 +51,25 @@ const JobInformationContainer: React.FunctionComponent = () => {
       setDepartments(await DepartmentAction.getAllDepartments());
     };
     fetchedData();
-  }, []);
+  }, [updateJobInformation]);
 
   const handleSaveJobInformation = async () => {
     if (
-      !jobInformation.employeeStatus ||
-      !jobInformation.jobTitleId ||
-      !jobInformation.departmentId ||
-      !jobInformation.joinDate
+      !updateJobInformation.employeeStatus ||
+      !updateJobInformation.jobTitleId ||
+      !updateJobInformation.departmentId ||
+      !updateJobInformation.joinDate
     ) {
       showNotification("error", "Vui lòng nhập đầy đủ thông tin công việc");
       return;
     }
 
-    await JobInformationAction.update(jobInformation.id, jobInformation);
+    await JobInformationAction.update(jobInformation.id, updateJobInformation);
     showNotification("success", "Cập nhật thông tin công việc thành công");
     setIsDisabled(!isDisabled);
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   };
 
   const handleSaveContract = async () => {
@@ -74,6 +84,9 @@ const JobInformationContainer: React.FunctionComponent = () => {
 
     showNotification("success", "Cập nhật thông tin hợp đồng thành công");
     setIsContractDisabled(!isContractDisabled);
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   };
 
   return (
@@ -86,14 +99,16 @@ const JobInformationContainer: React.FunctionComponent = () => {
           <div className="flex flex-row items-center m-2">
             <div className="m-2 w-36 font-bold">Ngày vào:</div>
             {isDisabled ? (
-              <div>{dayjs(jobInformation.joinDate).format("YYYY-DD-MM")}</div>
+              <div>
+                {dayjs(updateJobInformation.joinDate).format("YYYY-DD-MM")}
+              </div>
             ) : (
               <DatePicker
                 className="w-full"
-                defaultValue={dayjs(jobInformation.joinDate)}
+                defaultValue={dayjs(updateJobInformation.joinDate)}
                 onChange={(date) => {
-                  setJobInformation({
-                    ...jobInformation,
+                  setUpdateJobInformation({
+                    ...updateJobInformation,
                     joinDate: date ? date.toDate() : dayjs(new Date()).toDate(),
                   });
                 }}
@@ -103,15 +118,15 @@ const JobInformationContainer: React.FunctionComponent = () => {
           <div className="flex flex-row items-center m-2">
             <div className="m-2 w-36 font-bold">Trạng thái:</div>
             {isDisabled ? (
-              <div>{jobInformation.employeeStatus}</div>
+              <div>{updateJobInformation.employeeStatus}</div>
             ) : (
               <Select
                 className="w-full"
-                defaultValue={jobInformation.employeeStatus}
+                defaultValue={updateJobInformation.employeeStatus}
                 options={employeeStatusOptions}
                 onChange={(value) => {
-                  setJobInformation({
-                    ...jobInformation,
+                  setUpdateJobInformation({
+                    ...updateJobInformation,
                     employeeStatus: value,
                   });
                 }}
@@ -121,11 +136,11 @@ const JobInformationContainer: React.FunctionComponent = () => {
           <div className="flex flex-row items-center m-2">
             <div className="m-2 w-36 font-bold">Chức vụ:</div>
             {isDisabled ? (
-              <div>{jobInformation.jobTitle?.name}</div>
+              <div>{updateJobInformation.jobTitle?.name}</div>
             ) : (
               <Select
                 className="w-full"
-                defaultValue={jobInformation.jobTitle?.name}
+                defaultValue={updateJobInformation.jobTitle?.name}
                 options={jobTitles.map((jobTitle) => {
                   return {
                     label: jobTitle.name,
@@ -133,8 +148,8 @@ const JobInformationContainer: React.FunctionComponent = () => {
                   };
                 })}
                 onChange={(value) => {
-                  setJobInformation({
-                    ...jobInformation,
+                  setUpdateJobInformation({
+                    ...updateJobInformation,
                     jobTitleId: value,
                     jobTitle: jobTitles.find((jobTitle) => {
                       return jobTitle.id === value;
@@ -147,11 +162,11 @@ const JobInformationContainer: React.FunctionComponent = () => {
           <div className="flex flex-row items-center m-2">
             <div className="m-2 w-36 font-bold">Chi nhánh:</div>
             {isDisabled ? (
-              <div>{jobInformation.department?.name}</div>
+              <div>{updateJobInformation.department?.name}</div>
             ) : (
               <Select
                 className="w-full"
-                defaultValue={jobInformation.department?.name}
+                defaultValue={updateJobInformation.department?.name}
                 options={departments.map((department) => {
                   return {
                     label: department.name,
@@ -159,8 +174,8 @@ const JobInformationContainer: React.FunctionComponent = () => {
                   };
                 })}
                 onChange={(value) => {
-                  setJobInformation({
-                    ...jobInformation,
+                  setUpdateJobInformation({
+                    ...updateJobInformation,
                     departmentId: value,
                     department: departments.find(
                       (department) => department.id === value
@@ -175,14 +190,14 @@ const JobInformationContainer: React.FunctionComponent = () => {
             <div className="m-2 w-36 font-bold">Kỹ năng:</div>
             {isDisabled ? (
               <div>
-                {jobInformation.workingSkill?.map((workingSkill) => {
+                {updateJobInformation.workingSkill?.map((workingSkill) => {
                   return `${workingSkill.name}; `;
                 })}
               </div>
             ) : (
               <Select
                 mode="multiple"
-                defaultValue={jobInformation.workingSkill?.map(
+                defaultValue={updateJobInformation.workingSkill?.map(
                   (workingSkill) => {
                     return workingSkill.name;
                   }
@@ -205,10 +220,10 @@ const JobInformationContainer: React.FunctionComponent = () => {
                 })}
                 onChange={(value) => {
                   if (value.length) {
-                    setJobInformation({
-                      ...jobInformation,
+                    setUpdateJobInformation({
+                      ...updateJobInformation,
                       workingSkill: _.uniqBy(
-                        jobInformation.workingSkill?.concat(
+                        updateJobInformation.workingSkill?.concat(
                           workingSkills.filter((workingSkill) =>
                             value.includes(workingSkill.id)
                           )
@@ -217,8 +232,8 @@ const JobInformationContainer: React.FunctionComponent = () => {
                       ),
                     });
                   } else {
-                    setJobInformation({
-                      ...jobInformation,
+                    setUpdateJobInformation({
+                      ...updateJobInformation,
                       workingSkill: [],
                     });
                   }
@@ -275,11 +290,11 @@ const JobInformationContainer: React.FunctionComponent = () => {
           <div className="flex flex-row items-center m-2">
             <div className="m-2 w-36 font-bold">Loại hợp đồng:</div>
             {isContractDisabled ? (
-              <div>{jobInformation.contractType?.type}</div>
+              <div>{updateJobInformation.contractType?.type}</div>
             ) : (
               <Select
                 className="w-full"
-                defaultValue={jobInformation.contractType?.type}
+                defaultValue={updateJobInformation.contractType?.type}
                 options={contracts.map((contract) => {
                   return {
                     label: contract.type,
@@ -287,8 +302,8 @@ const JobInformationContainer: React.FunctionComponent = () => {
                   };
                 })}
                 onChange={(value) => {
-                  setJobInformation({
-                    ...jobInformation,
+                  setUpdateJobInformation({
+                    ...updateJobInformation,
                     contractId: value,
                     contractType: contracts.find(
                       (contract) => contract.id === value
@@ -307,21 +322,23 @@ const JobInformationContainer: React.FunctionComponent = () => {
             <div className="m-2 w-36 font-bold">Ngày ký:</div>
             {isContractDisabled ? (
               <div>
-                {jobInformation.contractStartDate
-                  ? dayjs(jobInformation.contractStartDate).format("YYYY-MM-DD")
+                {updateJobInformation.contractStartDate
+                  ? dayjs(updateJobInformation.contractStartDate).format(
+                      "YYYY-MM-DD"
+                    )
                   : ""}
               </div>
             ) : (
               <DatePicker
                 className="w-full"
                 defaultValue={
-                  jobInformation.contractStartDate
-                    ? dayjs(jobInformation.contractStartDate)
+                  updateJobInformation.contractStartDate
+                    ? dayjs(updateJobInformation.contractStartDate)
                     : dayjs(new Date())
                 }
                 onChange={(date) => {
-                  setJobInformation({
-                    ...jobInformation,
+                  setUpdateJobInformation({
+                    ...updateJobInformation,
                     contractStartDate: date
                       ? date.toDate()
                       : dayjs(new Date()).toDate(),
@@ -338,21 +355,23 @@ const JobInformationContainer: React.FunctionComponent = () => {
             <div className="m-2 w-36 font-bold">Ngày kết thúc:</div>
             {isContractDisabled ? (
               <div>
-                {jobInformation.contractEndDate
-                  ? dayjs(jobInformation.contractEndDate).format("YYYY-MM-DD")
+                {updateJobInformation.contractEndDate
+                  ? dayjs(updateJobInformation.contractEndDate).format(
+                      "YYYY-MM-DD"
+                    )
                   : ""}
               </div>
             ) : (
               <DatePicker
                 className="w-full"
                 defaultValue={
-                  jobInformation.contractEndDate
-                    ? dayjs(jobInformation.contractEndDate)
+                  updateJobInformation.contractEndDate
+                    ? dayjs(updateJobInformation.contractEndDate)
                     : dayjs(new Date())
                 }
                 onChange={(date) => {
-                  setJobInformation({
-                    ...jobInformation,
+                  setUpdateJobInformation({
+                    ...updateJobInformation,
                     contractEndDate: date
                       ? date.toDate()
                       : dayjs(new Date()).toDate(),
