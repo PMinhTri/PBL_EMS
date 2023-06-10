@@ -47,6 +47,10 @@ const EmployeeManagement: React.FunctionComponent = () => {
     UserDetailInformation[]
   >([]);
 
+  const [employeeFiltered, setEmployeeFiltered] = React.useState<
+    UserDetailInformation[]
+  >([]);
+
   const [newEmployee, setNewEmployee] =
     React.useState<CreateNewUserInformation>({
       email: "",
@@ -60,6 +64,19 @@ const EmployeeManagement: React.FunctionComponent = () => {
   const [isModalDeleteOpen, setIsModalDeleteOpen] = React.useState(false);
   const [jobTitles, setJobTitles] = useRecoilState(jobTitleState);
   const [departments, setDepartments] = useRecoilState(departmentState);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const employees = await UserAction.getAllEmployees();
+      setJobTitles(await JobTitleAction.getAllJobTitles());
+      setDepartments(await DepartmentAction.getAllDepartments());
+
+      setEmployeeList(employees);
+      setIsLoading(false);
+    };
+
+    fetchData();
+  }, [setDepartments, setJobTitles]);
 
   const handleSearchEmployee = (value: string) => {
     if (value === "") {
@@ -78,18 +95,34 @@ const EmployeeManagement: React.FunctionComponent = () => {
     }
   };
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      const employees = await UserAction.getAllEmployees();
-      setJobTitles(await JobTitleAction.getAllJobTitles());
-      setDepartments(await DepartmentAction.getAllDepartments());
+  const handleFilterEmployee = (payload: {
+    gender: string;
+    jobTitle: string;
+    department: string;
+  }) => {
+    const { gender, jobTitle, department } = payload;
 
-      setEmployeeList(employees);
-      setIsLoading(false);
-    };
+    const filteredEmployees = employeeList.filter((employee) => {
+      // Filter by gender
+      if (gender !== "All") {
+        return employee.gender === gender;
+      }
 
-    fetchData();
-  }, [setDepartments, setJobTitles]);
+      // Filter by job title
+      if (jobTitle !== "All") {
+        return employee.jobInformation?.jobTitle?.name === jobTitle;
+      }
+
+      // Filter by department
+      if (department !== "All") {
+        return employee.jobInformation?.department?.name === department;
+      }
+
+      return true;
+    });
+
+    setEmployeeFiltered(filteredEmployees);
+  };
 
   const handleCreateNewEmployee = async () => {
     if (
@@ -125,6 +158,18 @@ const EmployeeManagement: React.FunctionComponent = () => {
     window.location.reload();
   };
 
+  const resultEmployeeList = React.useMemo(() => {
+    if (employeeSearched.length) {
+      return employeeSearched;
+    }
+
+    if (employeeFiltered.length) {
+      return employeeFiltered;
+    }
+
+    return employeeList;
+  }, [employeeList, employeeSearched, employeeFiltered]);
+
   return (
     <div className="w-full h-screen flex flex-col">
       <div className="flex w-full h-16 justify-center items-center border-b-[2px]">
@@ -133,7 +178,11 @@ const EmployeeManagement: React.FunctionComponent = () => {
             <Space direction="vertical" className="w-[100%] mr-1 flex flex-row">
               <Popover
                 placement="bottomRight"
-                content={<EmployeeFilter />}
+                content={
+                  <EmployeeFilter
+                    onApply={(payload) => handleFilterEmployee(payload)}
+                  />
+                }
                 title={"Filter"}
                 trigger={"click"}
               >
@@ -277,92 +326,74 @@ const EmployeeManagement: React.FunctionComponent = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {employeeList
-                    .filter((employee) => {
-                      if (employeeSearched.length === 0) {
-                        return true; // Return all employees if employeeSearched is empty
-                      } else {
-                        return employeeSearched.some(
-                          (item) => item.id === employee.id
-                        );
-                      }
-                    })
-                    .map((item, index) => (
-                      <tr
-                        key={index}
-                        className="border-[2px] h-12 bg-slate-100"
-                      >
-                        <td className="text-center border-[2px]">
-                          {index + 1}
-                        </td>
-                        <td className="text-center border-[2px]">
-                          {item.fullName}
-                        </td>
-                        <td className="text-center border-[2px]">
-                          {item.gender}
-                        </td>
-                        <td className="text-center border-[2px]">
-                          {
-                            jobTitles.find(
-                              (job) =>
-                                job.id === item.jobInformation?.jobTitleId
-                            )?.name
-                          }
-                        </td>
-                        <td className="text-center border-[2px]">
-                          {item.email}
-                        </td>
-                        <td className="text-center border-[2px]">
-                          {item.phoneNumber}
-                        </td>
-                        <td className="text-center border-[2px]">
-                          {
-                            departments.find(
-                              (department) =>
-                                department.id ===
-                                item.jobInformation?.departmentId
-                            )?.name
-                          }
-                        </td>
-                        <td className="text-center border-[2px]"></td>
-                        <td className="text-center border-[2px]">
-                          {item.status}
-                        </td>
-                        <td className="flex justify-center items-center gap-2 flex-row p-4">
-                          <div className="flex justify-center items-center text-lg cursor-pointer text-orange-600">
-                            <BiEditAlt />
-                          </div>
-                          <div
-                            onClick={() => {
-                              setIsModalDeleteOpen(true);
-                            }}
-                            className="flex justify-center items-center text-lg cursor-pointer text-red-600"
-                          >
-                            <BiTrashAlt />
-                          </div>
-                          <Modal
-                            title="Bạn muốn xóa nhân viên này?"
-                            open={isModalDeleteOpen}
-                            width={400}
-                            onCancel={() => setIsModalDeleteOpen(false)}
-                            footer={[
-                              <button
-                                onClick={() => setIsModalDeleteOpen(false)}
-                                className="w-24 ml-2 rounded-md h-8 bg-red-500 text-white cursor-pointer"
-                              >
-                                Hủy
-                              </button>,
-                              <Button
-                                onClick={() => handleDeleteUser(item.id)}
-                                className="ml-2 w-24 rounded-md h-8 bg-blue-500 text-white cursor-pointer"
-                              >
-                                Xóa
-                              </Button>,
-                            ]}
-                          ></Modal>
-                        </td>
-                      </tr>
-                    ))}
+                  {resultEmployeeList.map((item, index) => (
+                    <tr key={index} className="border-[2px] h-12 bg-slate-100">
+                      <td className="text-center border-[2px]">{index + 1}</td>
+                      <td className="text-center border-[2px]">
+                        {item.fullName}
+                      </td>
+                      <td className="text-center border-[2px]">
+                        {item.gender}
+                      </td>
+                      <td className="text-center border-[2px]">
+                        {
+                          jobTitles.find(
+                            (job) => job.id === item.jobInformation?.jobTitleId
+                          )?.name
+                        }
+                      </td>
+                      <td className="text-center border-[2px]">{item.email}</td>
+                      <td className="text-center border-[2px]">
+                        {item.phoneNumber}
+                      </td>
+                      <td className="text-center border-[2px]">
+                        {
+                          departments.find(
+                            (department) =>
+                              department.id ===
+                              item.jobInformation?.departmentId
+                          )?.name
+                        }
+                      </td>
+                      <td className="text-center border-[2px]"></td>
+                      <td className="text-center border-[2px]">
+                        {item.status}
+                      </td>
+                      <td className="flex justify-center items-center gap-2 flex-row p-4">
+                        <div className="flex justify-center items-center text-lg cursor-pointer text-orange-600">
+                          <BiEditAlt />
+                        </div>
+                        <div
+                          onClick={() => {
+                            setIsModalDeleteOpen(true);
+                          }}
+                          className="flex justify-center items-center text-lg cursor-pointer text-red-600"
+                        >
+                          <BiTrashAlt />
+                        </div>
+                        <Modal
+                          title="Bạn muốn xóa nhân viên này?"
+                          open={isModalDeleteOpen}
+                          width={400}
+                          onCancel={() => setIsModalDeleteOpen(false)}
+                          footer={[
+                            <button
+                              onClick={() => setIsModalDeleteOpen(false)}
+                              className="w-24 ml-2 rounded-md h-8 bg-red-500 text-white cursor-pointer"
+                            >
+                              Hủy
+                            </button>,
+                            <Button
+                              onClick={() => handleDeleteUser(item.id)}
+                              className="ml-2 w-24 rounded-md h-8 bg-blue-500 text-white cursor-pointer"
+                            >
+                              Xóa
+                            </Button>,
+                          ]}
+                        ></Modal>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
