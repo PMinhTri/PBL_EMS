@@ -30,7 +30,7 @@ export class JobInformationDto {
   jobTitleId: string;
 
   @IsString()
-  jobHistory: string;
+  other: string;
 
   workingSkill: string[];
 

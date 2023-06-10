@@ -49,7 +49,7 @@ export const defaultJobInformation = {
   contractEndDate: new Date(),
   joinDate: new Date(),
   employeeStatus: "",
-  jobHistory: "",
+  other: "",
   jobTitleId: "",
   departmentId: "",
   workingSkill: [],

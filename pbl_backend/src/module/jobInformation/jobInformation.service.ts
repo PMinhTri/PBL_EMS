@@ -159,7 +159,7 @@ export class JobInformationService {
       data: {
         joinDate: new Date(dto.joinDate),
         employeeStatus: dto.employeeStatus,
-        jobHistory: dto.jobHistory,
+        other: dto.other,
         jobTitle: {
           connect: {
             id: dto.jobTitleId,

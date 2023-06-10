@@ -3,6 +3,7 @@ import {
   createJobInformation,
   getAllJobInformation,
   getJobInformationByUserId,
+  updateContract,
   updateJobInformation,
 } from "../api/jobInformation";
 import { handleError } from "../utils/errorHandler";
@@ -42,6 +43,24 @@ export const JobInformationAction = {
 
   update: async (id: string, payload: JobInformation) => {
     const response = await updateJobInformation(id, payload);
+
+    if (response.statusCode === 200) {
+      const { payload } = response;
+      return payload;
+    }
+
+    handleError(response);
+  },
+
+  updateContract: async (
+    id: string,
+    payload: {
+      contractTypeId: string;
+      contractStartDate: Date;
+      contractEndDate: Date;
+    }
+  ) => {
+    const response = await updateContract(id, payload);
 
     if (response.statusCode === 200) {
       const { payload } = response;

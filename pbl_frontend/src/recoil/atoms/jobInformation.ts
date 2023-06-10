@@ -11,7 +11,7 @@ export const jobInformationState = atom<JobInformation>({
     contractEndDate: new Date(),
     joinDate: new Date(),
     employeeStatus: "",
-    jobHistory: "",
+    other: "",
     jobTitleId: "",
     departmentId: "",
     workingSkill: [],

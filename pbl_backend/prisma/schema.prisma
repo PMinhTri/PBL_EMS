@@ -54,12 +54,12 @@ model JobInformation {
   contractEndDate   DateTime?
   joinDate          DateTime?
   employeeStatus    String?
-  jobHistory        String?
   jobTitleId        String?
   jobTitle          JobTitle?      @relation(fields: [jobTitleId], references: [id])
   workingSkill      WorkingSkill[]
   departmentId      String?
   department        Department?    @relation(fields: [departmentId], references: [id])
+  other             String?
 
   isDeleted Boolean? @default(false)
 

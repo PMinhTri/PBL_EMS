@@ -49,7 +49,7 @@ export const updateJobInformation = async (
     joinDate: dayjs(payload.joinDate).format("YYYY-MM-DD"),
     employeeStatus: payload.employeeStatus,
     jobTitleId: payload.jobTitleId,
-    jobHistory: payload.jobHistory,
+    other: payload.other,
     workingSkill: payload.workingSkill?.map((skill) => skill.id),
     departmentId: payload.departmentId,
   });
@@ -61,8 +61,8 @@ export const updateContract = async (
   id: string,
   payload: {
     contractTypeId: string;
-    contractStartDate: string;
-    contractEndDate: string;
+    contractStartDate: Date;
+    contractEndDate: Date;
   }
 ) => {
   const response: {

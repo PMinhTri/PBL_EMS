@@ -1,4 +1,4 @@
-import { DatePicker, Select } from "antd";
+import { DatePicker, Input, Select } from "antd";
 import React from "react";
 import { employeeStatusOptions } from "../../../constants/constantVariables";
 import { JobTitle } from "../../../types/jobTitleTypes";
@@ -82,6 +82,11 @@ const JobInformationContainer: React.FunctionComponent<Props> = (
       return;
     }
 
+    await JobInformationAction.updateContract(jobInformation.id, {
+      contractTypeId: contract.contractId,
+      contractStartDate: contract.contractStartDate,
+      contractEndDate: contract.contractEndDate,
+    });
     showNotification("success", "Cập nhật thông tin hợp đồng thành công");
     setIsContractDisabled(!isContractDisabled);
     setTimeout(() => {
@@ -243,8 +248,20 @@ const JobInformationContainer: React.FunctionComponent<Props> = (
             )}
           </div>
           <div className="flex flex-row items-center m-2">
-            <div className="m-2 w-36 font-bold">Dự án:</div>
-            <Select className="w-full" />
+            <div className="m-2 w-36 font-bold">Ghi chú:</div>
+            {isDisabled ? (
+              <div>{updateJobInformation.other}</div>
+            ) : (
+              <Input
+                allowClear
+                onChange={(e) =>
+                  setUpdateJobInformation({
+                    ...updateJobInformation,
+                    other: e.target.value,
+                  })
+                }
+              />
+            )}
           </div>
         </div>
         <div className="w-full flex flex-row justify-end">

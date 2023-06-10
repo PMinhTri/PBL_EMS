@@ -11,7 +11,7 @@ export type JobInformation = {
   contractEndDate: Date;
   joinDate: Date;
   employeeStatus: string;
-  jobHistory?: string;
+  other?: string;
   jobTitleId: string;
   departmentId: string;
   workingSkill?: WorkingSkill[];

@@ -76,6 +76,11 @@ const PersonalInformation: React.FunctionComponent<Props> = (props: Props) => {
       return;
     }
 
+    if (userInfo === updateUserInfo) {
+      setIsDisabled(!isDisabled);
+      return;
+    }
+
     await UserAction.updateUserInfo(updateUserInfo.email, updateUserInfo);
     showNotification("success", "Cập nhật thông tin thành công");
     setIsDisabled(!isDisabled);
@@ -223,7 +228,7 @@ const PersonalInformation: React.FunctionComponent<Props> = (props: Props) => {
             <div>{updateUserInfo.education?.grade}</div>
           ) : (
             <Select
-              defaultValue={updateUserInfo.education?.id}
+              defaultValue={updateUserInfo.education?.grade}
               disabled={isDisabled}
               className="w-full"
               style={{

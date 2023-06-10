@@ -1,6 +1,5 @@
 import {
   CreateNewUserInformation,
-  UpdateUserInformation,
   UserDetailInformation,
   UserResponse,
 } from "../types/userTypes";
