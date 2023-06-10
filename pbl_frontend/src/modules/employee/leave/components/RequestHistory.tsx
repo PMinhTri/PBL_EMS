@@ -123,7 +123,7 @@ const RequestHistory: React.FunctionComponent<Props> = (props: Props) => {
                     Xóa
                   </Button>,
                 ]}
-              ></Modal>
+              />
             </tr>
           ))}
         </tbody>

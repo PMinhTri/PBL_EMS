@@ -21,6 +21,7 @@ const LeaveManagement: React.FunctionComponent = () => {
     <div className="flex flex-col w-full h-full overflow-auto p-4">
       <LeaveRequestManagement employees={employeeList} />
       <LeaveBalanceManagement employees={employeeList} />
+      <footer className="py-4 px-6 bg-gray-200 text-gray-600 text-center"></footer>
     </div>
   );
 };

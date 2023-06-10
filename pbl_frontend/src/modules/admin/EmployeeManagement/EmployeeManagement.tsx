@@ -23,6 +23,7 @@ import { JobTitleAction } from "../../../actions/jobTitleAction";
 import { DepartmentAction } from "../../../actions/departmentAction";
 import { JobInformationAction } from "../../../actions/jobInformationAction";
 import dayjs from "dayjs";
+import EditEmployee from "./components/EditEmployee";
 
 const titleTable = [
   "STT",
@@ -60,7 +61,11 @@ const EmployeeManagement: React.FunctionComponent = () => {
       roleId: "",
     });
 
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [isOpenEditModal, setIsOpenEditModal] = React.useState<{
+    isOpen: boolean;
+    userInfo: UserDetailInformation;
+  }>({ userInfo: {} as UserDetailInformation, isOpen: false });
+  const [isOpenCreateModal, setIsOpenCreateModal] = React.useState(false);
   const [isModalDeleteOpen, setIsModalDeleteOpen] = React.useState(false);
   const [jobTitles, setJobTitles] = useRecoilState(jobTitleState);
   const [departments, setDepartments] = useRecoilState(departmentState);
@@ -245,7 +250,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
               <span className="ml-2 text-[16px]">Nhập file</span>
             </button>
             <button
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => setIsOpenCreateModal(true)}
               className="w-24 h-8 bg-blue-600 text-white text-lg flex justify-center items-center border-[1px] rounded-md 
             hover:bg-white hover:text-blue-600 hover:border-blue-600"
             >
@@ -254,9 +259,9 @@ const EmployeeManagement: React.FunctionComponent = () => {
             </button>
             <Modal
               title="Tạo mới nhân viên"
-              open={isModalOpen}
+              open={isOpenCreateModal}
               width={600}
-              onCancel={() => setIsModalOpen(false)}
+              onCancel={() => setIsOpenCreateModal(false)}
               footer={[
                 <Button
                   onClick={async () => {
@@ -267,7 +272,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
                   Tạo mới
                 </Button>,
                 <button
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => setIsOpenCreateModal(false)}
                   className="w-24 ml-2 rounded-md h-8 bg-red-500 text-white cursor-pointer"
                 >
                   Hủy
@@ -360,7 +365,12 @@ const EmployeeManagement: React.FunctionComponent = () => {
                         {item.status}
                       </td>
                       <td className="flex justify-center items-center gap-2 flex-row p-4">
-                        <div className="flex justify-center items-center text-lg cursor-pointer text-orange-600">
+                        <div
+                          className="flex justify-center items-center text-lg cursor-pointer text-orange-600"
+                          onClick={() =>
+                            setIsOpenEditModal({ userInfo: item, isOpen: true })
+                          }
+                        >
                           <BiEditAlt />
                         </div>
                         <div
@@ -390,13 +400,26 @@ const EmployeeManagement: React.FunctionComponent = () => {
                               Xóa
                             </Button>,
                           ]}
-                        ></Modal>
+                        />
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+            <Modal
+              onCancel={() =>
+                setIsOpenEditModal({
+                  isOpen: false,
+                  userInfo: {} as UserDetailInformation,
+                })
+              }
+              open={isOpenEditModal.isOpen}
+              width={800}
+              title="Thông tin nhân viên"
+            >
+              <EditEmployee userInfo={isOpenEditModal.userInfo} />
+            </Modal>
           </div>
         </div>
       )}

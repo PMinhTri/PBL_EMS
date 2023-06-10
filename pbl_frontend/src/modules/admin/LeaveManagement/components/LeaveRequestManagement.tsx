@@ -223,7 +223,7 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
                         Từ chối
                       </button>,
                     ]}
-                  ></Modal>
+                  />
                   <Modal
                     title="Duyệt yêu cầu này?"
                     open={isOpenApproveModal}
