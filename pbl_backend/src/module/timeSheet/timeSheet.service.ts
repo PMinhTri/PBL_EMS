@@ -232,4 +232,31 @@ export class TimeSheetService {
       result: timeSheets,
     };
   }
+
+  public async getAllOverTimeInMonth(
+    month: number,
+    year: number,
+  ): Promise<ServiceResponse<TimeSheet[], ServiceFailure<TimeSheetFailure>>> {
+    const timeSheets = await this.prisma.timeSheet.findMany({
+      where: {
+        month: month,
+        year: year,
+        overtime: true,
+      },
+    });
+
+    if (!timeSheets) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: TimeSheetFailure.TIME_SHEET_NOT_FOUND,
+        },
+      };
+    }
+
+    return {
+      status: ServiceResponseStatus.Success,
+      result: timeSheets,
+    };
+  }
 }

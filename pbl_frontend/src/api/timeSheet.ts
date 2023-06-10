@@ -74,3 +74,12 @@ export const getOvertimeWorkload = async (
 
   return response;
 };
+
+export const getAllOvertimeInMonth = async (month: number, year: number) => {
+  const response: {
+    statusCode: number;
+    payload: TimeSheet[];
+  } = await $get(`/time-sheet/overtime/all?month=${month}&year=${year}`);
+
+  return response;
+};

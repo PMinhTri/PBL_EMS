@@ -71,7 +71,7 @@ export class LeaveController {
           return res.send(
             BadRequestResult({
               reason: failure.reason,
-              message: 'Leave balance exceeded',
+              message: 'Số ngày phép của bạn đã hêt!',
             }),
           );
 
@@ -79,7 +79,7 @@ export class LeaveController {
           return res.send(
             BadRequestResult({
               reason: failure.reason,
-              message: 'Invalid leave request',
+              message: 'Yêu cầu nghỉ phép không hợp lệ',
             }),
           );
 
@@ -87,7 +87,15 @@ export class LeaveController {
           return res.send(
             BadRequestResult({
               reason: failure.reason,
-              message: 'Leave request overlap',
+              message: 'Đã có yêu cầu nghỉ phép trong thời gian này',
+            }),
+          );
+
+        case LeaveFailure.LEAVE_REQUEST_ON_WEEKEND:
+          return res.send(
+            BadRequestResult({
+              reason: failure.reason,
+              message: 'Không thể nghỉ phép vào ngày cuối tuần',
             }),
           );
       }

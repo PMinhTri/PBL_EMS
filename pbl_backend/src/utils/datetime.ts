@@ -46,3 +46,8 @@ export const dateTimeUtils = {
   getDates,
   getDatesWithCondition,
 };
+
+export const isWeekend = (date: Date): boolean => {
+  const dayOfWeek = date.getDay();
+  return dayOfWeek === 6 || dayOfWeek === 0;
+};

@@ -117,6 +117,29 @@ export class TimeSheetController {
     return res.send(SuccessResult(result));
   }
 
+  @Get('overtime/all')
+  public async getAllOvertimeInMonth(
+    @Query('month') month: number,
+    @Query('year') year: number,
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const { result, status } =
+      await this.timeSheetService.getAllOverTimeInMonth(
+        Number(month),
+        Number(year),
+      );
+
+    if (status === ServiceResponseStatus.Failed) {
+      return res.send(
+        BadRequestResult({
+          message: 'Không tìm thấy thông tin chấm công!',
+        }),
+      );
+    }
+
+    return res.send(SuccessResult(result));
+  }
+
   @Delete('delete')
   public async deleteTimeSheet(
     @Query('userId') userId: string,

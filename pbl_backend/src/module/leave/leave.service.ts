@@ -7,7 +7,7 @@ import {
   ServiceResponseStatus,
 } from 'src/serviceResponse';
 import { LeaveFailure } from 'src/enumTypes/failure.enum';
-import { dateTimeUtils } from 'src/utils/datetime';
+import { dateTimeUtils, isWeekend } from 'src/utils/datetime';
 import { Session } from 'src/constant/leaveSession.constant';
 import { Leave, LeaveType } from '@prisma/client';
 import { LeaveStatus } from 'src/enumTypes/leave.enum';
@@ -30,6 +30,18 @@ export class LeaveService {
       dto.startDate,
       dto.endDate,
     );
+
+    if (
+      isWeekend(new Date(dto.startDate)) ||
+      isWeekend(new Date(dto.endDate))
+    ) {
+      return {
+        valid: false,
+        failure: {
+          reason: LeaveFailure.LEAVE_REQUEST_ON_WEEKEND,
+        },
+      };
+    }
 
     if (Session[dto.session] < 1 && Session[dto.session] !== dto.leaveDays) {
       return {

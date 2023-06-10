@@ -1,7 +1,7 @@
 import { DatePicker, Progress } from "antd";
 import React from "react";
 import { LeaveAction } from "../../../../actions/leaveAction";
-import { LeaveRequest, LeaveType } from "../../../../types/leaveTypes";
+import { LeaveType } from "../../../../types/leaveTypes";
 import dayjs from "dayjs";
 import { getWorkingDay, isWeekend } from "../../../../utils/datetime";
 import showNotification from "../../../../utils/notification";
@@ -23,18 +23,12 @@ export const RequestForm: React.FunctionComponent = () => {
     balance: 0,
   });
   const [remaining, setRemaining] = React.useState<number>(0);
-  const [allLeaveRequest, setAllLeaveRequest] = React.useState<LeaveRequest[]>(
-    []
-  );
 
   const [leaveType, setLeaveType] = React.useState<LeaveType[]>([]);
 
   React.useEffect(() => {
     const fetchData = async () => {
       const leaveTypes = await LeaveAction.getAllLeaveType();
-      setAllLeaveRequest(
-        (await LeaveAction.getAllLeaveRequestByUserId(userAuthInfo.id)) ?? []
-      );
 
       setLeaveType(leaveTypes);
       setOnSelectLeaveType(leaveTypes[0]);
@@ -111,7 +105,7 @@ export const RequestForm: React.FunctionComponent = () => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
       <h2 className="text-xl font-bold mb-4">Yêu cầu nghỉ phép</h2>
-      <form onSubmit={handleSubmit}>
+      <form>
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
             <label
@@ -275,7 +269,7 @@ export const RequestForm: React.FunctionComponent = () => {
         </div>
         <button
           className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-          type="submit"
+          onClick={handleSubmit}
         >
           Gửi
         </button>
