@@ -178,7 +178,15 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
                   <td className="py-3 px-4 text-center border-b">
                     {item.reason}
                   </td>
-                  <td className="py-3 px-4 text-center border-b">
+                  <td
+                    className={`py-3 px-4 text-center text-white font-bold border-b ${
+                      item.status === LeaveStatus.Pending && "bg-blue-500"
+                    } ${item.status === LeaveStatus.Rejected && "bg-red-500"} ${
+                      item.status === LeaveStatus.Approved && "bg-green-500"
+                    } ${
+                      item.status === LeaveStatus.Cancelled && "bg-gray-500"
+                    }`}
+                  >
                     {item.status}
                   </td>
                   <td className="py-3 px-4 text-center border-b">
@@ -243,7 +251,7 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
                         Duyệt
                       </button>,
                     ]}
-                  ></Modal>
+                  />
                 </tr>
               ))}
             </tbody>

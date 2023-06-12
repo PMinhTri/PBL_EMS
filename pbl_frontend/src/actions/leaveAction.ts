@@ -8,6 +8,7 @@ import {
   getRemainingBalance,
   getRemainingBalanceByUser,
   rejectLeaveRequest,
+  updateLeaveRequest,
 } from "../api/leave";
 import { LeaveRequestPayload, LeaveType } from "../types/leaveTypes";
 import { handleError } from "../utils/errorHandler";
@@ -21,6 +22,16 @@ export const LeaveAction = {
 
   createLeaveRequest: async (payload: LeaveRequestPayload) => {
     const response = await createLeaveRequest(payload);
+
+    if (response.statusCode === 200) {
+      return response.payload;
+    }
+
+    handleError(response);
+  },
+
+  updateLeaveRequest: async (id: string, payload: LeaveRequestPayload) => {
+    const response = await updateLeaveRequest(id, payload);
 
     if (response.statusCode === 200) {
       return response.payload;

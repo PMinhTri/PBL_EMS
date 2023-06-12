@@ -1,6 +1,8 @@
 import React from "react";
 import { Button, Input, Modal, Popover, Select, Space } from "antd";
 import {
+  ArrowDownOutlined,
+  ArrowUpOutlined,
   FilterOutlined,
   SearchOutlined,
   SortAscendingOutlined,
@@ -57,6 +59,8 @@ const EmployeeManagement: React.FunctionComponent = () => {
       roleId: "",
     });
 
+  const [onSelectSort, setOnSelectSort] = React.useState<string>("");
+
   const [isOpenEditModal, setIsOpenEditModal] = React.useState<{
     isOpen: boolean;
     userInfo: UserDetailInformation;
@@ -97,25 +101,14 @@ const EmployeeManagement: React.FunctionComponent = () => {
     jobTitle: string;
     department: string;
   }) => {
-    const { gender, jobTitle, department } = payload;
-
     const filteredEmployees = employeeList.filter((employee) => {
-      // Filter by gender
-      if (gender !== "All") {
-        return employee.gender === gender;
-      }
-
-      // Filter by job title
-      if (jobTitle !== "All") {
-        return employee.jobInformation?.jobTitle?.name === jobTitle;
-      }
-
-      // Filter by department
-      if (department !== "All") {
-        return employee.jobInformation?.department?.name === department;
-      }
-
-      return true;
+      return (
+        (!payload.gender || employee.gender === payload.gender) &&
+        (!payload.jobTitle ||
+          employee.jobInformation?.jobTitle?.name === payload.jobTitle) &&
+        (!payload.department ||
+          employee.jobInformation?.department?.name === payload.department)
+      );
     });
 
     setEmployeeFiltered(filteredEmployees);
@@ -143,6 +136,55 @@ const EmployeeManagement: React.FunctionComponent = () => {
 
       window.location.reload();
     }
+  };
+
+  const handleSort = (type: "Asc" | "Dsc") => {
+    if (onSelectSort === "") {
+      return;
+    }
+
+    const sortedEmployee: UserDetailInformation[] = [];
+
+    switch (onSelectSort) {
+      case "fullName":
+        if (type === "Asc") {
+          sortedEmployee.push(
+            ...employeeList.sort((a, b) => {
+              return a.fullName.localeCompare(b.fullName);
+            })
+          );
+        }
+        if (type === "Dsc") {
+          sortedEmployee.push(
+            ...employeeList.sort((a, b) => {
+              return b.fullName.localeCompare(a.fullName);
+            })
+          );
+        }
+        break;
+
+      case "Email":
+        if (type === "Asc") {
+          sortedEmployee.push(
+            ...employeeList.sort((a, b) => {
+              return a.email.localeCompare(b.email);
+            })
+          );
+        }
+        if (type === "Dsc") {
+          sortedEmployee.push(
+            ...employeeList.sort((a, b) => {
+              return b.email.localeCompare(a.email);
+            })
+          );
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    setEmployeeList(sortedEmployee);
   };
 
   const handleDeleteUser = async (userId: string) => {
@@ -189,7 +231,33 @@ const EmployeeManagement: React.FunctionComponent = () => {
               </Popover>
               <Popover
                 placement="right"
-                content={<EmployeeSort />}
+                content={
+                  <>
+                    <EmployeeSort
+                      onSelect={(value) => setOnSelectSort(value)}
+                    />
+                    <Space className="flex justify-center flex-row mr-1">
+                      <Button
+                        type="primary"
+                        size="middle"
+                        className="bg-blue-600 mt-2"
+                        icon={<ArrowUpOutlined />}
+                        onClick={() => handleSort("Asc")}
+                      >
+                        Asc
+                      </Button>
+                      <Button
+                        type="primary"
+                        size="middle"
+                        className="bg-blue-600 mt-2"
+                        icon={<ArrowDownOutlined />}
+                        onClick={() => handleSort("Dsc")}
+                      >
+                        Dsc
+                      </Button>
+                    </Space>
+                  </>
+                }
                 title={"Sort"}
                 trigger={"click"}
               >
@@ -324,31 +392,35 @@ const EmployeeManagement: React.FunctionComponent = () => {
                 </thead>
                 <tbody className="overflow-x-auto">
                   {resultEmployeeList.map((item, index) => (
-                    <tr key={index} className="border-[2px] h-12 bg-slate-100">
-                      <td className="text-center border-[2px]">{index + 1}</td>
-                      <td className="text-center border-[2px]">
+                    <tr key={index} className="border-[2px] h-12 bg-white">
+                      <td className="px-1 text-left border-[2px]">
+                        {index + 1}
+                      </td>
+                      <td className="px-1 text-left border-[2px]">
                         {item.fullName}
                       </td>
-                      <td className="text-center border-[2px]">
+                      <td className="px-1 text-left border-[2px]">
                         {item.gender}
                       </td>
-                      <td className="text-center border-[2px]">
+                      <td className="px-1 text-left border-[2px]">
                         {item.jobInformation?.jobTitle?.name}
                       </td>
-                      <td className="text-center border-[2px]">{item.email}</td>
-                      <td className="text-center border-[2px]">
+                      <td className="px-1 text-left border-[2px]">
+                        {item.email}
+                      </td>
+                      <td className="px-1 text-left border-[2px]">
                         {item.citizenId}
                       </td>
-                      <td className="text-center border-[2px]">
+                      <td className="px-1 text-left border-[2px]">
                         {item.phoneNumber}
                       </td>
-                      <td className="text-center border-[2px]">
+                      <td className="px-1 text-left border-[2px]">
                         {item.jobInformation?.department?.name}
                       </td>
-                      <td className="text-center border-[2px]">
+                      <td className="px-1 text-left border-[2px]">
                         {item.education?.grade}
                       </td>
-                      <td className="text-center border-[2px]">
+                      <td className="px-1 text-left border-[2px]">
                         {item.status}
                       </td>
                       <td className="flex justify-center items-center gap-2 flex-row p-4">

@@ -25,6 +25,18 @@ export const createLeaveRequest = async (payload: LeaveRequestPayload) => {
   return response;
 };
 
+export const updateLeaveRequest = async (
+  id: string,
+  payload: LeaveRequestPayload
+) => {
+  const response: {
+    statusCode: number;
+    payload: LeaveRequest;
+  } = await $patch(`/leave/update/${id}`, payload);
+
+  return response;
+};
+
 export const getLeaveRequestsByUser = async (userId: string) => {
   const response: {
     statusCode: number;

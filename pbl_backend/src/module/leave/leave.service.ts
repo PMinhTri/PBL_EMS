@@ -290,7 +290,7 @@ export class LeaveService {
         endDate: new Date(dto.endDate),
         session: dto.session,
         reason: dto.reason,
-        status: 'Pending',
+        status: LeaveStatus.Pending,
       },
     });
 

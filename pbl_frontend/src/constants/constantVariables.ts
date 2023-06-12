@@ -1,3 +1,4 @@
+import { LeaveRequest } from "../types/leaveTypes";
 import { EmployeeStatus, Gender, SessionDate } from "./enum";
 
 export const UserInformation: Record<string, string> = {
@@ -134,4 +135,15 @@ export const Session: Record<SessionDate, number> = {
   [SessionDate.FullDay]: 1,
   [SessionDate.Morning]: 0.5,
   [SessionDate.Afternoon]: 0.5,
+};
+
+export const defaultRequest: LeaveRequest = {
+  id: "",
+  userId: "",
+  leaveTypeId: "",
+  leaveDays: 0,
+  startDate: new Date(),
+  endDate: new Date(),
+  session: "",
+  reason: "",
 };

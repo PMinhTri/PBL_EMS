@@ -10,6 +10,8 @@ import { BiEdit } from "react-icons/bi";
 import { MdOutlineCancel } from "react-icons/md";
 import { Button, Modal } from "antd";
 import showNotification from "../../../../utils/notification";
+import UpdateRequest from "./UpdateForm";
+import { defaultRequest } from "../../../../constants/constantVariables";
 
 type Props = {
   userId?: string;
@@ -23,6 +25,13 @@ const RequestHistory: React.FunctionComponent<Props> = (props: Props) => {
     LeaveRequest[]
   >([]);
   const [leaveType, setLeaveType] = React.useState<LeaveType[]>([]);
+  const [isUpdateRequest, setIsUpdateRequest] = React.useState<{
+    isOpen: boolean;
+    item: LeaveRequest;
+  }>({
+    isOpen: false,
+    item: defaultRequest,
+  });
 
   const [isOpenCancelModal, setIsOpenCancelModal] = React.useState(false);
 
@@ -88,11 +97,22 @@ const RequestHistory: React.FunctionComponent<Props> = (props: Props) => {
               </td>
               <td className="py-3 px-8 text-center border-b">{item.session}</td>
               <td className="py-3 px-4 text-center border-b">{item.reason}</td>
-              <td className="py-3 px-4 text-center border-b">{item.status}</td>
+              <td
+                className={`py-3 px-4 text-center text-white font-bold border-b ${
+                  item.status === LeaveStatus.Pending && "bg-blue-500"
+                } ${item.status === LeaveStatus.Rejected && "bg-red-500"} ${
+                  item.status === LeaveStatus.Approved && "bg-green-500"
+                } ${item.status === LeaveStatus.Cancelled && "bg-gray-500"}`}
+              >
+                {item.status}
+              </td>
               <td className="py-3 px-4 text-center border-b">
                 {item.status === LeaveStatus.Pending && (
                   <div className="w-full flex flex-row gap-2 justify-center items-center">
-                    <div className="text-green-500 text-2xl hover:text-green-600 hover:cursor-pointer">
+                    <div
+                      className="text-green-500 text-2xl hover:text-green-600 hover:cursor-pointer"
+                      onClick={() => setIsUpdateRequest({ isOpen: true, item })}
+                    >
                       <BiEdit />
                     </div>
                     <div
@@ -128,6 +148,19 @@ const RequestHistory: React.FunctionComponent<Props> = (props: Props) => {
           ))}
         </tbody>
       </table>
+      <Modal
+        open={isUpdateRequest.isOpen}
+        width={800}
+        onCancel={() =>
+          setIsUpdateRequest({
+            isOpen: false,
+            item: defaultRequest,
+          })
+        }
+        footer={null}
+      >
+        <UpdateRequest leaveRequest={isUpdateRequest.item} />
+      </Modal>
     </div>
   );
 };
