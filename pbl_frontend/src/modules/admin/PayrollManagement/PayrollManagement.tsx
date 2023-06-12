@@ -6,6 +6,9 @@ import { UserAction } from "../../../actions/userAction";
 import { LeaveAction } from "../../../actions/leaveAction";
 import { LeaveRequest, LeaveStatus } from "../../../types/leaveTypes";
 import { BiEdit, BiReset } from "react-icons/bi";
+import { PayrollAction } from "../../../actions/payrollAction";
+import { Payroll } from "../../../types/payrollTypes";
+import { moneyFormat } from "../../../utils/format";
 
 const currentYears = Array.from(
   { length: 5 },
@@ -30,6 +33,8 @@ const PayrollManagement: React.FunctionComponent = () => {
     []
   );
 
+  const [payrollList, setPayrollList] = React.useState<Payroll[]>([]);
+
   React.useEffect(() => {
     const fetchData = async () => {
       setEmployeeList(await UserAction.getAllEmployees());
@@ -44,6 +49,9 @@ const PayrollManagement: React.FunctionComponent = () => {
           selectedMonth,
           selectedYear
         )
+      );
+      setPayrollList(
+        await PayrollAction.getAllPayload(selectedMonth, selectedYear)
       );
     };
 
@@ -108,7 +116,9 @@ const PayrollManagement: React.FunctionComponent = () => {
                 <th className="border border-gray-300 px-4 py-2">Nghỉ phép</th>
                 <th className="border border-gray-300 px-4 py-2">Tăng ca</th>
                 <th className="border border-gray-300 px-4 py-2">Phụ cấp</th>
-                <th className="border border-gray-300 px-4 py-2">Hệ số</th>
+                <th className="border border-gray-300 px-4 py-2">
+                  Lương cơ bản
+                </th>
                 <th className="border border-gray-300 px-4 py-2">Trạng thái</th>
                 <th className="border border-gray-300 px-4 py-2">Lương</th>
                 <th className="border border-gray-300 px-4 py-2">Thao tác</th>
@@ -128,7 +138,6 @@ const PayrollManagement: React.FunctionComponent = () => {
                       (timeSheet) => timeSheet.userId === employee.id
                     )?.hoursWorked || 0) / 8}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2">1</td>
                   <td className="border border-gray-300 px-4 py-2">
                     {leaveRequests
                       .filter(
@@ -142,18 +151,38 @@ const PayrollManagement: React.FunctionComponent = () => {
                       )}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
-                    {
-                      allOvertimeSheets.filter(
+                    {allOvertimeSheets
+                      .filter(
                         (overtimeSheet) =>
                           overtimeSheet.userId === employee.id &&
                           overtimeSheet.status === "Đã chấm công"
-                      ).length
-                    }
+                      )
+                      .reduce(
+                        (acc, overtimeSheet) => acc + overtimeSheet.hoursWorked,
+                        0
+                      ) / 8}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2">0</td>
-                  <td className="border border-gray-300 px-4 py-2">Đã duyệt</td>
                   <td className="border border-gray-300 px-4 py-2">
-                    5.500.000đ
+                    {payrollList.find(
+                      (payroll) => payroll.userId === employee.id
+                    )?.additional || 0}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {payrollList.find(
+                      (payroll) => payroll.userId === employee.id
+                    )?.basicSalary || 0}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {payrollList.find(
+                      (payroll) => payroll.userId === employee.id
+                    )?.status || "Chưa thanh toán"}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {moneyFormat(
+                      payrollList.find(
+                        (payroll) => payroll.userId === employee.id
+                      )?.totalSalary || 0
+                    )}
                   </td>
                   <td className="py-3 px-4 text-center border-[2px]">
                     <div className="w-full flex flex-row gap-2 justify-center items-center">
