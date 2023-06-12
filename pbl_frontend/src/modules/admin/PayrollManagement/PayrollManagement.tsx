@@ -105,8 +105,7 @@ const PayrollManagement: React.FunctionComponent = () => {
                 <th className="border border-gray-300 px-4 py-2">STT</th>
                 <th className="border border-gray-300 px-4 py-2">Họ và tên</th>
                 <th className="border border-gray-300 px-4 py-2">Ngày công</th>
-                <th className="border border-gray-300 px-4 py-2">Ngày nghỉ</th>
-                <th className="border border-gray-300 px-4 py-2">Có phép</th>
+                <th className="border border-gray-300 px-4 py-2">Nghỉ phép</th>
                 <th className="border border-gray-300 px-4 py-2">Tăng ca</th>
                 <th className="border border-gray-300 px-4 py-2">Phụ cấp</th>
                 <th className="border border-gray-300 px-4 py-2">Hệ số</th>
@@ -125,9 +124,9 @@ const PayrollManagement: React.FunctionComponent = () => {
                     {employee.fullName}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
-                    {timeSheets.find(
+                    {(timeSheets.find(
                       (timeSheet) => timeSheet.userId === employee.id
-                    )?.hoursWorked || 0}
+                    )?.hoursWorked || 0) / 8}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">1</td>
                   <td className="border border-gray-300 px-4 py-2">
@@ -152,7 +151,6 @@ const PayrollManagement: React.FunctionComponent = () => {
                     }
                   </td>
                   <td className="border border-gray-300 px-4 py-2">0</td>
-                  <td className="border border-gray-300 px-4 py-2">1.0</td>
                   <td className="border border-gray-300 px-4 py-2">Đã duyệt</td>
                   <td className="border border-gray-300 px-4 py-2">
                     5.500.000đ

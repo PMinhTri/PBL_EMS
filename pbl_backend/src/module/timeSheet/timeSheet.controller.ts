@@ -149,6 +149,14 @@ export class TimeSheetController {
       userId,
     );
 
+    if (status === ServiceResponseStatus.Failed) {
+      return res.send(
+        BadRequestResult({
+          message: 'Không tìm thấy thông tin chấm công!',
+        }),
+      );
+    }
+
     return res.send(SuccessResult());
   }
 

@@ -3,9 +3,9 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class PayrollDto {
   @IsNotEmpty()
-  @IsNumber()
-  @ApiProperty({ type: 'number' })
-  userId: number;
+  @IsString()
+  @ApiProperty({ type: 'string' })
+  userId: string;
 
   @IsNotEmpty()
   @IsNumber()
