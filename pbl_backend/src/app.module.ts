@@ -9,7 +9,7 @@ import { MailModule } from './mail/mail.module';
 import { AuthenticationMiddleware } from './middleware/authentication.middleware';
 import { AuthModule } from './module/auth/auth.module';
 import { UserModule } from './module/user/user.module';
-import { RoleModule } from './module/role/Role.module';
+import { RoleModule } from './module/role/role.module';
 import { RolesGuard } from './module/role/role.guard';
 import { JobInformationModule } from './module/jobInformation/jobInformation.module';
 import { ProjectModule } from './module/project/project.module';
