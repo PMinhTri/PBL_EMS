@@ -126,7 +126,7 @@ const LoginPage: React.FunctionComponent = () => {
                 className="flex items-center justify-center w-full h-10 focus:outline-none text-white text-sm bg-blue-600 hover:bg-blue-700 rounded py-2 transition duration-150 ease-in"
                 loading={loading}
               >
-                <span className="mr-2 uppercase">Login</span>
+                <span className="mr-2 uppercase">Đăng nhập</span>
               </Button>
             </div>
           </form>

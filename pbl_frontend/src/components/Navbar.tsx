@@ -3,7 +3,7 @@ import loginImg from "../assets/login.jpg";
 import { Popover, Space } from "antd";
 import { AuthAction } from "../actions/authAction";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { userAuthState } from "../recoil/atoms/user";
+import { userAuthState, userInfoState } from "../recoil/atoms/user";
 import { authState } from "../recoil/atoms/auth";
 
 enum NavbarOptions {
@@ -16,6 +16,7 @@ enum NavbarOptions {
 const SelectContent: React.FunctionComponent = () => {
   const setAuth = useSetRecoilState(authState);
   const user = useRecoilValue(userAuthState);
+  const info = useRecoilValue(userInfoState);
   const options =
     user.role === "Admin"
       ? [
@@ -59,7 +60,7 @@ const SelectContent: React.FunctionComponent = () => {
         <div className="border-[1px] border-blue-400 rounded-full justify-center align-center w-8 h-8">
           <img
             className="object-cover object-center h-full w-full rounded-full"
-            src={loginImg}
+            src={info.avatar}
             alt="avatar"
           />
         </div>

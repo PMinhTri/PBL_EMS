@@ -31,6 +31,7 @@ const Account = () => {
     isActive: true,
     key: 0,
   });
+  const [avatar, setAvatar] = React.useState("");
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -63,6 +64,34 @@ const Account = () => {
     },
   ];
 
+  const handleFileChange = React.useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.src = reader.result as string;
+          img.onload = () => {
+            const elem = document.createElement("canvas");
+            const width = 200;
+            const scaleFactor = width / img.width;
+            elem.width = width;
+            elem.height = img.height * scaleFactor;
+            const ctx = elem.getContext("2d");
+            ctx?.drawImage(img, 0, 0, width, img.height * scaleFactor);
+            const data = ctx?.canvas.toDataURL("image/jpeg", 0.8);
+
+            setAvatar(data as string);
+            UserAction.updateAvatar(userAuthInfo.id, data as string);
+          };
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    [userAuthInfo.id]
+  );
+
   return (
     <Container>
       <Navbar />
@@ -74,7 +103,13 @@ const Account = () => {
             <div className="col-span-1 rounded-md shadow-md w-full h-[600px] border-2 flex flex-col">
               <div className="w-full flex flex-row justify-between items-center h-32 border-b-[2px] p-4">
                 <div className="flex items-center">
-                  <div className="w-16 h-16 rounded-full bg-gray-300 flex-shrink-0 mr-4"></div>
+                  <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 mr-4">
+                    <img
+                      src={avatar || userInfo.avatar}
+                      alt="avatar"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                   <div>
                     <div className="text-lg font-medium">
                       {userInfo.fullName}
@@ -84,13 +119,21 @@ const Account = () => {
                     </div>
                   </div>
                 </div>
-                <button
+                <label
+                  htmlFor="avatar-upload"
                   className="ml-2 border flex flex-row justify-between items-center border-blue-600 rounded-md px-2 py-1 
-                  bg-white text-blue-600 hover:bg-blue-600 hover:text-white transition-colors duration-300"
+                bg-white text-blue-600 hover:bg-blue-600 hover:text-white transition-colors duration-300 cursor-pointer"
                 >
+                  <input
+                    id="avatar-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
                   <ArrowUpOutlined />
                   Upload
-                </button>
+                </label>
               </div>
             </div>
             <div className="col-span-2 w-full">

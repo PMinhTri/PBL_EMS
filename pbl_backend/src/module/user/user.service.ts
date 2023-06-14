@@ -99,12 +99,12 @@ export class UserService {
   }
 
   public async updatePersonalInformation(
-    email: string,
-    dto: userInformationDto,
+    id: string,
+    dto: Partial<userInformationDto>,
   ): Promise<ServiceResponse<User, ServiceFailure<UserFailure>>> {
-    const user = await this.prisma.user.findFirst({
+    const user = await this.prisma.user.findUnique({
       where: {
-        email: email,
+        id: id,
       },
     });
 
@@ -130,12 +130,41 @@ export class UserService {
         address: dto.address,
         city: dto.city,
         nationality: dto.nationality,
-        avatar: dto.avatar,
         education: {
           connect: {
             id: dto.educationId,
           },
         },
+      },
+    });
+
+    return {
+      status: ServiceResponseStatus.Success,
+    };
+  }
+
+  public async updateAvatar(id: string, avatar: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!user) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: UserFailure.USER_NOT_FOUND,
+        },
+      };
+    }
+
+    await this.prisma.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        avatar: avatar,
       },
     });
 

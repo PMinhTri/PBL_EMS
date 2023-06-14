@@ -3,6 +3,7 @@ import {
   deleteUser,
   getAllEmployees,
   getUserById,
+  updateAvatar,
   updateUserInformation,
 } from "../api/user";
 import {
@@ -48,10 +49,21 @@ export const UserAction = {
   },
 
   updateUserInfo: async (
-    email: string,
-    userInformation: UserDetailInformation
+    id: string,
+    userInformation: Partial<UserDetailInformation>
   ) => {
-    const response = await updateUserInformation(email, userInformation);
+    const response = await updateUserInformation(id, userInformation);
+
+    if (response.statusCode === 200) {
+      const { payload } = response;
+      return payload;
+    }
+
+    handleError(response);
+  },
+
+  updateAvatar: async (id: string, avatarUrl: string) => {
+    const response = await updateAvatar(id, avatarUrl);
 
     if (response.statusCode === 200) {
       const { payload } = response;

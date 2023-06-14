@@ -81,7 +81,7 @@ const PersonalInformation: React.FunctionComponent<Props> = (props: Props) => {
       return;
     }
 
-    await UserAction.updateUserInfo(updateUserInfo.email, updateUserInfo);
+    await UserAction.updateUserInfo(updateUserInfo.id, updateUserInfo);
     showNotification("success", "Cập nhật thông tin thành công");
     setIsDisabled(!isDisabled);
     setTimeout(() => {

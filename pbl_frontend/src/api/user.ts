@@ -3,7 +3,7 @@ import {
   UserDetailInformation,
   UserResponse,
 } from "../types/userTypes";
-import { $delete, $get, $post } from "../utils/http";
+import { $delete, $get, $patch, $post } from "../utils/http";
 
 export const createNewUser = async (data: CreateNewUserInformation) => {
   const response: {
@@ -30,27 +30,24 @@ export const getAllEmployees = async () => {
 };
 
 export const updateUserInformation = async (
-  email: string,
-  userInformation: UserDetailInformation
+  id: string,
+  userInformation: Partial<UserDetailInformation>
 ) => {
   const response: {
     statusCode: number;
     payload: UserDetailInformation;
-  } = await $post(`/users/update-personal-information`, {
-    email: email,
-    userInformation: {
-      fullName: userInformation.fullName,
-      gender: userInformation.gender,
-      dateOfBirth: userInformation.dateOfBirth,
-      phoneNumber: userInformation.phoneNumber,
-      address: userInformation.address,
-      city: userInformation.city,
-      citizenId: userInformation.citizenId,
-      nationality: userInformation.nationality,
-      avatar: userInformation.avatar,
-      educationId: userInformation.educationId,
-    },
+  } = await $patch(`/users/${id}/update-personal-information`, {
+    ...userInformation,
   });
+
+  return response;
+};
+
+export const updateAvatar = async (id: string, avatarUrl: string) => {
+  const response: {
+    statusCode: number;
+    payload: UserDetailInformation;
+  } = await $patch(`/users/${id}/update-avatar`, { avatar: avatarUrl });
 
   return response;
 };

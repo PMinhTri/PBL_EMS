@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Res,
 } from '@nestjs/common';
@@ -12,7 +13,7 @@ import { createUserDto } from './user.dto';
 import { BadRequestResult, IResponse, SuccessResult } from 'src/httpResponse';
 import { ServiceResponseStatus } from 'src/serviceResponse';
 import { UserFailure } from 'src/enumTypes/failure.enum';
-import { UpdateInformationInput } from './user.type';
+import { UserInformation } from './user.type';
 import { Roles } from '../role/role.decorator';
 import { RoleEnum } from 'src/enumTypes/role.enum';
 
@@ -61,14 +62,38 @@ export class UserController {
     return res.send(SuccessResult(emails));
   }
 
-  @Post('/update-personal-information')
+  @Patch('/:id/update-personal-information')
   public async updatePersonalInformation(
-    @Body() payload: UpdateInformationInput,
+    @Param('id') id: string,
+    @Body() payload: Partial<UserInformation>,
     @Res() res: IResponse,
   ): Promise<IResponse> {
-    const { email, userInformation } = payload;
     const { status, failure } =
-      await this.userService.updatePersonalInformation(email, userInformation);
+      await this.userService.updatePersonalInformation(id, payload);
+
+    if (status === ServiceResponseStatus.Failed) {
+      switch (failure.reason) {
+        case UserFailure.USER_NOT_FOUND:
+          return res.send(
+            BadRequestResult({
+              reason: failure.reason,
+              message: `User not found`,
+            }),
+          );
+      }
+    }
+
+    return res.send(SuccessResult());
+  }
+
+  @Patch('/:id/update-avatar/')
+  public async updateAvatar(
+    @Param('id') id: string,
+    @Body() payload: { avatar: string },
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const { avatar } = payload;
+    const { status, failure } = await this.userService.updateAvatar(id, avatar);
 
     if (status === ServiceResponseStatus.Failed) {
       switch (failure.reason) {

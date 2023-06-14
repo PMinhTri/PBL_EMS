@@ -31,7 +31,15 @@ const EditEmployee: React.FunctionComponent<Props> = (props: Props) => {
     >
       <div className="w-full flex flex-row justify-between items-center h-32 border-b-[2px] p-4">
         <div className="flex items-center gap-4">
-          <div className="w-24 h-24 rounded-full bg-gray-300 flex-shrink-0 mr-4"></div>
+          <div className="flex items-center">
+            <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0 mr-4">
+              <img
+                src={userInfo.avatar}
+                alt="avatar"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
           <div className="w-full flex justify-start flex-col">
             <div className="text-2xl font-semibold text-gray-800 mb-1">
               {userInfo.fullName}

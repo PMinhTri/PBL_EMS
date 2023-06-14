@@ -2,7 +2,7 @@ import { userInformationDto } from './user.dto';
 
 export type UpdateInformationInput = {
   email: string;
-  userInformation: userInformationDto;
+  userInformation: Partial<userInformationDto>;
 };
 
 export type UserInformation = {

@@ -476,6 +476,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
               open={isOpenEditModal.isOpen}
               width={800}
               title="Thông tin nhân viên"
+              footer={<></>}
             >
               <EditEmployee userInfo={isOpenEditModal.userInfo} />
             </Modal>
