@@ -26,9 +26,7 @@ const UpdateRequest: React.FunctionComponent<Props> = (props: Props) => {
   const [onSelectSession, setOnSelectSession] = React.useState<string>(
     leaveRequest.session
   );
-  const [onLeaveDaysChange, setOnLeaveDaysChange] = React.useState<string>(
-    leaveRequest.leaveDays.toString()
-  );
+
   const [onSelectLeaveType, setOnSelectLeaveType] = React.useState<LeaveType>({
     id: "",
     name: "",
@@ -100,8 +98,7 @@ const UpdateRequest: React.FunctionComponent<Props> = (props: Props) => {
         endDate: endDate,
         reason: reason.trim(),
         session: onSelectSession,
-        leaveDays:
-          onLeaveDaysChange === "0" ? leaveDays : Number(onLeaveDaysChange),
+        leaveDays: leaveDays,
       });
 
       if (response) {
@@ -249,7 +246,6 @@ const UpdateRequest: React.FunctionComponent<Props> = (props: Props) => {
               id="leaveDays"
               value={leaveDays}
               defaultValue={leaveDays}
-              onChange={(e) => setOnLeaveDaysChange(e.target.value)}
               className="w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500"
               required
             />

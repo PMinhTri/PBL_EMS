@@ -1,4 +1,5 @@
 import { LeaveRequest } from "../types/leaveTypes";
+import { UserDetailInformation } from "../types/userTypes";
 import { EmployeeStatus, Gender, SessionDate } from "./enum";
 
 export const UserInformation: Record<string, string> = {
@@ -146,4 +147,25 @@ export const defaultRequest: LeaveRequest = {
   endDate: new Date(),
   session: "",
   reason: "",
+};
+
+export const defaultUserInfo: UserDetailInformation = {
+  id: "",
+  email: "",
+  fullName: "",
+  firstName: "",
+  lastName: "",
+  gender: "",
+  dateOfBirth: new Date(),
+  phoneNumber: "",
+  address: "",
+  city: "",
+  nationality: "",
+  avatar: "",
+  citizenId: "",
+  status: "",
+  role: {
+    name: "",
+  },
+  educationId: "",
 };

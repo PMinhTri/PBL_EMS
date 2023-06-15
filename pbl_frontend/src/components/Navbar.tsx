@@ -5,6 +5,9 @@ import { AuthAction } from "../actions/authAction";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { userAuthState, userInfoState } from "../recoil/atoms/user";
 import { authState } from "../recoil/atoms/auth";
+import { UserDetailInformation } from "../types/userTypes";
+import { defaultUserInfo } from "../constants/constantVariables";
+import { UserAction } from "../actions/userAction";
 
 enum NavbarOptions {
   Account = "Tài khoản",
@@ -16,7 +19,16 @@ enum NavbarOptions {
 const SelectContent: React.FunctionComponent = () => {
   const setAuth = useSetRecoilState(authState);
   const user = useRecoilValue(userAuthState);
-  const info = useRecoilValue(userInfoState);
+  const [userInfo, setUserInfo] =
+    React.useState<UserDetailInformation>(defaultUserInfo);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      setUserInfo((await UserAction.getUserInfo(user.id)) ?? defaultUserInfo);
+    };
+
+    fetchData();
+  }, [user.id, userInfo]);
   const options =
     user.role === "Admin"
       ? [
@@ -60,7 +72,7 @@ const SelectContent: React.FunctionComponent = () => {
         <div className="border-[1px] border-blue-400 rounded-full justify-center align-center w-8 h-8">
           <img
             className="object-cover object-center h-full w-full rounded-full"
-            src={info.avatar}
+            src={userInfo.avatar}
             alt="avatar"
           />
         </div>
@@ -86,6 +98,16 @@ const SelectContent: React.FunctionComponent = () => {
 
 const Navbar: React.FunctionComponent = () => {
   const user = useRecoilValue(userAuthState);
+  const [userInfo, setUserInfo] =
+    React.useState<UserDetailInformation>(defaultUserInfo);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      setUserInfo((await UserAction.getUserInfo(user.id)) ?? defaultUserInfo);
+    };
+
+    fetchData();
+  }, [user.id, userInfo]);
 
   return (
     <div className="shadow-md w-full h-12 fixed bg-blue-800 top-0 left-0 z-50">
@@ -116,7 +138,7 @@ const Navbar: React.FunctionComponent = () => {
               <button className="border-[1px] border-blue-400 rounded-full justify-center align-center w-8 h-8 ml-4">
                 <img
                   className="object-cover object-center h-full w-full rounded-full"
-                  src={loginImg}
+                  src={userInfo.avatar}
                   alt="avatar"
                 />
               </button>

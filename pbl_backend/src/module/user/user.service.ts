@@ -130,11 +130,7 @@ export class UserService {
         address: dto.address,
         city: dto.city,
         nationality: dto.nationality,
-        education: {
-          connect: {
-            id: dto.educationId,
-          },
-        },
+        educationId: dto.educationId,
       },
     });
 
@@ -202,6 +198,7 @@ export class UserService {
         },
         jobInformation: {
           select: {
+            id: true,
             joinDate: true,
             employeeStatus: true,
             contractType: {

@@ -191,9 +191,6 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
                   </td>
                   <td className="py-3 px-4 text-center border-b">
                     <div className="w-full flex flex-row gap-2 justify-center items-center">
-                      <div className="text-blue-500 text-2xl hover:text-blue-600 hover:cursor-pointer">
-                        <BiInfoCircle />
-                      </div>
                       {item.status === LeaveStatus.Pending && (
                         <>
                           <div

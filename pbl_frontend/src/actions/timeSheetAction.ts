@@ -6,7 +6,7 @@ import {
   getTimeSheetOfUser,
   getTotalWorkload,
 } from "../api/timeSheet";
-import { TimeSheet, TimeSheetPayload } from "../types/timeSheet";
+import { TimeSheetPayload } from "../types/timeSheet";
 import { handleError } from "../utils/errorHandler";
 
 export const TimeSheetAction = {

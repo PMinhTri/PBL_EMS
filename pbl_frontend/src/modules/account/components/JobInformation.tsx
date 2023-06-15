@@ -64,7 +64,10 @@ const JobInformationContainer: React.FunctionComponent<Props> = (
       return;
     }
 
-    await JobInformationAction.update(jobInformation.id, updateJobInformation);
+    await JobInformationAction.update(
+      updateJobInformation.id,
+      updateJobInformation
+    );
     showNotification("success", "Cập nhật thông tin công việc thành công");
     setIsDisabled(!isDisabled);
     setTimeout(() => {

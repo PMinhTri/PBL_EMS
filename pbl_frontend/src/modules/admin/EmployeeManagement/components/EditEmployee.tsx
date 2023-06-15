@@ -2,8 +2,6 @@ import React from "react";
 import { UserDetailInformation } from "../../../../types/userTypes";
 import PersonalInformation from "../../../account/components/PersonalInformation";
 import JobInformationContainer from "../../../account/components/JobInformation";
-import { JobInformation } from "../../../../types/jobInformationTypes";
-import { JobInformationAction } from "../../../../actions/jobInformationAction";
 import { defaultJobInformation } from "../../../../constants/constantVariables";
 
 type Props = {
@@ -12,17 +10,6 @@ type Props = {
 
 const EditEmployee: React.FunctionComponent<Props> = (props: Props) => {
   const { userInfo } = props;
-  const [jobInformation, setJobInformation] = React.useState<JobInformation>(
-    defaultJobInformation
-  );
-
-  React.useEffect(() => {
-    const fetchData = async () => {
-      setJobInformation(await JobInformationAction.getByUserId(userInfo.id));
-    };
-
-    fetchData();
-  }, [userInfo.id]);
 
   return (
     <div
@@ -56,7 +43,9 @@ const EditEmployee: React.FunctionComponent<Props> = (props: Props) => {
           <PersonalInformation userInfo={userInfo} />
         </div>
         <div className="w-full">
-          <JobInformationContainer jobInformation={jobInformation} />
+          <JobInformationContainer
+            jobInformation={userInfo.jobInformation || defaultJobInformation}
+          />
         </div>
       </div>
     </div>
