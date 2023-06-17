@@ -16,6 +16,15 @@ export const getAllLeaveType = async () => {
   return response;
 };
 
+export const createLeaveType = async (name: string, balance: number) => {
+  const response: {
+    statusCode: number;
+    payload: LeaveType;
+  } = await $post("/leave/leave-types/create", { name, balance });
+
+  return response;
+};
+
 export const createLeaveRequest = async (payload: LeaveRequestPayload) => {
   const response: {
     statusCode: number;

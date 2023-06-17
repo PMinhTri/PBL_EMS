@@ -28,7 +28,7 @@ model User {
 
   jobInformation JobInformation?
 
-  leave     Leave[]
+  leave     LeaveRequest[]
   timeSheet TimeSheet[]
   payroll   Payroll[]
 
@@ -147,7 +147,7 @@ model Insurance {
   updatedAt       DateTime @updatedAt
 }
 
-model Leave {
+model LeaveRequest {
   id          String     @id @default(uuid())
   userId      String
   user        User       @relation(fields: [userId], references: [id])
@@ -165,10 +165,10 @@ model Leave {
 }
 
 model LeaveType {
-  id      String  @id @default(uuid())
+  id      String         @id @default(uuid())
   name    String
   balance Float
-  Leave   Leave[]
+  Leave   LeaveRequest[]
 }
 
 model Education {

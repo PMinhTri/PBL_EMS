@@ -2,6 +2,7 @@ import {
   approveLeaveRequest,
   cancelLeaveRequest,
   createLeaveRequest,
+  createLeaveType,
   getAllLeaveRequest,
   getAllLeaveType,
   getLeaveRequestsByUser,
@@ -18,6 +19,16 @@ export const LeaveAction = {
     const response = await getAllLeaveType();
 
     return response.payload;
+  },
+
+  createLeaveType: async (name: string, balance: number) => {
+    const response = await createLeaveType(name, balance);
+
+    if (response.statusCode === 200) {
+      return response.payload;
+    }
+
+    handleError(response);
   },
 
   createLeaveRequest: async (payload: LeaveRequestPayload) => {

@@ -1,5 +1,6 @@
 import { Department } from "../types/departmentTypes";
-import { getAllDepartments } from "../api/department";
+import { createDepartment, getAllDepartments } from "../api/department";
+import { handleError } from "../utils/errorHandler";
 
 export const DepartmentAction = {
   getAllDepartments: async (): Promise<Department[]> => {
@@ -8,5 +9,16 @@ export const DepartmentAction = {
     const { payload } = departments;
 
     return payload;
+  },
+
+  create: async (name: string) => {
+    const response = await createDepartment(name);
+
+    if (response.statusCode === 200) {
+      const { payload } = response;
+      return payload;
+    }
+
+    handleError(response);
   },
 };

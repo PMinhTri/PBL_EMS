@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { LeaveService } from './leave.service';
 import { BadRequestResult, IResponse, SuccessResult } from 'src/httpResponse';
-import { LeaveDto } from './leave.dto';
+import { LeaveRequestDto } from './leave.dto';
 import { NotFoundResult } from 'src/httpResponse';
 import { LeaveFailure } from 'src/enumTypes/failure.enum';
 import { ServiceResponseStatus } from 'src/serviceResponse';
@@ -56,7 +56,7 @@ export class LeaveController {
 
   @Post('/create')
   public async createLeaveRequest(
-    @Body() payload: LeaveDto,
+    @Body() payload: LeaveRequestDto,
     @Res() res: IResponse,
   ): Promise<IResponse> {
     const {
@@ -107,7 +107,7 @@ export class LeaveController {
   @Patch('/update/:id')
   public async updateLeaveRequest(
     @Param('id') id: string,
-    @Body() payload: LeaveDto,
+    @Body() payload: LeaveRequestDto,
     @Res() res: IResponse,
   ): Promise<IResponse> {
     const {

@@ -15,3 +15,10 @@ export enum SessionDate {
   Afternoon = "Chiều",
   FullDay = "Cả ngày",
 }
+
+export enum ActionType {
+  Create = "Create",
+  Update = "Update",
+  Edit = "Edit",
+  Delete = "Delete",
+}

@@ -20,7 +20,7 @@ export class TimeSheetService {
     const extractDate = dayjs(dto.date).format('DD/MM/YYYY');
     const [date, month, year] = extractDate.split('/').map(Number);
 
-    const existingLeave = await this.prisma.leave.findFirst({
+    const existingLeave = await this.prisma.leaveRequest.findFirst({
       where: {
         userId: dto.userId,
         startDate: {
@@ -150,6 +150,7 @@ export class TimeSheetService {
         userId: userId,
         month: month,
         year: year,
+        overtime: false,
       },
     });
 

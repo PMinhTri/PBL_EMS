@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { LeaveDto } from './leave.dto';
+import { LeaveRequestDto } from './leave.dto';
 import {
   ServiceFailure,
   ServiceResponse,
@@ -9,7 +9,7 @@ import {
 import { LeaveFailure } from 'src/enumTypes/failure.enum';
 import { dateTimeUtils, isWeekend } from 'src/utils/datetime';
 import { Session } from 'src/constant/leaveSession.constant';
-import { Leave, LeaveType } from '@prisma/client';
+import { LeaveRequest, LeaveType } from '@prisma/client';
 import { LeaveStatus } from 'src/enumTypes/leave.enum';
 import * as dayjs from 'dayjs';
 import { intersection, isEqual } from 'lodash';
@@ -20,7 +20,7 @@ export class LeaveService {
   constructor(private prisma: PrismaService) {}
 
   private async checkValidLeaveRequest(
-    dto: LeaveDto,
+    dto: LeaveRequestDto,
     requestId?: string,
   ): Promise<{
     valid: boolean;
@@ -62,23 +62,25 @@ export class LeaveService {
     }
 
     if (dayjs(dto.startDate).isSame(dto.endDate)) {
-      const existedLeaveRequestByDate = await this.prisma.leave.findMany({
-        where: {
-          user: {
-            id: dto.userId,
+      const existedLeaveRequestByDate = await this.prisma.leaveRequest.findMany(
+        {
+          where: {
+            user: {
+              id: dto.userId,
+            },
+            status: {
+              in: [LeaveStatus.Pending, LeaveStatus.Approved],
+            },
           },
-          status: {
-            in: [LeaveStatus.Pending, LeaveStatus.Approved],
+          select: {
+            id: true,
+            session: true,
+            leaveDays: true,
+            startDate: true,
+            endDate: true,
           },
         },
-        select: {
-          id: true,
-          session: true,
-          leaveDays: true,
-          startDate: true,
-          endDate: true,
-        },
-      });
+      );
 
       const existedInOneDay = existedLeaveRequestByDate.filter((leaveRequest) =>
         dayjs(leaveRequest.startDate).isSame(dayjs(leaveRequest.endDate)),
@@ -129,7 +131,7 @@ export class LeaveService {
         }
       }
     } else {
-      const allLeaveRequest = await this.prisma.leave.findMany({
+      const allLeaveRequest = await this.prisma.leaveRequest.findMany({
         where: {
           user: {
             id: dto.userId,
@@ -172,8 +174,8 @@ export class LeaveService {
   }
 
   public async createLeaveRequest(
-    dto: LeaveDto,
-  ): Promise<ServiceResponse<Leave, ServiceFailure<LeaveFailure>>> {
+    dto: LeaveRequestDto,
+  ): Promise<ServiceResponse<LeaveRequest, ServiceFailure<LeaveFailure>>> {
     const { valid, failure } = await this.checkValidLeaveRequest(dto);
 
     const year = dayjs(dto.startDate).year();
@@ -200,7 +202,7 @@ export class LeaveService {
       };
     }
 
-    const leaveRequest = await this.prisma.leave.create({
+    const leaveRequest = await this.prisma.leaveRequest.create({
       data: {
         user: {
           connect: {
@@ -229,9 +231,9 @@ export class LeaveService {
 
   public async updateLeaveRequest(
     id: string,
-    dto: LeaveDto,
-  ): Promise<ServiceResponse<Leave, ServiceFailure<LeaveFailure>>> {
-    const existedLeaveRequest = await this.prisma.leave.findUnique({
+    dto: LeaveRequestDto,
+  ): Promise<ServiceResponse<LeaveRequest, ServiceFailure<LeaveFailure>>> {
+    const existedLeaveRequest = await this.prisma.leaveRequest.findUnique({
       where: {
         id: id,
       },
@@ -275,7 +277,7 @@ export class LeaveService {
       };
     }
 
-    const leaveRequest = await this.prisma.leave.update({
+    const leaveRequest = await this.prisma.leaveRequest.update({
       where: {
         id: id,
       },
@@ -337,7 +339,7 @@ export class LeaveService {
     const firstDate = new Date(year, 0, 1);
     const lastDate = new Date(year, 11, 31);
 
-    const allLeaveRequest = await this.prisma.leave.findMany({
+    const allLeaveRequest = await this.prisma.leaveRequest.findMany({
       where: {
         user: {
           id: userId,
@@ -346,7 +348,7 @@ export class LeaveService {
           id: leaveTypeId,
         },
         status: {
-          in: [LeaveStatus.Pending, LeaveStatus.Approved],
+          in: [LeaveStatus.Approved],
         },
         AND: [
           {
@@ -363,13 +365,13 @@ export class LeaveService {
       },
     });
 
-    const balance = await this.prisma.leaveType.findFirst({
+    const leaveType = await this.prisma.leaveType.findUnique({
       where: {
         id: leaveTypeId,
       },
     });
 
-    if (!balance) {
+    if (!leaveType) {
       return {
         status: ServiceResponseStatus.Failed,
         failure: {
@@ -379,7 +381,7 @@ export class LeaveService {
     }
 
     const remainingLeaveDays =
-      balance.balance -
+      leaveType.balance -
       allLeaveRequest.reduce((acc, curr) => {
         return acc + curr.leaveDays;
       }, 0);
@@ -398,7 +400,7 @@ export class LeaveService {
 
     const users = await this.prisma.user.findMany();
 
-    const allLeaveRequest = await this.prisma.leave.findMany({
+    const allLeaveRequest = await this.prisma.leaveRequest.findMany({
       where: {
         status: LeaveStatus.Approved,
         AND: [
@@ -451,8 +453,8 @@ export class LeaveService {
   public async approveLeaveRequest(
     id: string,
     status: string,
-  ): Promise<ServiceResponse<Leave, ServiceFailure<LeaveFailure>>> {
-    const existedLeaveRequest = await this.prisma.leave.findUnique({
+  ): Promise<ServiceResponse<LeaveRequest, ServiceFailure<LeaveFailure>>> {
+    const existedLeaveRequest = await this.prisma.leaveRequest.findUnique({
       where: {
         id: id,
       },
@@ -467,7 +469,7 @@ export class LeaveService {
       };
     }
 
-    const leaveRequest = await this.prisma.leave.update({
+    const leaveRequest = await this.prisma.leaveRequest.update({
       where: {
         id: id,
       },
@@ -485,8 +487,8 @@ export class LeaveService {
   public async cancelLeaveRequest(
     id: string,
     status: string,
-  ): Promise<ServiceResponse<Leave, ServiceFailure<LeaveFailure>>> {
-    const existedLeaveRequest = await this.prisma.leave.findUnique({
+  ): Promise<ServiceResponse<LeaveRequest, ServiceFailure<LeaveFailure>>> {
+    const existedLeaveRequest = await this.prisma.leaveRequest.findUnique({
       where: {
         id: id,
       },
@@ -501,7 +503,7 @@ export class LeaveService {
       };
     }
 
-    const leaveRequest = await this.prisma.leave.update({
+    const leaveRequest = await this.prisma.leaveRequest.update({
       where: {
         id: id,
       },
@@ -518,7 +520,7 @@ export class LeaveService {
   }
 
   public async rejectLeaveRequest(id: string, status: string) {
-    const existedLeaveRequest = await this.prisma.leave.findUnique({
+    const existedLeaveRequest = await this.prisma.leaveRequest.findUnique({
       where: {
         id: id,
       },
@@ -533,7 +535,7 @@ export class LeaveService {
       };
     }
 
-    const leaveRequest = await this.prisma.leave.update({
+    const leaveRequest = await this.prisma.leaveRequest.update({
       where: {
         id: id,
       },
@@ -550,8 +552,8 @@ export class LeaveService {
 
   public async removeLeaveRequest(
     id: string,
-  ): Promise<ServiceResponse<Leave, ServiceFailure<LeaveFailure>>> {
-    const existedLeaveRequest = await this.prisma.leave.findUnique({
+  ): Promise<ServiceResponse<LeaveRequest, ServiceFailure<LeaveFailure>>> {
+    const existedLeaveRequest = await this.prisma.leaveRequest.findUnique({
       where: {
         id: id,
       },
@@ -566,7 +568,7 @@ export class LeaveService {
       };
     }
 
-    const leaveRequest = await this.prisma.leave.delete({
+    const leaveRequest = await this.prisma.leaveRequest.delete({
       where: {
         id: id,
       },
@@ -581,13 +583,13 @@ export class LeaveService {
   public async getAllLeaveRequest(
     year: number,
     month?: number,
-  ): Promise<Leave[]> {
+  ): Promise<LeaveRequest[]> {
     const firstDate = month
       ? new Date(year, month - 1, 1)
       : new Date(year, 0, 1);
     const lastDate = month ? new Date(year, month, 0) : new Date(year, 11, 31);
 
-    return this.prisma.leave.findMany({
+    return this.prisma.leaveRequest.findMany({
       where: {
         AND: [
           {
@@ -607,8 +609,8 @@ export class LeaveService {
 
   public async getLeaveRequestByUserId(
     userId: string,
-  ): Promise<ServiceResponse<Leave[], ServiceFailure<LeaveFailure>>> {
-    const existedLeaveRequest = await this.prisma.leave.findMany({
+  ): Promise<ServiceResponse<LeaveRequest[], ServiceFailure<LeaveFailure>>> {
+    const existedLeaveRequest = await this.prisma.leaveRequest.findMany({
       where: {
         user: {
           id: userId,
@@ -633,8 +635,8 @@ export class LeaveService {
 
   public async getLeaveRequestById(
     id: string,
-  ): Promise<ServiceResponse<Leave, ServiceFailure<LeaveFailure>>> {
-    const existedLeaveRequest = await this.prisma.leave.findUnique({
+  ): Promise<ServiceResponse<LeaveRequest, ServiceFailure<LeaveFailure>>> {
+    const existedLeaveRequest = await this.prisma.leaveRequest.findUnique({
       where: {
         id: id,
       },
@@ -687,7 +689,7 @@ export class LeaveService {
   public async deleteAllLeaveRequests(): Promise<
     ServiceResponse<null, ServiceFailure<LeaveFailure>>
   > {
-    return this.prisma.leave.deleteMany().then(() => {
+    return this.prisma.leaveRequest.deleteMany().then(() => {
       return {
         status: ServiceResponseStatus.Success,
         result: null,
