@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Input, Modal, Popover, Select, Space } from "antd";
+import { Button, Input, Modal, Popover, Space } from "antd";
 import {
   ArrowDownOutlined,
   ArrowUpOutlined,
@@ -21,20 +21,6 @@ import showNotification from "../../../utils/notification";
 import { JobInformationAction } from "../../../actions/jobInformationAction";
 import dayjs from "dayjs";
 import EditEmployee from "./components/EditEmployee";
-
-const titleTable = [
-  "STT",
-  "Họ và tên",
-  "Giới tính",
-  "Chức vụ",
-  "Email",
-  "CCCD/CMND",
-  "Số điện thoại",
-  "Chi nhánh",
-  "Trình độ",
-  "Trạng thái",
-  "Thao tác",
-];
 
 const EmployeeManagement: React.FunctionComponent = () => {
   const [isLoading, setIsLoading] = React.useState(true);
@@ -377,110 +363,134 @@ const EmployeeManagement: React.FunctionComponent = () => {
           </div>
         </div>
       ) : (
-        <div className="w-full px-2 py-2 h-screen overflow-auto">
-          <div>
-            <div className="flex w-full max-h-80 overflow-x-auto overflow-y-auto scrollbar">
-              <table className="w-full">
-                <thead className="bg-blue-600 text-white rounded-t-md sticky top-0">
-                  <tr>
-                    {titleTable.map((item, index) => (
-                      <th key={index} className="text-center h-12">
-                        {item}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="overflow-x-auto">
-                  {resultEmployeeList.map((item, index) => (
-                    <tr key={index} className="border-[2px] h-12 bg-white">
-                      <td className="px-1 text-left border-[2px]">
-                        {index + 1}
-                      </td>
-                      <td className="px-1 text-left border-[2px]">
-                        {item.fullName}
-                      </td>
-                      <td className="px-1 text-left border-[2px]">
-                        {item.gender}
-                      </td>
-                      <td className="px-1 text-left border-[2px]">
-                        {item.jobInformation?.jobTitle?.name}
-                      </td>
-                      <td className="px-1 text-left border-[2px]">
-                        {item.email}
-                      </td>
-                      <td className="px-1 text-left border-[2px]">
-                        {item.citizenId}
-                      </td>
-                      <td className="px-1 text-left border-[2px]">
-                        {item.phoneNumber}
-                      </td>
-                      <td className="px-1 text-left border-[2px]">
-                        {item.jobInformation?.department?.name}
-                      </td>
-                      <td className="px-1 text-left border-[2px]">
-                        {item.education?.grade}
-                      </td>
-                      <td className="px-1 text-left border-[2px]">
-                        {item.status}
-                      </td>
-                      <td className="flex justify-center items-center gap-2 flex-row p-4">
-                        <div
-                          className="flex justify-center items-center text-lg cursor-pointer text-orange-600"
-                          onClick={() =>
-                            setIsOpenEditModal({ userInfo: item, isOpen: true })
-                          }
-                        >
-                          <BiEditAlt />
-                        </div>
-                        <div
-                          onClick={() => {
-                            setIsModalDeleteOpen(true);
-                          }}
-                          className="flex justify-center items-center text-lg cursor-pointer text-red-600"
-                        >
-                          <BiTrashAlt />
-                        </div>
-                        <Modal
-                          title="Bạn muốn xóa nhân viên này?"
-                          open={isModalDeleteOpen}
-                          width={400}
-                          onCancel={() => setIsModalDeleteOpen(false)}
-                          footer={[
-                            <button
-                              onClick={() => setIsModalDeleteOpen(false)}
-                              className="w-24 ml-2 rounded-md h-8 bg-red-500 text-white cursor-pointer"
-                            >
-                              Hủy
-                            </button>,
-                            <Button
-                              onClick={() => handleDeleteUser(item.id)}
-                              className="ml-2 w-24 rounded-md h-8 bg-blue-500 text-white cursor-pointer"
-                            >
-                              Xóa
-                            </Button>,
-                          ]}
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <Modal
-              onCancel={() =>
-                setIsOpenEditModal({
-                  isOpen: false,
-                  userInfo: {} as UserDetailInformation,
-                })
-              }
-              open={isOpenEditModal.isOpen}
-              width={800}
-              title="Thông tin nhân viên"
-              footer={<></>}
-            >
-              <EditEmployee userInfo={isOpenEditModal.userInfo} />
-            </Modal>
-          </div>
+        <div className="overflow-auto h-96 rounded-lg border border-gray-200 shadow-md m-5 scrollbar">
+          <table className="w-full border-collapse bg-white text-left text-sm text-gray-500">
+            <thead className="bg-gray-200 sticky top-0 z-10">
+              <tr>
+                <th scope="col" className="px-6 py-4 font-medium text-gray-900">
+                  Họ và tên
+                </th>
+                <th scope="col" className="px-6 py-4 font-medium text-gray-900">
+                  Giới tính
+                </th>
+                <th scope="col" className="px-6 py-4 font-medium text-gray-900">
+                  Chức vụ
+                </th>
+                <th scope="col" className="px-6 py-4 font-medium text-gray-900">
+                  Số điện thoại
+                </th>
+                <th scope="col" className="px-6 py-4 font-medium text-gray-900">
+                  CCCD/CMND
+                </th>
+                <th scope="col" className="px-6 py-4 font-medium text-gray-900">
+                  Chi nhánh
+                </th>
+                <th scope="col" className="px-6 py-4 font-medium text-gray-900">
+                  Trình độ
+                </th>
+                <th scope="col" className="px-6 py-4 font-medium text-gray-900">
+                  Trạng thái
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-4 font-medium text-gray-900"
+                ></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100 border-t border-gray-100">
+              {resultEmployeeList.map((employee, index) => (
+                <tr key={index} className="hover:bg-gray-50">
+                  <th className="flex gap-3 px-6 py-4 font-normal text-gray-900">
+                    <div className="relative h-10 w-10">
+                      <img
+                        className="h-full w-full rounded-full object-cover object-center"
+                        src={employee.avatar}
+                        alt=""
+                      />
+                    </div>
+                    <div className="text-sm">
+                      <div className="font-medium text-gray-700">
+                        {employee.fullName}
+                      </div>
+                      <div className="text-gray-400">{employee.email}</div>
+                    </div>
+                  </th>
+                  <td className="px-6 py-4">{employee.gender}</td>
+                  <td className="px-6 py-4">
+                    {employee.jobInformation?.jobTitle?.name}
+                  </td>
+                  <td className="px-6 py-4">{employee.phoneNumber}</td>
+                  <td className="px-6 py-4">{employee.citizenId}</td>
+                  <td className="px-6 py-4">
+                    {employee.jobInformation?.department?.name}
+                  </td>
+                  <td className="px-6 py-4">{employee.education?.grade}</td>
+                  <td className="px-6 py-4">
+                    <div className="inline-flex items-center gap-1 rounded-sm bg-green-100 px-2 py-2 text-xs font-semibold text-green-600">
+                      {employee.status}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex justify-end gap-4">
+                      <div
+                        className="flex justify-center items-center text-2xl cursor-pointer text-green-600"
+                        onClick={() =>
+                          setIsOpenEditModal({
+                            userInfo: employee,
+                            isOpen: true,
+                          })
+                        }
+                      >
+                        <BiEditAlt />
+                      </div>
+                      <div
+                        onClick={() => {
+                          setIsModalDeleteOpen(true);
+                        }}
+                        className="flex justify-center items-center text-2xl cursor-pointer text-red-600"
+                      >
+                        <BiTrashAlt />
+                      </div>
+                      <Modal
+                        title="Bạn muốn xóa nhân viên này?"
+                        open={isModalDeleteOpen}
+                        width={400}
+                        onCancel={() => setIsModalDeleteOpen(false)}
+                        footer={[
+                          <button
+                            onClick={() => setIsModalDeleteOpen(false)}
+                            className="w-24 ml-2 rounded-md h-8 bg-red-500 text-white cursor-pointer"
+                          >
+                            Hủy
+                          </button>,
+                          <Button
+                            onClick={() => handleDeleteUser(employee.id)}
+                            className="ml-2 w-24 rounded-md h-8 bg-blue-500 text-white cursor-pointer"
+                          >
+                            Xóa
+                          </Button>,
+                        ]}
+                      />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <Modal
+            onCancel={() =>
+              setIsOpenEditModal({
+                isOpen: false,
+                userInfo: {} as UserDetailInformation,
+              })
+            }
+            open={isOpenEditModal.isOpen}
+            width={800}
+            title="Thông tin nhân viên"
+            footer={<></>}
+          >
+            <EditEmployee userInfo={isOpenEditModal.userInfo} />
+          </Modal>
         </div>
       )}
     </div>

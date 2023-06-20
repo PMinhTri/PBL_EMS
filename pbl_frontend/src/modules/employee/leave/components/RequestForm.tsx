@@ -115,7 +115,8 @@ export const RequestForm: React.FunctionComponent = () => {
               Loại nghỉ phép
             </label>
             <select
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+              name="leaveType"
+              className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-blue-600 focus:shadow-md"
               onChange={(e) => {
                 setOnSelectLeaveType(
                   leaveType.find((type) => type.id === e.target.value) || {
@@ -162,7 +163,8 @@ export const RequestForm: React.FunctionComponent = () => {
               Ngày bắt đầu
             </label>
             <DatePicker
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+              name="startDate"
+              className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-blue-600 focus:shadow-md"
               value={dayjs(startDate)}
               defaultValue={dayjs(startDate)}
               onChange={(date) => {
@@ -178,6 +180,7 @@ export const RequestForm: React.FunctionComponent = () => {
                 setStartDate(dayjs(date).toDate());
                 setEndDate(dayjs(date).toDate());
               }}
+              allowClear={false}
             />
           </div>
           <div>
@@ -188,7 +191,8 @@ export const RequestForm: React.FunctionComponent = () => {
               Ngày kết thúc
             </label>
             <DatePicker
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+              name="endDate"
+              className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-blue-600 focus:shadow-md"
               value={dayjs(endDate)}
               defaultValue={dayjs(endDate)}
               onChange={(date) => {
@@ -211,6 +215,7 @@ export const RequestForm: React.FunctionComponent = () => {
 
                 setEndDate(dayjs(date).toDate());
               }}
+              allowClear={false}
             />
           </div>
         </div>
@@ -228,7 +233,7 @@ export const RequestForm: React.FunctionComponent = () => {
               value={leaveDays}
               defaultValue={leaveDays}
               onChange={(e) => setOnLeaveDaysChange(e.target.value)}
-              className="w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500"
+              className="w-full appearance-none rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-blue-600 focus:shadow-md"
               required
             />
           </div>
@@ -240,7 +245,7 @@ export const RequestForm: React.FunctionComponent = () => {
               Buổi nghỉ
             </label>
             <select
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+              className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-blue-600 focus:shadow-md"
               id="session"
               value={onSelectSession}
               onChange={(e) => setOnSelectSession(e.target.value)}
@@ -260,7 +265,7 @@ export const RequestForm: React.FunctionComponent = () => {
             Lý do
           </label>
           <textarea
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+            className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-blue-600 focus:shadow-md"
             id="reason"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
