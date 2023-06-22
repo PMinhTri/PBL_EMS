@@ -97,14 +97,25 @@ const RequestHistory: React.FunctionComponent<Props> = (props: Props) => {
               </td>
               <td className="py-3 px-8 text-center border-b">{item.session}</td>
               <td className="py-3 px-4 text-center border-b">{item.reason}</td>
-              <td
-                className={`py-3 px-4 text-center text-white font-bold border-b ${
-                  item.status === LeaveStatus.Pending && "bg-blue-500"
-                } ${item.status === LeaveStatus.Rejected && "bg-red-500"} ${
-                  item.status === LeaveStatus.Approved && "bg-green-500"
-                } ${item.status === LeaveStatus.Cancelled && "bg-gray-500"}`}
-              >
-                {item.status}
+              <td className={`py-3 px-4 text-center border-b`}>
+                <div
+                  className={`inline-flex items-center gap-1 rounded-sm
+                    px-2 py-2 text-xs font-semibold ${
+                      item.status === LeaveStatus.Pending &&
+                      "bg-blue-200 text-blue-600"
+                    } ${
+                    item.status === LeaveStatus.Rejected &&
+                    "bg-red-200 text-red-600"
+                  } ${
+                    item.status === LeaveStatus.Approved &&
+                    "bg-green-200 text-green-600 "
+                  } ${
+                    item.status === LeaveStatus.Cancelled &&
+                    "bg-gray-200 text-gray-600"
+                  }`}
+                >
+                  {item.status}
+                </div>
               </td>
               <td className="py-3 px-4 text-center border-b">
                 {item.status === LeaveStatus.Pending && (

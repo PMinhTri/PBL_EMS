@@ -92,6 +92,13 @@ const Account = () => {
     [userAuthInfo.id]
   );
 
+  const handleDeleteAvatar = React.useCallback(async () => {
+    setAvatar("");
+    await UserAction.updateAvatar(userAuthInfo.id, "");
+
+    window.location.reload();
+  }, [userAuthInfo.id]);
+
   return (
     <Container>
       <Navbar />
@@ -100,12 +107,12 @@ const Account = () => {
           <div>...loading</div>
         ) : (
           <div className="m-2 grid grid-cols-4 gap-4 mt-4 w-full">
-            <div className="col-span-1 rounded-md shadow-md w-full h-[600px] border-2 flex flex-col">
-              <div className="w-full flex flex-row justify-between items-center h-32 border-b-[2px] p-4">
+            <div className="col-span-3 flex flex-col justify-center items-center gap-2">
+              <div className="w-[98%] flex flex-row justify-between rounded-md items-center border-[2px] p-4">
                 <div className="flex items-center">
                   <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 mr-4">
                     <img
-                      src={avatar || userInfo.avatar}
+                      src={userInfo.avatar || avatar}
                       alt="avatar"
                       className="w-full h-full object-cover"
                     />
@@ -119,33 +126,42 @@ const Account = () => {
                     </div>
                   </div>
                 </div>
-                <label
-                  htmlFor="avatar-upload"
-                  className="ml-2 border flex flex-row justify-between items-center border-blue-600 rounded-md px-2 py-1 
+                <div className="w-1/2 flex flex-row justify-end items-center">
+                  <button
+                    className="border flex justify-center items-center rounded-md px-2 py-1 border-gray-300
+                  hover:bg-gray-400 hover:border-gray-400 hover:text-white transition-colors duration-300"
+                    onClick={handleDeleteAvatar}
+                  >
+                    <span className="">Xóa ảnh</span>
+                  </button>
+                  <label
+                    htmlFor="avatar-upload"
+                    className="ml-2 border flex flex-row justify-between items-center border-blue-600 rounded-md px-2 py-1 
                 bg-white text-blue-600 hover:bg-blue-600 hover:text-white transition-colors duration-300 cursor-pointer"
-                >
-                  <input
-                    id="avatar-upload"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleFileChange}
-                  />
-                  <ArrowUpOutlined />
-                  Upload
-                </label>
+                  >
+                    <input
+                      id="avatar-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleFileChange}
+                    />
+                    <ArrowUpOutlined />
+                    Tải lên
+                  </label>
+                </div>
               </div>
-            </div>
-            <div className="col-span-2 w-full">
-              {profileType === ProfileType.PERSONAL && (
-                <PersonalInformation userInfo={userInfo} />
-              )}
-              {profileType === ProfileType.WORK && (
-                <JobInformationContainer jobInformation={jobInformation} />
-              )}
-              {profileType === ProfileType.CHANGE_PASSWORD && (
-                <ChangePassword />
-              )}
+              <div className="col-span-2 w-full">
+                {profileType === ProfileType.PERSONAL && (
+                  <PersonalInformation userInfo={userInfo} />
+                )}
+                {profileType === ProfileType.WORK && (
+                  <JobInformationContainer jobInformation={jobInformation} />
+                )}
+                {profileType === ProfileType.CHANGE_PASSWORD && (
+                  <ChangePassword />
+                )}
+              </div>
             </div>
             <div className="col-span-1 w-full">
               <div className="flex flex-col gap-2 rounded-md items-start w-full border-[2px] shadow-md">

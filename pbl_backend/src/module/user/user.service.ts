@@ -169,6 +169,36 @@ export class UserService {
     };
   }
 
+  public async deleteAvatar(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!user) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: UserFailure.USER_NOT_FOUND,
+        },
+      };
+    }
+
+    await this.prisma.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        avatar: null,
+      },
+    });
+
+    return {
+      status: ServiceResponseStatus.Success,
+    };
+  }
+
   public async getAllUsers(): Promise<
     ServiceResponse<userInformationDto[], ServiceFailure<UserFailure>>
   > {
@@ -348,6 +378,35 @@ export class UserService {
     return {
       status: ServiceResponseStatus.Success,
       result: user,
+    };
+  }
+
+  public async searchUsers(
+    query: string,
+  ): Promise<ServiceResponse<User[], ServiceFailure<UserFailure>>> {
+    const users = await this.prisma.user.findMany({
+      where: {
+        OR: [
+          { fullName: { contains: query } },
+          { email: { contains: query } },
+          { phoneNumber: { contains: query } },
+          { citizenId: { contains: query } },
+        ],
+      },
+    });
+
+    if (!users.length) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: UserFailure.USER_NOT_FOUND,
+        },
+      };
+    }
+
+    return {
+      status: ServiceResponseStatus.Success,
+      result: users,
     };
   }
 }

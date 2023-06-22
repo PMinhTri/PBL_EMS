@@ -65,20 +65,19 @@ const EmployeeManagement: React.FunctionComponent = () => {
     fetchData();
   }, []);
 
-  const handleSearchEmployee = (value: string) => {
-    if (value === "") {
+  const handleSearchEmployee = async (query: string) => {
+    if (query === "") {
       setEmployeeSearched([]);
       return;
     } else {
-      const searchResult = employeeList.filter((employee) =>
-        employee.fullName.toLowerCase().includes(value.toLowerCase())
-      );
+      const searchResult = (await UserAction.search(query)) ?? [];
 
       if (!searchResult.length) {
         showNotification("error", "Không tìm thấy nhân viên");
+      } else {
+        setEmployeeSearched(searchResult);
+        console.log(searchResult);
       }
-
-      setEmployeeSearched(searchResult);
     }
   };
 
@@ -426,8 +425,8 @@ const EmployeeManagement: React.FunctionComponent = () => {
                   </td>
                   <td className="px-6 py-4">{employee.education?.grade}</td>
                   <td className="px-6 py-4">
-                    <div className="inline-flex items-center gap-1 rounded-sm bg-green-100 px-2 py-2 text-xs font-semibold text-green-600">
-                      {employee.status}
+                    <div className="inline-flex items-center gap-1 rounded-sm bg-green-200 px-2 py-2 text-xs font-semibold text-green-600">
+                      {employee.jobInformation?.employeeStatus}
                     </div>
                   </td>
                   <td className="px-6 py-4">

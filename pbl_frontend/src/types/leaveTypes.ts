@@ -25,6 +25,7 @@ export type LeaveRequest = {
   session: string;
   reason: string;
   status?: string;
+  leaveType?: LeaveType;
 };
 
 export enum LeaveStatus {

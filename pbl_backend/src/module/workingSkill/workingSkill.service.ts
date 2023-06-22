@@ -36,7 +36,6 @@ export class WorkingSkillService {
     const newWorkingSkill = await this.prisma.workingSkill.create({
       data: {
         name: dto.name,
-        description: dto.description,
       },
     });
 

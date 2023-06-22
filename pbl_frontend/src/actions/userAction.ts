@@ -3,6 +3,7 @@ import {
   deleteUser,
   getAllEmployees,
   getUserById,
+  searchUser,
   updateAvatar,
   updateUserInformation,
 } from "../api/user";
@@ -73,8 +74,30 @@ export const UserAction = {
     handleError(response);
   },
 
+  deleteAvatar: async (id: string) => {
+    const response = await deleteUser(id);
+
+    if (response.statusCode === 200) {
+      const { payload } = response;
+      return payload;
+    }
+
+    handleError(response);
+  },
+
   deleteUser: async (id: string) => {
     const response = await deleteUser(id);
+
+    if (response.statusCode === 200) {
+      const { payload } = response;
+      return payload;
+    }
+
+    handleError(response);
+  },
+
+  search: async (query: string) => {
+    const response = await searchUser(query);
 
     if (response.statusCode === 200) {
       const { payload } = response;

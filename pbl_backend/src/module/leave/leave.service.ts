@@ -604,6 +604,9 @@ export class LeaveService {
           },
         ],
       },
+      include: {
+        leaveType: true,
+      },
     });
   }
 
@@ -615,6 +618,9 @@ export class LeaveService {
         user: {
           id: userId,
         },
+      },
+      include: {
+        leaveType: true,
       },
     });
 
@@ -629,6 +635,34 @@ export class LeaveService {
 
     return {
       result: existedLeaveRequest,
+      status: ServiceResponseStatus.Success,
+    };
+  }
+
+  public async getLeaveTypeByLeaveRequestId(
+    leaveRequestId: string,
+  ): Promise<ServiceResponse<LeaveType, ServiceFailure<LeaveFailure>>> {
+    const existedLeaveRequest = await this.prisma.leaveRequest.findUnique({
+      where: {
+        id: leaveRequestId,
+      },
+
+      select: {
+        leaveType: true,
+      },
+    });
+
+    if (!existedLeaveRequest) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: LeaveFailure.LEAVE_NOT_FOUND,
+        },
+      };
+    }
+
+    return {
+      result: existedLeaveRequest.leaveType,
       status: ServiceResponseStatus.Success,
     };
   }

@@ -14,6 +14,8 @@ import { ContractAction } from "../../../actions/contractAction";
 import { LeaveAction } from "../../../actions/leaveAction";
 import showNotification from "../../../utils/notification";
 import { ActionType } from "../../../constants/enum";
+import { WorkingSkill } from "../../../types/workingSkillTypes";
+import { WorkingSkillAction } from "../../../actions/workingSkillAction";
 
 const Setting: React.FunctionComponent = () => {
   const [isRoleCollapse, setIsRoleCollapse] = React.useState(true);
@@ -21,6 +23,8 @@ const Setting: React.FunctionComponent = () => {
   const [isOfficeCollapse, setIsOfficeCollapse] = React.useState(true);
   const [isEducationCollapse, setIsEducationCollapse] = React.useState(true);
   const [isContractCollapse, setIsContractCollapse] = React.useState(true);
+  const [isWorkingSkillCollapse, setIsWorkingSkillCollapse] =
+    React.useState(true);
   const [isLeavesCollapse, setIsLeavesCollapse] = React.useState(true);
 
   const [roles, setRoles] = React.useState<Role[]>([]);
@@ -28,6 +32,7 @@ const Setting: React.FunctionComponent = () => {
   const [departments, setDepartments] = React.useState<Department[]>([]);
   const [educations, setEducations] = React.useState<Education[]>([]);
   const [contracts, setContracts] = React.useState<Contract[]>([]);
+  const [workingSkills, setWorkingSkills] = React.useState<WorkingSkill[]>([]);
   const [leaveTypes, setLeaveTypes] = React.useState<LeaveType[]>([]);
 
   const [newRole, setNewRole] = React.useState<string>("");
@@ -35,6 +40,7 @@ const Setting: React.FunctionComponent = () => {
   const [newDepartment, setNewDepartment] = React.useState<string>("");
   const [newEducation, setNewEducation] = React.useState<string>("");
   const [newContract, setNewContract] = React.useState<string>("");
+  const [newWorkingSkill, setNewWorkingSkill] = React.useState<string>("");
   const [newLeaveType, setNewLeaveType] = React.useState<{
     name: string;
     balance: number;
@@ -51,6 +57,7 @@ const Setting: React.FunctionComponent = () => {
       setEducations(await EducationAction.getAllEducation());
       setContracts(await ContractAction.getAllContracts());
       setLeaveTypes(await LeaveAction.getAllLeaveType());
+      setWorkingSkills(await WorkingSkillAction.getAllWorkingSkills());
     };
 
     fetchData();
@@ -134,6 +141,23 @@ const Setting: React.FunctionComponent = () => {
         }
 
         break;
+      }
+    }
+  };
+
+  const handleWorkingSkill = async (type: ActionType) => {
+    switch (type) {
+      case ActionType.Create: {
+        if (newWorkingSkill === "") return;
+
+        const response = await WorkingSkillAction.create({
+          name: newWorkingSkill,
+        });
+
+        if (response) {
+          showNotification("success", "Thêm kỹ năng thành công");
+          setWorkingSkills([...workingSkills, response]);
+        }
       }
     }
   };
@@ -455,6 +479,69 @@ const Setting: React.FunctionComponent = () => {
                   {contracts.map((contract) => (
                     <option key={contract.id} value={contract.id}>
                       {contract.type}
+                    </option>
+                  ))}
+                </select>
+                <div className="w-1/5 px-8 gap-2 flex flex-row">
+                  <div className="bg-green-500 px-4 hover:cursor-pointer text-white rounded-sm border hover:bg-green-600">
+                    Sửa
+                  </div>
+                  <div className="bg-red-500 px-4 hover:cursor-pointer text-white rounded-sm border hover:bg-red-600">
+                    Xóa
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          className={`w-full border flex flex-col rounded-md ${
+            isWorkingSkillCollapse ? "h-12" : "h-auto"
+          } transition-height duration-300`}
+        >
+          <div className="flex flex-row gap-4 justify-start items-center">
+            <div
+              onClick={() => setIsWorkingSkillCollapse(!isWorkingSkillCollapse)}
+              className="p-4 hover:cursor-pointer transition-transform duration-300"
+              style={{
+                transform: isContractCollapse
+                  ? "rotate(0deg)"
+                  : "rotate(90deg)",
+              }}
+            >
+              <AiOutlineCaretRight />
+            </div>
+            <div className="w-1/3 text-lg font-bold text-gray-600">
+              Thêm kỹ năng
+            </div>
+          </div>
+          <div
+            className={`w-full transition-all duration-300 overflow-hidden ${
+              !isWorkingSkillCollapse ? "h-auto p-6" : "h-0"
+            }`}
+          >
+            <div className="flex flex-col w-full p-2 gap-2">
+              <div className="w-full flex flex-row justify-center items-center">
+                <div className="w-1/5">Thêm</div>
+                <input
+                  className="w-3/5 p-2 border rounded-md"
+                  onChange={(e) => setNewWorkingSkill(e.target.value)}
+                />
+                <div className="w-1/5 px-8 flex flex-row">
+                  <div
+                    className="text-white px-2 bg-blue-500 rounded-sm border hover:cursor-pointer hover:bg-blue-600"
+                    onClick={() => handleWorkingSkill(ActionType.Create)}
+                  >
+                    Thêm
+                  </div>
+                </div>
+              </div>
+              <div className="w-full flex flex-row justify-center items-center">
+                <div className="w-1/5">Chỉnh sửa</div>
+                <select className="w-3/5 p-2 border rounded-md">
+                  {workingSkills.map((skill) => (
+                    <option key={skill.id} value={skill.id}>
+                      {skill.name}
                     </option>
                   ))}
                 </select>

@@ -52,11 +52,29 @@ export const updateAvatar = async (id: string, avatarUrl: string) => {
   return response;
 };
 
+export const deleteAvatar = async (id: string) => {
+  const response: {
+    statusCode: number;
+    payload: UserDetailInformation;
+  } = await $delete(`/users/${id}/delete-avatar`);
+
+  return response;
+};
+
 export const deleteUser = async (id: string) => {
   const response: {
     statusCode: number;
     payload: UserDetailInformation;
   } = await $delete(`/users/${id}`);
+
+  return response;
+};
+
+export const searchUser = async (query: string) => {
+  const response: {
+    statusCode: number;
+    payload: UserDetailInformation[];
+  } = await $get(`/users/search?query=${query}`);
 
   return response;
 };

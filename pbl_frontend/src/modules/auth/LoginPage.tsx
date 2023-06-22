@@ -76,6 +76,11 @@ const LoginPage: React.FunctionComponent = () => {
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                     setEmail(event.target.value);
                   }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      onLogin();
+                    }
+                  }}
                 />
               </div>
             </div>

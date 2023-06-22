@@ -153,8 +153,6 @@ export const defaultUserInfo: UserDetailInformation = {
   id: "",
   email: "",
   fullName: "",
-  firstName: "",
-  lastName: "",
   gender: "",
   dateOfBirth: new Date(),
   phoneNumber: "",

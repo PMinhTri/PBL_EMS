@@ -22,3 +22,10 @@ export enum ActionType {
   Edit = "Edit",
   Delete = "Delete",
 }
+
+export enum LeaveStatus {
+  Pending = "Chờ duyệt",
+  Approved = "Đã duyệt",
+  Rejected = "Đã từ chối",
+  Cancelled = "Đã hủy",
+}
