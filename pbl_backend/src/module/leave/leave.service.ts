@@ -617,12 +617,6 @@ export class LeaveService {
       };
     }
 
-    if (filterOptions?.status) {
-      where.status = {
-        in: filterOptions.status,
-      };
-    }
-
     return this.prisma.leaveRequest.findMany({
       where,
       include: {

@@ -22,3 +22,12 @@ export type UserInformation = {
     name: string;
   };
 };
+
+export type FilterQuery = {
+  gender?: string;
+  jobTitleId?: string;
+  departmentId?: string;
+  contractId?: string;
+  employeeStatus?: string;
+  educationId?: string;
+};

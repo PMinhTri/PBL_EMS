@@ -48,14 +48,14 @@ const EmployeeFilter: React.FunctionComponent<Props> = (props: Props) => {
       setJobTitleOptions([
         ...jobTitles.map((item) => ({
           label: item.name,
-          value: item.name,
+          value: item.id,
         })),
       ]);
 
       setDepartmentOptions([
         ...departments.map((item) => ({
           label: item.name,
-          value: item.name,
+          value: item.id,
         })),
       ]);
     };

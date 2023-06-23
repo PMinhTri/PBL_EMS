@@ -21,11 +21,11 @@ export const getUserById = async (id: string) => {
   return response;
 };
 
-export const getAllEmployees = async () => {
+export const getAllEmployees = async (query?: string) => {
   const response: {
     statusCode: number;
     payload: UserDetailInformation[];
-  } = await $get(`/users`);
+  } = query ? await $get(`/users?${query}`) : await $get(`/users`);
   return response;
 };
 
@@ -66,15 +66,6 @@ export const deleteUser = async (id: string) => {
     statusCode: number;
     payload: UserDetailInformation;
   } = await $delete(`/users/${id}`);
-
-  return response;
-};
-
-export const searchUser = async (query: string) => {
-  const response: {
-    statusCode: number;
-    payload: UserDetailInformation[];
-  } = await $get(`/users/search?query=${query}`);
 
   return response;
 };

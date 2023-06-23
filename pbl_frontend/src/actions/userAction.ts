@@ -3,7 +3,6 @@ import {
   deleteUser,
   getAllEmployees,
   getUserById,
-  searchUser,
   updateAvatar,
   updateUserInformation,
 } from "../api/user";
@@ -42,8 +41,47 @@ export const UserAction = {
     }
   },
 
-  getAllEmployees: async () => {
-    const response = await getAllEmployees();
+  getAllEmployees: async (query?: {
+    search?: string;
+    filter?: {
+      gender?: string;
+      departmentId?: string;
+      jobTitleId?: string;
+    };
+  }) => {
+    let queryParam = "";
+
+    if (query?.search) {
+      queryParam = `search=${query.search}`;
+      if (query?.filter) {
+        if (query?.filter.gender && query?.filter.gender !== "All") {
+          queryParam += `&gender=${query.filter.gender}`;
+        }
+        if (
+          query?.filter.departmentId &&
+          query?.filter.departmentId !== "All"
+        ) {
+          queryParam += `&departmentId=${query.filter.departmentId}`;
+        }
+        if (query?.filter.jobTitleId && query?.filter.jobTitleId !== "All") {
+          queryParam += `&jobTitleId=${query.filter.jobTitleId}`;
+        }
+      }
+    }
+
+    if (query?.filter && !query?.search) {
+      if (query?.filter.gender && query?.filter.gender !== "All") {
+        queryParam += `&gender=${query.filter.gender}`;
+      }
+      if (query?.filter.departmentId && query?.filter.departmentId !== "All") {
+        queryParam += `&departmentId=${query.filter.departmentId}`;
+      }
+      if (query?.filter.jobTitleId && query?.filter.jobTitleId !== "All") {
+        queryParam += `&jobTitleId=${query.filter.jobTitleId}`;
+      }
+    }
+
+    const response = await getAllEmployees(queryParam);
 
     const { payload } = response;
     return payload;
@@ -87,17 +125,6 @@ export const UserAction = {
 
   deleteUser: async (id: string) => {
     const response = await deleteUser(id);
-
-    if (response.statusCode === 200) {
-      const { payload } = response;
-      return payload;
-    }
-
-    handleError(response);
-  },
-
-  search: async (query: string) => {
-    const response = await searchUser(query);
 
     if (response.statusCode === 200) {
       const { payload } = response;

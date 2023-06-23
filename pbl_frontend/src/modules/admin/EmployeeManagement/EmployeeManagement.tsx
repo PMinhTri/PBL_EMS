@@ -1,10 +1,9 @@
 import React from "react";
-import { Button, Input, Modal, Popover, Space } from "antd";
+import { Button, Modal, Popover, Select, Space } from "antd";
 import {
   ArrowDownOutlined,
   ArrowUpOutlined,
   FilterOutlined,
-  SearchOutlined,
   SortAscendingOutlined,
 } from "@ant-design/icons";
 import { UserAction } from "../../../actions/userAction";
@@ -28,14 +27,19 @@ const EmployeeManagement: React.FunctionComponent = () => {
   const [employeeList, setEmployeeList] = React.useState<
     UserDetailInformation[]
   >([]);
-  const [searchText, setSearchText] = React.useState<string>("");
-  const [employeeSearched, setEmployeeSearched] = React.useState<
-    UserDetailInformation[]
-  >([]);
+  const [listSearchData, setListSearchData] = React.useState<string[]>([]);
 
-  const [employeeFiltered, setEmployeeFiltered] = React.useState<
-    UserDetailInformation[]
-  >([]);
+  const [searchQuery, setSearchQuery] = React.useState<string>("");
+
+  const [filterQuery, setFilterQuery] = React.useState<{
+    gender: string;
+    departmentId: string;
+    jobTitleId: string;
+  }>({
+    gender: "",
+    departmentId: "",
+    jobTitleId: "",
+  });
 
   const [newEmployee, setNewEmployee] =
     React.useState<CreateNewUserInformation>({
@@ -58,47 +62,41 @@ const EmployeeManagement: React.FunctionComponent = () => {
   React.useEffect(() => {
     const fetchData = async () => {
       const employees = await UserAction.getAllEmployees();
+      const arr: string[] = [];
 
-      setEmployeeList(employees);
+      for (const employee of employees) {
+        arr.push(employee.fullName);
+        arr.push(employee.email);
+      }
+
+      setListSearchData(arr);
+
+      if (searchQuery !== "") {
+        const queryEmployees = await UserAction.getAllEmployees({
+          search: searchQuery,
+          filter: filterQuery,
+        });
+        setEmployeeList(queryEmployees);
+      } else if (filterQuery) {
+        setEmployeeList(
+          await UserAction.getAllEmployees({
+            filter: filterQuery,
+          })
+        );
+      } else {
+        setEmployeeList(employees);
+      }
       setIsLoading(false);
     };
 
     fetchData();
-  }, []);
-
-  const handleSearchEmployee = async (query: string) => {
-    if (query === "") {
-      setEmployeeSearched([]);
-      return;
-    } else {
-      const searchResult = (await UserAction.search(query)) ?? [];
-
-      if (!searchResult.length) {
-        showNotification("error", "Không tìm thấy nhân viên");
-      } else {
-        setEmployeeSearched(searchResult);
-        console.log(searchResult);
-      }
-    }
-  };
-
-  const handleFilterEmployee = (payload: {
-    gender: string;
-    jobTitle: string;
-    department: string;
-  }) => {
-    const filteredEmployees = employeeList.filter((employee) => {
-      return (
-        (!payload.gender || employee.gender === payload.gender) &&
-        (!payload.jobTitle ||
-          employee.jobInformation?.jobTitle?.name === payload.jobTitle) &&
-        (!payload.department ||
-          employee.jobInformation?.department?.name === payload.department)
-      );
-    });
-
-    setEmployeeFiltered(filteredEmployees);
-  };
+  }, [
+    filterQuery,
+    filterQuery.departmentId,
+    filterQuery.gender,
+    filterQuery.jobTitleId,
+    searchQuery,
+  ]);
 
   const handleCreateNewEmployee = async () => {
     if (
@@ -183,18 +181,6 @@ const EmployeeManagement: React.FunctionComponent = () => {
     window.location.reload();
   };
 
-  const resultEmployeeList = React.useMemo(() => {
-    if (employeeSearched.length) {
-      return employeeSearched;
-    }
-
-    if (employeeFiltered.length) {
-      return employeeFiltered;
-    }
-
-    return employeeList;
-  }, [employeeList, employeeSearched, employeeFiltered]);
-
   return (
     <div className="w-full h-screen flex flex-col">
       <div className="flex w-full h-16 justify-center items-center border-b-[2px]">
@@ -205,7 +191,13 @@ const EmployeeManagement: React.FunctionComponent = () => {
                 placement="bottomRight"
                 content={
                   <EmployeeFilter
-                    onApply={(payload) => handleFilterEmployee(payload)}
+                    onApply={(payload) =>
+                      setFilterQuery({
+                        gender: payload.gender,
+                        departmentId: payload.department,
+                        jobTitleId: payload.jobTitle,
+                      })
+                    }
                   />
                 }
                 title={"Filter"}
@@ -255,29 +247,31 @@ const EmployeeManagement: React.FunctionComponent = () => {
           </div>
           <div>
             <Space.Compact style={{ width: "100%" }}>
-              <Input
-                defaultValue={searchText}
-                onChange={(e) => {
-                  setSearchText(e.target.value);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleSearchEmployee(searchText);
-                  }
+              <Select
+                showSearch
+                style={{ width: 400 }}
+                placeholder="Tìm kiếm"
+                optionFilterProp="children"
+                filterOption={(input, option) =>
+                  (option?.label ?? "").includes(input)
+                }
+                filterSort={(optionA, optionB) =>
+                  (optionA?.label ?? "")
+                    .toLowerCase()
+                    .localeCompare((optionB?.label ?? "").toLowerCase())
+                }
+                options={[
+                  ...listSearchData.map((item) => ({
+                    label: item,
+                    value: item,
+                  })),
+                ]}
+                onChange={(value) => {
+                  if (value === undefined) setSearchQuery("");
+                  setSearchQuery(value.trim());
                 }}
                 allowClear
               />
-              <Button
-                className="bg-blue-600 text-white"
-                type="primary"
-                icon={<SearchOutlined />}
-                size="middle"
-                onClick={() => {
-                  handleSearchEmployee(searchText);
-                }}
-              >
-                Search
-              </Button>
             </Space.Compact>
           </div>
         </div>
@@ -347,7 +341,10 @@ const EmployeeManagement: React.FunctionComponent = () => {
           <table className="w-full border-collapse bg-white text-left text-sm text-gray-500">
             <thead className="bg-gray-200 sticky top-0 z-10">
               <tr>
-                <th scope="col" className="px-6 py-4 font-medium text-gray-900">
+                <th
+                  scope="col"
+                  className="px-6 py-4 w-2 font-medium text-gray-900"
+                >
                   Họ và tên
                 </th>
                 <th scope="col" className="px-6 py-4 font-medium text-gray-900">
@@ -378,7 +375,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 border-t border-gray-100">
-              {resultEmployeeList.map((employee, index) => (
+              {employeeList.map((employee, index) => (
                 <tr key={index} className="hover:bg-gray-50">
                   <th className="flex gap-3 px-6 py-4 font-normal text-gray-900">
                     <div className="relative h-10 w-10">
@@ -405,7 +402,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
                     {employee.jobInformation?.department?.name}
                   </td>
                   <td className="px-6 py-4">{employee.education?.grade}</td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 w-36">
                     <div className="inline-flex items-center gap-1 rounded-sm bg-green-200 px-2 py-2 text-xs font-semibold text-green-600">
                       {employee.jobInformation?.employeeStatus}
                     </div>

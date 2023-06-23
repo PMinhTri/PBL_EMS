@@ -23,8 +23,20 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get()
-  public async getAllUsers(@Res() res: IResponse): Promise<IResponse> {
-    const { result: users } = await this.userService.getAllUsers();
+  public async getAllUsers(
+    @Query('search') search: string,
+    @Query('gender') gender: string,
+    @Query('jobTitleId') jobTitleId: string,
+    @Query('departmentId') departmentId: string,
+    @Query('employeeStatus') employeeStatus: string,
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const { result: users } = await this.userService.getAllUsers(search, {
+      gender,
+      jobTitleId,
+      departmentId,
+      employeeStatus,
+    });
 
     return res.send(SuccessResult(users));
   }
@@ -61,16 +73,6 @@ export class UserController {
     const emails = await this.userService.getAllEmails();
 
     return res.send(SuccessResult(emails));
-  }
-
-  @Get('/search')
-  public async searchUsers(
-    @Query('query') query: string,
-    @Res() res: IResponse,
-  ): Promise<IResponse> {
-    const { result: users } = await this.userService.searchUsers(query);
-
-    return res.send(SuccessResult(users));
   }
 
   @Patch('/:id/update-personal-information')
