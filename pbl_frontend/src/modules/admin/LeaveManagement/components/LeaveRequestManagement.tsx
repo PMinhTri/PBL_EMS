@@ -61,6 +61,9 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
   const [checkAll, setCheckAll] = React.useState(true);
   const [checkedList, setCheckedList] = React.useState<string[]>([]);
 
+  const [isSearchEmployee, setIsSearchEmployee] = React.useState(false);
+  const [searchEmployeeId, setSearchEmployeeId] = React.useState("");
+
   const [openApproveModal, setOpenApproveModal] = React.useState<{
     leaveRequest: LeaveRequest;
     isOpen: boolean;
@@ -149,6 +152,16 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
     }
   }, [checkAll]);
 
+  const listRequestHistory = React.useMemo(() => {
+    if (isSearchEmployee) {
+      return requestHistoryData.filter(
+        (item) => item.userId === searchEmployeeId
+      );
+    }
+
+    return requestHistoryData;
+  }, [isSearchEmployee, requestHistoryData, searchEmployeeId]);
+
   return (
     <div className="w-full mt-3 bg-white p-6 rounded-lg shadow-lg">
       <h2 className="text-xl font-bold mb-4">Quản lý yêu cầu nghỉ phép</h2>
@@ -228,7 +241,7 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
             <Select
               showSearch
               style={{ width: 200 }}
-              placeholder="Search to Select"
+              placeholder="Tên nhân viên"
               optionFilterProp="children"
               filterOption={(input, option) =>
                 (option?.label ?? "").includes(input)
@@ -244,6 +257,14 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
                   value: user.id,
                 })),
               ]}
+              onChange={(value) => {
+                if (value === undefined) {
+                  setIsSearchEmployee(false);
+                  return;
+                }
+                setIsSearchEmployee(true);
+                setSearchEmployeeId(value.toString());
+              }}
               allowClear
             />
           </Space>
@@ -263,7 +284,7 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
               </tr>
             </thead>
             <tbody>
-              {requestHistoryData.map((item, index) => (
+              {listRequestHistory.map((item, index) => (
                 <tr key={index}>
                   <td className="py-3 px-4 text-center border-b">
                     {
