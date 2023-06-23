@@ -15,6 +15,8 @@ import { LeaveRequestDto } from './leave.dto';
 import { NotFoundResult } from 'src/httpResponse';
 import { LeaveFailure } from 'src/enumTypes/failure.enum';
 import { ServiceResponseStatus } from 'src/serviceResponse';
+import { LeaveStatusKey } from 'src/constant/leaveSession.constant';
+import { LeaveStatus } from 'src/enumTypes/leave.enum';
 
 @Controller('leave')
 export class LeaveController {
@@ -44,11 +46,25 @@ export class LeaveController {
   public async getAllLeaveRequest(
     @Query('year') year: number,
     @Query('month') month: number,
+    @Query('status') status: string[],
     @Res() res: IResponse,
   ): Promise<IResponse> {
+    const listStatus =
+      typeof status === 'string'
+        ? [LeaveStatusKey[status as keyof typeof LeaveStatusKey] as LeaveStatus]
+        : status?.map(
+            (item) =>
+              LeaveStatusKey[
+                item as keyof typeof LeaveStatusKey
+              ] as LeaveStatus,
+          );
+
     const leaveRequests = await this.leaveService.getAllLeaveRequest(
       year,
       month,
+      {
+        status: listStatus,
+      },
     );
 
     return res.send(SuccessResult(leaveRequests));

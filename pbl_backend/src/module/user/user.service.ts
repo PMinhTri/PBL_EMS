@@ -393,6 +393,10 @@ export class UserService {
           { citizenId: { contains: query } },
         ],
       },
+      include: {
+        jobInformation: true,
+        education: true,
+      },
     });
 
     if (!users.length) {

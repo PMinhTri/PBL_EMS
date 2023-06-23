@@ -112,11 +112,15 @@ export const rejectLeaveRequest = async (id: string) => {
   return response;
 };
 
-export const getAllLeaveRequest = async (month: number, year: number) => {
+export const getAllLeaveRequest = async (
+  month: number,
+  year: number,
+  filterQuery?: string
+) => {
   const response: {
     statusCode: number;
     payload: LeaveRequest[];
-  } = await $get(`/leave/?month=${month}&year=${year}`);
+  } = await $get(`/leave/?month=${month}&year=${year}&${filterQuery}`);
 
   return response;
 };

@@ -74,9 +74,7 @@ export const RequestForm: React.FunctionComponent = () => {
     }
   }, [startDate, endDate, onSelectSession]);
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     if (!startDate || !endDate || !onSelectSession || !reason) {
       showNotification("warning", "Vui lòng điền đầy đủ thông tin.");
       return;
@@ -103,7 +101,7 @@ export const RequestForm: React.FunctionComponent = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
+    <div className="bg-white border p-6 rounded-lg shadow-lg">
       <h2 className="text-xl font-bold mb-4">Yêu cầu nghỉ phép</h2>
       <form>
         <div className="grid grid-cols-2 gap-4 mb-4">

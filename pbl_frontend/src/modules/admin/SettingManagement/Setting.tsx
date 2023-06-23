@@ -152,6 +152,7 @@ const Setting: React.FunctionComponent = () => {
 
         const response = await WorkingSkillAction.create({
           name: newWorkingSkill,
+          description: "",
         });
 
         if (response) {

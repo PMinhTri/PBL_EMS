@@ -1,6 +1,16 @@
 import React from "react";
 import { BiEdit } from "react-icons/bi";
-import { Button, Modal, Popover, Select, Space } from "antd";
+import {
+  Button,
+  Checkbox,
+  Col,
+  Divider,
+  Modal,
+  Popover,
+  Row,
+  Select,
+  Space,
+} from "antd";
 import showNotification from "../../../../utils/notification";
 import { LeaveAction } from "../../../../actions/leaveAction";
 import {
@@ -12,6 +22,7 @@ import { UserDetailInformation } from "../../../../types/userTypes";
 import ApproveContent from "./ApproveContent";
 import { FilterOutlined } from "@ant-design/icons";
 import { UserAction } from "../../../../actions/userAction";
+import { CheckboxChangeEvent } from "antd/es/checkbox";
 
 const currentYears = Array.from(
   { length: 5 },
@@ -21,6 +32,13 @@ const currentYears = Array.from(
 type Props = {
   employees: UserDetailInformation[];
 };
+
+const checkBoxOptions = [
+  { label: LeaveStatus.Pending, value: "Pending" },
+  { label: LeaveStatus.Approved, value: "Approved" },
+  { label: LeaveStatus.Rejected, value: "Rejected" },
+  { label: LeaveStatus.Cancelled, value: "Cancelled" },
+];
 
 const LeaveRequestManagement: React.FunctionComponent<Props> = (
   props: Props
@@ -33,8 +51,6 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
     new Date().getFullYear()
   );
 
-  // const [leaveStatus, setLeaveStatus] = React.useState<LeaveStatus>();
-
   const [listUser, setListUser] = React.useState<UserDetailInformation[]>([]);
 
   const [requestHistoryData, setRequestHistoryData] = React.useState<
@@ -42,6 +58,8 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
   >([]);
 
   const [leaveType, setLeaveType] = React.useState<LeaveType[]>([]);
+  const [checkAll, setCheckAll] = React.useState(true);
+  const [checkedList, setCheckedList] = React.useState<string[]>([]);
 
   const [openApproveModal, setOpenApproveModal] = React.useState<{
     leaveRequest: LeaveRequest;
@@ -87,11 +105,29 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
     }
   }, []);
 
+  const handleOnSelectCheckBox = React.useCallback((values: string[]) => {
+    if (values.length === 4) {
+      setCheckAll(true);
+    } else {
+      setCheckAll(false);
+    }
+
+    setCheckedList(values);
+  }, []);
+
+  const onCheckAllChange = (e: CheckboxChangeEvent) => {
+    setCheckedList(
+      e.target.checked ? checkBoxOptions.map((option) => option.value) : []
+    );
+    setCheckAll(e.target.checked);
+  };
+
   React.useEffect(() => {
     const fetchDate = async () => {
       const leaveRequests = await LeaveAction.getAllLeaveRequest(
         selectedMonth,
-        selectedYear
+        selectedYear,
+        checkedList
       );
       setListUser(await UserAction.getAllEmployees());
       setLeaveType(await LeaveAction.getAllLeaveType());
@@ -99,7 +135,19 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
     };
 
     fetchDate();
-  }, [selectedMonth, selectedYear, handleRejectRequest, handleApproveRequest]);
+  }, [
+    selectedMonth,
+    selectedYear,
+    handleRejectRequest,
+    handleApproveRequest,
+    checkedList,
+  ]);
+
+  React.useEffect(() => {
+    if (checkAll) {
+      setCheckedList(checkBoxOptions.map((option) => option.value));
+    }
+  }, [checkAll]);
 
   return (
     <div className="w-full mt-3 bg-white p-6 rounded-lg shadow-lg">
@@ -145,16 +193,28 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
             <Popover
               placement="left"
               content={
-                <Select
-                  className="w-full"
-                  options={[
-                    { label: "Tất cả", value: "all" },
-                    { label: LeaveStatus.Approved, value: "approved" },
-                    { label: LeaveStatus.Pending, value: "pending" },
-                    { label: LeaveStatus.Rejected, value: "rejected" },
-                    { label: LeaveStatus.Cancelled, value: "cancelled" },
-                  ]}
-                />
+                <div>
+                  <Checkbox onChange={onCheckAllChange} checked={checkAll}>
+                    Tất cả
+                  </Checkbox>
+                  <Divider />
+                  <Checkbox.Group
+                    value={checkedList}
+                    onChange={(values) => {
+                      handleOnSelectCheckBox(values as string[]);
+                    }}
+                  >
+                    <Row>
+                      {checkBoxOptions.map((option) => (
+                        <Col span={16}>
+                          <Checkbox value={option.value}>
+                            {option.label}
+                          </Checkbox>
+                        </Col>
+                      ))}
+                    </Row>
+                  </Checkbox.Group>
+                </div>
               }
               title={"Trạng thái"}
               trigger={"click"}
@@ -191,7 +251,7 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
       </div>
       <div className="w-full">
         <h2 className="text-xl font-bold mb-4">Lịch sử yêu cầu</h2>
-        <div className="flex border-[2px] max-h-80 overflow-x-auto overflow-y-auto scrollbar">
+        <div className="flex border-[2px] max-h-[400px] overflow-x-auto overflow-y-auto scrollbar">
           <table className="min-w-full border border-gray-300">
             <thead className="bg-gray-200 sticky top-0 z-10">
               <tr>
@@ -259,39 +319,41 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
                       )}
                     </div>
                   </td>
-                  <Modal
-                    title="Duyệt yêu cầu này?"
-                    open={openApproveModal.isOpen}
-                    width={600}
-                    onCancel={() =>
-                      setOpenApproveModal({
-                        leaveRequest: {} as LeaveRequest,
-                        isOpen: false,
-                      })
-                    }
-                    footer={[
-                      <button
-                        onClick={() => handleRejectRequest(item.id)}
-                        className="w-24 ml-2 rounded-md h-8 bg-red-500 hover:bg-red-600 text-white cursor-pointer"
-                      >
-                        Từ chối
-                      </button>,
-                      <button
-                        className="ml-2 w-24 rounded-md h-8 bg-blue-500 hover:bg-blue-600 text-white cursor-pointer"
-                        onClick={() => handleApproveRequest(item.id)}
-                      >
-                        Duyệt
-                      </button>,
-                    ]}
-                  >
-                    <ApproveContent
-                      leaveRequest={openApproveModal.leaveRequest}
-                    />
-                  </Modal>
                 </tr>
               ))}
             </tbody>
           </table>
+          <Modal
+            title="Duyệt yêu cầu này?"
+            open={openApproveModal.isOpen}
+            width={600}
+            onCancel={() =>
+              setOpenApproveModal({
+                leaveRequest: {} as LeaveRequest,
+                isOpen: false,
+              })
+            }
+            footer={[
+              <button
+                onClick={() =>
+                  handleRejectRequest(openApproveModal.leaveRequest.id)
+                }
+                className="w-24 ml-2 rounded-md h-8 bg-red-500 hover:bg-red-600 text-white cursor-pointer"
+              >
+                Từ chối
+              </button>,
+              <button
+                className="ml-2 w-24 rounded-md h-8 bg-blue-500 hover:bg-blue-600 text-white cursor-pointer"
+                onClick={() =>
+                  handleApproveRequest(openApproveModal.leaveRequest.id)
+                }
+              >
+                Duyệt
+              </button>,
+            ]}
+          >
+            <ApproveContent leaveRequest={openApproveModal.leaveRequest} />
+          </Modal>
         </div>
       </div>
     </div>

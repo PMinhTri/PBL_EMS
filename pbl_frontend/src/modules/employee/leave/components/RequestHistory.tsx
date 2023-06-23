@@ -65,7 +65,7 @@ const RequestHistory: React.FunctionComponent<Props> = (props: Props) => {
   };
 
   return (
-    <div className="w-full mt-3 bg-white p-6 rounded-lg shadow-lg">
+    <div className="w-full mt-3 bg-white p-6 border rounded-lg shadow-lg">
       <h2 className="text-xl font-bold mb-4">Lịch sử yêu cầu</h2>
       <table className="min-w-full border border-gray-300">
         <thead className="bg-gray-100">

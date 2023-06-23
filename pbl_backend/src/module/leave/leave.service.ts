@@ -583,27 +583,48 @@ export class LeaveService {
   public async getAllLeaveRequest(
     year: number,
     month?: number,
+    filterOptions?: {
+      status?: LeaveStatus[];
+    },
   ): Promise<LeaveRequest[]> {
     const firstDate = month
       ? new Date(year, month - 1, 1)
       : new Date(year, 0, 1);
     const lastDate = month ? new Date(year, month, 0) : new Date(year, 11, 31);
 
-    return this.prisma.leaveRequest.findMany({
-      where: {
-        AND: [
-          {
-            startDate: {
-              gte: firstDate,
-            },
-          },
-          {
-            endDate: {
-              lte: lastDate,
-            },
-          },
-        ],
+    const where: {
+      startDate: {
+        gte: Date;
+      };
+      endDate: {
+        lte: Date;
+      };
+      status?: {
+        in: string[];
+      };
+    } = {
+      startDate: {
+        gte: firstDate,
       },
+      endDate: {
+        lte: lastDate,
+      },
+    };
+
+    if (filterOptions?.status) {
+      where.status = {
+        in: filterOptions.status,
+      };
+    }
+
+    if (filterOptions?.status) {
+      where.status = {
+        in: filterOptions.status,
+      };
+    }
+
+    return this.prisma.leaveRequest.findMany({
+      where,
       include: {
         leaveType: true,
       },

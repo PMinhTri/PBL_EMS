@@ -3,7 +3,7 @@ import loginImg from "../assets/login.jpg";
 import { Popover, Space } from "antd";
 import { AuthAction } from "../actions/authAction";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { userAuthState, userInfoState } from "../recoil/atoms/user";
+import { userAuthState } from "../recoil/atoms/user";
 import { authState } from "../recoil/atoms/auth";
 import { UserDetailInformation } from "../types/userTypes";
 import { defaultUserInfo } from "../constants/constantVariables";
@@ -16,19 +16,17 @@ enum NavbarOptions {
   Logout = "Đăng xuất",
 }
 
-const SelectContent: React.FunctionComponent = () => {
+type SelectContentProps = {
+  userInfo: UserDetailInformation;
+};
+
+const SelectContent: React.FunctionComponent<SelectContentProps> = (
+  props: SelectContentProps
+) => {
+  const { userInfo } = props;
   const setAuth = useSetRecoilState(authState);
   const user = useRecoilValue(userAuthState);
-  const [userInfo, setUserInfo] =
-    React.useState<UserDetailInformation>(defaultUserInfo);
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      setUserInfo((await UserAction.getUserInfo(user.id)) ?? defaultUserInfo);
-    };
-
-    fetchData();
-  }, [user.id, userInfo]);
   const options =
     user.role === "Admin"
       ? [
@@ -97,17 +95,17 @@ const SelectContent: React.FunctionComponent = () => {
 };
 
 const Navbar: React.FunctionComponent = () => {
-  const user = useRecoilValue(userAuthState);
+  const auth = useRecoilValue(userAuthState);
   const [userInfo, setUserInfo] =
     React.useState<UserDetailInformation>(defaultUserInfo);
 
   React.useEffect(() => {
     const fetchData = async () => {
-      setUserInfo((await UserAction.getUserInfo(user.id)) ?? defaultUserInfo);
+      setUserInfo((await UserAction.getUserInfo(auth.id)) ?? defaultUserInfo);
     };
 
     fetchData();
-  }, [user.id, userInfo]);
+  }, [auth.id]);
 
   return (
     <div className="shadow-md w-full h-12 fixed bg-blue-800 top-0 left-0 z-50">
@@ -116,7 +114,7 @@ const Navbar: React.FunctionComponent = () => {
           className="font-bold text-2xl cursor-pointer flex font-[Poppins] 
         text-white mb-4 md:mb-0"
           onClick={() => {
-            if (user.role === "Admin")
+            if (auth.role === "Admin")
               window.location.href = "/admin/dashboard";
             else window.location.href = "/employee/time-sheet";
           }}
@@ -131,7 +129,7 @@ const Navbar: React.FunctionComponent = () => {
           <Space wrap>
             <Popover
               placement="bottomRight"
-              content={<SelectContent />}
+              content={<SelectContent userInfo={userInfo} />}
               title={"Tài khoản"}
               trigger={"click"}
             >

@@ -13,6 +13,7 @@ import { jobInformationState } from "../../recoil/atoms/jobInformation";
 import { JobInformationAction } from "../../actions/jobInformationAction";
 import { defaultJobInformation } from "../../constants/constantVariables";
 import ChangePassword from "./components/ChangePassword";
+import Loading from "../../components/Loading";
 
 enum ProfileType {
   PERSONAL = "Thông tin cá nhân",
@@ -104,7 +105,7 @@ const Account = () => {
       <Navbar />
       <ContentWrapper>
         {isLoading ? (
-          <div>...loading</div>
+          <Loading />
         ) : (
           <div className="m-2 grid grid-cols-4 gap-4 mt-4 w-full">
             <div className="col-span-3 flex flex-col justify-center items-center gap-2">

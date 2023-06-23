@@ -111,8 +111,16 @@ export const LeaveAction = {
     handleError(response);
   },
 
-  getAllLeaveRequest: async (month: number, year: number) => {
-    const response = await getAllLeaveRequest(month, year);
+  getAllLeaveRequest: async (
+    month: number,
+    year: number,
+    filter?: string[]
+  ) => {
+    const filterQuery = filter?.length
+      ? `status=${filter.join("&status=")}`
+      : "";
+
+    const response = await getAllLeaveRequest(month, year, filterQuery);
 
     return response.payload;
   },
