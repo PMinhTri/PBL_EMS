@@ -267,6 +267,7 @@ export class UserService {
             id: true,
             joinDate: true,
             employeeStatus: true,
+            contractId: true,
             contractType: {
               select: {
                 type: true,
@@ -274,11 +275,13 @@ export class UserService {
             },
             contractStartDate: true,
             contractEndDate: true,
+            jobTitleId: true,
             jobTitle: {
               select: {
                 name: true,
               },
             },
+            departmentId: true,
             department: {
               select: {
                 name: true,
@@ -286,6 +289,7 @@ export class UserService {
             },
             workingSkill: {
               select: {
+                id: true,
                 name: true,
                 description: true,
               },
