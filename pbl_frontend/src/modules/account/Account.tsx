@@ -113,7 +113,7 @@ const Account = () => {
                 <div className="flex items-center">
                   <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 mr-4">
                     <img
-                      src={userInfo.avatar || avatar}
+                      src={avatar || userInfo.avatar}
                       alt="avatar"
                       className="w-full h-full object-cover"
                     />

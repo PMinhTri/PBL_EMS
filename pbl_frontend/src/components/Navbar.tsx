@@ -16,16 +16,20 @@ enum NavbarOptions {
   Logout = "Đăng xuất",
 }
 
-type SelectContentProps = {
-  userInfo: UserDetailInformation;
-};
-
-const SelectContent: React.FunctionComponent<SelectContentProps> = (
-  props: SelectContentProps
-) => {
-  const { userInfo } = props;
+const SelectContent: React.FunctionComponent = () => {
   const setAuth = useSetRecoilState(authState);
   const user = useRecoilValue(userAuthState);
+
+  const [userInfo, setUserInfo] =
+    React.useState<UserDetailInformation>(defaultUserInfo);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      setUserInfo((await UserAction.getUserInfo(user.id)) ?? defaultUserInfo);
+    };
+
+    fetchData();
+  }, [user.id]);
 
   const options =
     user.role === "Admin"
@@ -129,7 +133,7 @@ const Navbar: React.FunctionComponent = () => {
           <Space wrap>
             <Popover
               placement="bottomRight"
-              content={<SelectContent userInfo={userInfo} />}
+              content={<SelectContent />}
               title={"Tài khoản"}
               trigger={"click"}
             >
