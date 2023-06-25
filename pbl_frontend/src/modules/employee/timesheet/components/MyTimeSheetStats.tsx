@@ -5,41 +5,16 @@ import {
   BsCalendarPlus,
   BsCalendarX,
 } from "react-icons/bs";
-import { TimeSheetAction } from "../../../../actions/timeSheetAction";
-import { useRecoilValue } from "recoil";
-import userSelector from "../../../../recoil/selectors/user";
 import { LeaveRequest } from "../../../../types/leaveTypes";
-import { LeaveAction } from "../../../../actions/leaveAction";
 
-const MyTimeSheetStats: React.FunctionComponent = () => {
-  const [currentDate, setCurrentDate] = React.useState<Date>(new Date());
-  const [totalWorkload, setTotalWorkload] = React.useState<number>(0);
-  const [overtimeWorkload, setOvertimeWorkload] = React.useState<number>(0);
-  const { userAuthInfo } = useRecoilValue(userSelector);
-  const [leaveRequest, setLeaveRequest] = React.useState<LeaveRequest[]>([]);
+type Props = {
+  totalWorkload: number;
+  overtimeWorkload: number;
+  leaveRequest: LeaveRequest[];
+};
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      const month = currentDate.getMonth() + 1;
-      const year = currentDate.getFullYear();
-
-      const workload = await TimeSheetAction.totalWorkload(
-        userAuthInfo.id,
-        month,
-        year
-      );
-
-      setLeaveRequest(
-        (await LeaveAction.getAllLeaveRequestByUserId(userAuthInfo.id)) ?? []
-      );
-      setOvertimeWorkload(
-        await TimeSheetAction.getOvertimeWorkLoad(userAuthInfo.id, month, year)
-      );
-      setTotalWorkload(workload);
-    };
-    fetchData();
-  }, [currentDate, userAuthInfo.id]);
-
+const MyTimeSheetStats: React.FunctionComponent<Props> = (props: Props) => {
+  const { totalWorkload, overtimeWorkload, leaveRequest } = props;
   return (
     <div className="grid grid-cols-4 gap-4">
       <div className="flex flex-col w-full h-32 bg-white border shadow-md rounded-md">

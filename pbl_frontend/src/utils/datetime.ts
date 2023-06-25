@@ -117,7 +117,7 @@ export const getPastDatesWithinYear = (
   const totalDays = dayjs(currentDate).diff(startDate, "day") + 1;
   const pastDates: string[] = [];
 
-  for (let i = 0; i < totalDays; i++) {
+  for (let i = 1; i < totalDays; i++) {
     const date = dayjs(currentDate).subtract(i, "day");
     if (weekend) {
       if (date.day() === 6 || date.day() === 0) {
