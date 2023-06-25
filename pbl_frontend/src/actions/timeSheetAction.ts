@@ -8,16 +8,23 @@ import {
 } from "../api/timeSheet";
 import { TimeSheetPayload } from "../types/timeSheet";
 import { handleError } from "../utils/errorHandler";
+import showNotification from "../utils/notification";
 
 export const TimeSheetAction = {
   create: async (timeSheet: TimeSheetPayload) => {
     const response = await createTimeSheet(timeSheet);
 
     if (response.statusCode === 200) {
+      showNotification("success", "Đã thực hiện chấm công!");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
       return response.payload;
     }
 
     handleError(response);
+
+    return;
   },
 
   getByUser: async (userId: string, month: number, year: number) => {

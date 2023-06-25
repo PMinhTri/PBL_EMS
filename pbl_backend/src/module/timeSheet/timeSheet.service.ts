@@ -9,6 +9,7 @@ import { TimeSheet } from '@prisma/client';
 import { TimeSheetFailure } from 'src/enumTypes/failure.enum';
 import { TimeSheetDto } from './timeSheet.dto';
 import * as dayjs from 'dayjs';
+import { timeSheetStatus } from 'src/enumTypes/timeSheet.enum';
 
 @Injectable()
 export class TimeSheetService {
@@ -52,7 +53,7 @@ export class TimeSheetService {
     });
 
     if (existingTimeSheet) {
-      if (existingTimeSheet.status === 'Đã chấm') {
+      if (existingTimeSheet.status === timeSheetStatus.Submitted) {
         return {
           status: ServiceResponseStatus.Failed,
           failure: {

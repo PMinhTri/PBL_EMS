@@ -14,6 +14,7 @@ export enum SessionDate {
   Morning = "Sáng",
   Afternoon = "Chiều",
   FullDay = "Cả ngày",
+  Night = "Tối",
 }
 
 export enum ActionType {
@@ -28,4 +29,11 @@ export enum LeaveStatus {
   Approved = "Đã duyệt",
   Rejected = "Đã từ chối",
   Cancelled = "Đã hủy",
+}
+
+export enum TimeSheetStatus {
+  Submitted = "Đã chấm công",
+  Unsubmitted = "Chưa chấm công",
+  LeaveWithoutRequest = "Nghỉ không phép",
+  LeaveWithRequest = "Nghỉ có phép",
 }

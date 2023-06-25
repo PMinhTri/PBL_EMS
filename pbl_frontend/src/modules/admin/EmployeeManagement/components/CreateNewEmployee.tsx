@@ -3,7 +3,7 @@ import { Input, Select } from "antd";
 import { Role } from "../../../../types/roleTypes";
 import { RoleAction } from "../../../../actions/roleAction";
 import { CreateNewUserInformation } from "../../../../types/userTypes";
-import { EmployeeStatus, Gender } from "../../../../constants/enum";
+import { EmployeeStatus } from "../../../../constants/enum";
 import {
   employeeStatusOptions,
   genderOptions,

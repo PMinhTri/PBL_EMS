@@ -35,7 +35,7 @@ export class TimeSheetController {
         case 'TIME_SHEET_ALREADY_EXISTS':
           return res.send(
             BadRequestResult({
-              message: 'Đã chấm công!',
+              message: 'Đã thực hiện chấm công!',
             }),
           );
       }

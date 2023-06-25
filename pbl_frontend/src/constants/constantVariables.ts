@@ -136,6 +136,7 @@ export const Session: Record<SessionDate, number> = {
   [SessionDate.FullDay]: 1,
   [SessionDate.Morning]: 0.5,
   [SessionDate.Afternoon]: 0.5,
+  [SessionDate.Night]: 0.5,
 };
 
 export const defaultRequest: LeaveRequest = {

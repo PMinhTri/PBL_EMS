@@ -12,7 +12,6 @@ import { UserModule } from './module/user/user.module';
 import { RoleModule } from './module/role/role.module';
 import { RolesGuard } from './module/role/role.guard';
 import { JobInformationModule } from './module/jobInformation/jobInformation.module';
-import { ProjectModule } from './module/project/project.module';
 import { JobTitleModule } from './module/jobTitle/jobTitle.module';
 import { DepartmentModule } from './module/department/department.module';
 import { PayrollModule } from './module/payroll/payroll.module';
@@ -30,7 +29,6 @@ import { ContractModule } from './module/contract/contract.module';
     JobTitleModule,
     PayrollModule,
     DepartmentModule,
-    ProjectModule,
     LeaveModule,
     TimeSheetModule,
     MailModule,

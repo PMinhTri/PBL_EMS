@@ -2,14 +2,14 @@ import React from "react";
 
 const Dashboard: React.FunctionComponent = () => {
   return (
-    <div className="w-full h-full flex flex-col overflow-auto p-4">
-      <div className="w-full h-screen bg-gray-200 overflow-auto scrollbar rounded-md">
-        <div className="relative pt-16 pb-32 bg-blueGray-500">
+    <div className="w-full h-full flex flex-col overflow-auto p-4 bg-gray-200">
+      <div className="w-full h-screen bg-white overflow-auto scrollbar rounded-md">
+        <div className="relative pt-8 pb-32 bg-blueGray-500">
           <div className="px-4 md:px-6 mx-auto w-full">
             <div>
               <div className="flex flex-wrap">
                 <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
-                  <div className="relative flex flex-col min-w-0 break-words bg-white rounded-lg mb-6 xl:mb-0 shadow-lg">
+                  <div className="relative flex flex-col min-w-0 break-words bg-white border rounded-lg mb-6 xl:mb-0 shadow-lg">
                     <div className="flex-auto p-4">
                       <div className="flex flex-wrap">
                         <div className="relative w-full pr-4 max-w-full flex-grow flex-1">
@@ -36,7 +36,7 @@ const Dashboard: React.FunctionComponent = () => {
                   </div>
                 </div>
                 <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
-                  <div className="relative flex flex-col min-w-0 break-words bg-white rounded-lg mb-6 xl:mb-0 shadow-lg">
+                  <div className="relative flex flex-col min-w-0 break-words bg-white border rounded-lg mb-6 xl:mb-0 shadow-lg">
                     <div className="flex-auto p-4">
                       <div className="flex flex-wrap">
                         <div className="relative w-full pr-4 max-w-full flex-grow flex-1">
@@ -63,12 +63,12 @@ const Dashboard: React.FunctionComponent = () => {
                   </div>
                 </div>
                 <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
-                  <div className="relative flex flex-col min-w-0 break-words bg-white rounded-lg mb-6 xl:mb-0 shadow-lg">
+                  <div className="relative flex flex-col min-w-0 break-words bg-white border rounded-lg mb-6 xl:mb-0 shadow-lg">
                     <div className="flex-auto p-4">
                       <div className="flex flex-wrap">
                         <div className="relative w-full pr-4 max-w-full flex-grow flex-1">
                           <h5 className="text-blueGray-400 uppercase font-bold text-xs">
-                            SALES
+                            Vắng hôm nay
                           </h5>
                           <span className="font-bold text-xl">924</span>
                         </div>
@@ -90,12 +90,12 @@ const Dashboard: React.FunctionComponent = () => {
                   </div>
                 </div>
                 <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
-                  <div className="relative flex flex-col min-w-0 break-words bg-white rounded-lg mb-6 xl:mb-0 shadow-lg">
+                  <div className="relative flex flex-col min-w-0 break-words bg-white border rounded-lg mb-6 xl:mb-0 shadow-lg">
                     <div className="flex-auto p-4">
                       <div className="flex flex-wrap">
                         <div className="relative w-full pr-4 max-w-full flex-grow flex-1">
                           <h5 className="text-blueGray-400 uppercase font-bold text-xs">
-                            PERFORMANCE
+                            Tổng lương tháng này
                           </h5>
                           <span className="font-bold text-xl">49,65%</span>
                         </div>
