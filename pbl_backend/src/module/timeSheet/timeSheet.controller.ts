@@ -93,6 +93,29 @@ export class TimeSheetController {
     return res.send(SuccessResult(result));
   }
 
+  @Get('workload/all')
+  public async getAllWorkloadInMonth(
+    @Query('month') month: number,
+    @Query('year') year: number,
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const { result, status } =
+      await this.timeSheetService.getAllTotalWorkloadOfAllUser(
+        Number(month),
+        Number(year),
+      );
+
+    if (status === ServiceResponseStatus.Failed) {
+      return res.send(
+        BadRequestResult({
+          message: 'Không tìm thấy thông tin chấm công!',
+        }),
+      );
+    }
+
+    return res.send(SuccessResult(result));
+  }
+
   @Get('overtime')
   public async getOvertimeByUserIdAndMonth(
     @Query('userId') userId: string,
@@ -105,6 +128,29 @@ export class TimeSheetController {
       Number(month),
       Number(year),
     );
+
+    if (status === ServiceResponseStatus.Failed) {
+      return res.send(
+        BadRequestResult({
+          message: 'Không tìm thấy thông tin chấm công!',
+        }),
+      );
+    }
+
+    return res.send(SuccessResult(result));
+  }
+
+  @Get('overtime/all/total')
+  public async getAllTotalOvertimeOfAllUser(
+    @Query('month') month: number,
+    @Query('year') year: number,
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const { result, status } =
+      await this.timeSheetService.getAllTotalOvertimeOfAllUser(
+        Number(month),
+        Number(year),
+      );
 
     if (status === ServiceResponseStatus.Failed) {
       return res.send(

@@ -9,6 +9,8 @@ import userSelector from "../../../../recoil/selectors/user";
 import { LeaveRequest, LeaveStatus } from "../../../../types/leaveTypes";
 import { LeaveAction } from "../../../../actions/leaveAction";
 import { BiEdit, BiReset } from "react-icons/bi";
+import { Modal } from "antd";
+import { isWeekend } from "../../../../utils/datetime";
 
 const currentYears = Array.from(
   { length: 5 },
@@ -31,16 +33,43 @@ const TimeSheetTable: React.FunctionComponent = () => {
 
   const [timeSheets, setTimeSheets] = React.useState<TimeSheet[]>([]);
 
+  const [overtimes, setOvertimes] = React.useState<TimeSheet[]>([]);
+
+  const [openModal, setOpenModal] = React.useState<boolean>(false);
+
+  const [allWorkload, setAllWorkload] = React.useState<
+    {
+      userId: string;
+      totalWorkload: number;
+    }[]
+  >([]);
+
+  const [allOvertime, setAllOvertime] = React.useState<
+    {
+      userId: string;
+      totalOvertime: number;
+    }[]
+  >([]);
+
   React.useEffect(() => {
     const fetchData = async () => {
       const employees = await UserAction.getAllEmployees();
       setTimeSheets(
         await TimeSheetAction.getAllInMonth(selectedMonth, selectedYear)
       );
+      setOvertimes(
+        await TimeSheetAction.getAllOvertime(selectedMonth, selectedYear)
+      );
       setLeaveRequests(
         await LeaveAction.getAllLeaveRequest(selectedMonth, selectedYear)
       );
       setEmployeeList(employees);
+      setAllWorkload(
+        await TimeSheetAction.getAllTotalWorkload(selectedMonth, selectedYear)
+      );
+      setAllOvertime(
+        await TimeSheetAction.getAllTotalOvertime(selectedMonth, selectedYear)
+      );
     };
 
     fetchData();
@@ -52,9 +81,21 @@ const TimeSheetTable: React.FunctionComponent = () => {
   };
 
   const getWorkLoadValue = (userId: string, day: number) => {
-    const value = timeSheets.find(
-      (timeSheet) => timeSheet.userId === userId && timeSheet.date === day
-    )?.hoursWorked;
+    const value = timeSheets
+      .filter(
+        (timeSheet) => timeSheet.userId === userId && timeSheet.date === day
+      )
+      .reduce((acc, curr) => acc + curr.hoursWorked, 0);
+
+    return value ? value / 8 : 0;
+  };
+
+  const getOvertimeValue = (userId: string, day: number) => {
+    const value = overtimes
+      .filter((ovetime) => ovetime.userId === userId && ovetime.date === day)
+      .reduce((acc, curr) => acc + curr.hoursWorked, 0);
+
+    console.log(value);
 
     return value ? value / 8 : 0;
   };
@@ -129,10 +170,10 @@ const TimeSheetTable: React.FunctionComponent = () => {
 
               if (dayOfWeek === 0) {
                 // Sunday (CN) - Apply purple color
-                dayClass += " bg-blue-300";
+                dayClass += " bg-blue-500";
               } else if (dayOfWeek === 6) {
                 // Saturday (Th.7) - Apply blue color
-                dayClass += " bg-blue-300";
+                dayClass += " bg-blue-500";
               } else {
                 dayClass += " bg-white";
               }
@@ -178,26 +219,35 @@ const TimeSheetTable: React.FunctionComponent = () => {
                   const date = new Date(selectedYear, selectedMonth - 1, day);
                   const dayOfWeek = date.getDay();
                   let inputClass =
-                    "flex border w-12 justify-center items-center";
+                    "flex border w-12 justify-center items-center hover:cursor-pointer";
 
                   if (dayOfWeek === 0) {
                     // Sunday (CN) - Apply specific styles
-                    inputClass += " bg-blue-300";
+                    inputClass += " bg-blue-500 hover:bg-blue-600";
                   } else if (dayOfWeek === 6) {
                     // Saturday (Th.7) - Apply specific styles
-                    inputClass += " bg-blue-300";
+                    inputClass += " bg-blue-500 hover:bg-blue-600";
+                  } else {
+                    inputClass += " bg-white hover:bg-gray-100";
                   }
 
                   return (
-                    <div key={day} className={inputClass}>
-                      {getWorkLoadValue(employee.id, day)}
+                    <div
+                      key={day}
+                      className={inputClass}
+                      onClick={() => setOpenModal(true)}
+                    >
+                      {isWeekend(date)
+                        ? getOvertimeValue(employee.id, day)
+                        : getWorkLoadValue(employee.id, day)}
                     </div>
                   );
                 })}
                 <div className="flex border w-28 justify-center items-center">
-                  {timeSheets
-                    .filter((timeSheet) => timeSheet.userId === employee.id)
-                    .reduce((acc, curr) => acc + curr.hoursWorked, 0) / 8}
+                  {
+                    allWorkload.find((sheet) => sheet.userId === employee.id)
+                      ?.totalWorkload
+                  }
                 </div>
                 <div className="flex border w-28 justify-center items-center">
                   {leaveRequests
@@ -208,7 +258,12 @@ const TimeSheetTable: React.FunctionComponent = () => {
                     )
                     .reduce((acc, curr) => acc + curr.leaveDays, 0)}
                 </div>
-                <div className="flex border w-28 justify-center items-center"></div>
+                <div className="flex border w-28 justify-center items-center">
+                  {
+                    allOvertime.find((sheet) => sheet.userId === employee.id)
+                      ?.totalOvertime
+                  }
+                </div>
                 <div className="flex border w-28 justify-center items-center">
                   {
                     <div className="w-full flex flex-row gap-2 justify-center items-center">
@@ -226,6 +281,9 @@ const TimeSheetTable: React.FunctionComponent = () => {
           ))}
         </div>
       </div>
+      <Modal open={openModal} onCancel={() => setOpenModal(false)}>
+        {"THIS WILL OPEN"}
+      </Modal>
     </div>
   );
 };

@@ -19,7 +19,7 @@ const TimeSheetPage: React.FunctionComponent = () => {
       const month = currentDate.getMonth() + 1;
       const year = currentDate.getFullYear();
 
-      const workload = await TimeSheetAction.totalWorkload(
+      const workload = await TimeSheetAction.getTotalWorkload(
         userAuthInfo.id,
         month,
         year

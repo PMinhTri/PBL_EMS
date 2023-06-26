@@ -79,7 +79,37 @@ export const getAllOvertimeInMonth = async (month: number, year: number) => {
   const response: {
     statusCode: number;
     payload: TimeSheet[];
-  } = await $get(`/time-sheet/overtime/all?month=${month}&year=${year}`);
+  } = await $get(`/time-sheet/overtime/all/?month=${month}&year=${year}`);
+
+  return response;
+};
+
+export const getAllTotalWorkloadOfAllUser = async (
+  month: number,
+  year: number
+) => {
+  const response: {
+    statusCode: number;
+    payload: {
+      userId: string;
+      totalWorkload: number;
+    }[];
+  } = await $get(`/time-sheet/workload/all?month=${month}&year=${year}`);
+
+  return response;
+};
+
+export const getAllTotalOvertimeOfAllUser = async (
+  month: number,
+  year: number
+) => {
+  const response: {
+    statusCode: number;
+    payload: {
+      userId: string;
+      totalOvertime: number;
+    }[];
+  } = await $get(`/time-sheet/overtime/all/total/?month=${month}&year=${year}`);
 
   return response;
 };

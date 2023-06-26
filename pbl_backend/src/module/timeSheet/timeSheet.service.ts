@@ -175,6 +175,118 @@ export class TimeSheetService {
     };
   }
 
+  public async getAllTotalWorkloadOfAllUser(
+    month: number,
+    year: number,
+  ): Promise<
+    ServiceResponse<
+      {
+        userId: string;
+        totalWorkload: number;
+      }[],
+      ServiceFailure<TimeSheetFailure>
+    >
+  > {
+    const timeSheets = await this.prisma.timeSheet.findMany({
+      where: {
+        overtime: false,
+        month: month,
+        year: year,
+      },
+    });
+
+    const users = await this.prisma.user.findMany({});
+
+    if (!timeSheets) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: TimeSheetFailure.TIME_SHEET_NOT_FOUND,
+        },
+      };
+    }
+
+    const totalWorkloadOfAllUser: {
+      userId: string;
+      totalWorkload: number;
+    }[] = [];
+
+    for (const user of users) {
+      const totalWorkload = timeSheets.reduce((acc, curr) => {
+        if (curr.userId === user.id) {
+          return acc + curr.hoursWorked;
+        }
+        return acc;
+      }, 0);
+
+      totalWorkloadOfAllUser.push({
+        userId: user.id,
+        totalWorkload: totalWorkload / 8,
+      });
+    }
+
+    return {
+      status: ServiceResponseStatus.Success,
+      result: totalWorkloadOfAllUser,
+    };
+  }
+
+  public async getAllTotalOvertimeOfAllUser(
+    month: number,
+    year: number,
+  ): Promise<
+    ServiceResponse<
+      {
+        userId: string;
+        totalOvertime: number;
+      }[],
+      ServiceFailure<TimeSheetFailure>
+    >
+  > {
+    const timeSheets = await this.prisma.timeSheet.findMany({
+      where: {
+        overtime: true,
+        month: month,
+        year: year,
+      },
+    });
+
+    const users = await this.prisma.user.findMany({});
+
+    if (!timeSheets) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: TimeSheetFailure.TIME_SHEET_NOT_FOUND,
+        },
+      };
+    }
+
+    const totalOvertimeOfAllUser: {
+      userId: string;
+      totalOvertime: number;
+    }[] = [];
+
+    for (const user of users) {
+      const totalOvertime = timeSheets.reduce((acc, curr) => {
+        if (curr.userId === user.id) {
+          return acc + curr.hoursWorked;
+        }
+        return acc;
+      }, 0);
+
+      totalOvertimeOfAllUser.push({
+        userId: user.id,
+        totalOvertime: totalOvertime / 8,
+      });
+    }
+
+    return {
+      status: ServiceResponseStatus.Success,
+      result: totalOvertimeOfAllUser,
+    };
+  }
+
   public async totalOvertimeOfUser(
     userId: string,
     month: number,
