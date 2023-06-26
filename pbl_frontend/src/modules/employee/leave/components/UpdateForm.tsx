@@ -84,9 +84,7 @@ const UpdateRequest: React.FunctionComponent<Props> = (props: Props) => {
     }
   }, [startDate, endDate, onSelectSession]);
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     if (!startDate || !endDate || !onSelectSession || !reason) {
       showNotification("warning", "Vui lòng điền đầy đủ thông tin.");
       return;
@@ -287,31 +285,31 @@ const UpdateRequest: React.FunctionComponent<Props> = (props: Props) => {
             required
           />
         </div>
-        {isUpdate && (
-          <div className="flex gap-1 flex-row">
-            <button
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-              onClick={handleSubmit}
-            >
-              Cập nhật
-            </button>
-            <button
-              className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
-              onClick={() => setIsUpdate(false)}
-            >
-              Hủy
-            </button>
-          </div>
-        )}
-        {!isUpdate && (
+      </form>
+      {isUpdate && (
+        <div className="flex gap-1 flex-row">
           <button
             className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-            onClick={() => setIsUpdate(true)}
+            onClick={handleSubmit}
           >
-            Chỉnh sửa
+            Cập nhật
           </button>
-        )}
-      </form>
+          <button
+            className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+            onClick={() => setIsUpdate(false)}
+          >
+            Hủy
+          </button>
+        </div>
+      )}
+      {!isUpdate && (
+        <button
+          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+          onClick={() => setIsUpdate(true)}
+        >
+          Chỉnh sửa
+        </button>
+      )}
     </div>
   );
 };

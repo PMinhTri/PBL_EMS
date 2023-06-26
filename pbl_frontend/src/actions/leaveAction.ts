@@ -41,7 +41,7 @@ export const LeaveAction = {
 
       setTimeout(() => {
         window.location.reload();
-      }, 2000);
+      }, 1000);
       return response.payload;
     }
 
@@ -50,16 +50,6 @@ export const LeaveAction = {
 
   updateLeaveRequest: async (id: string, payload: LeaveRequestPayload) => {
     const response = await updateLeaveRequest(id, payload);
-
-    if (response.statusCode === 200) {
-      return response.payload;
-    }
-
-    handleError(response);
-  },
-
-  getLeaveRequestsByUser: async (userId: string) => {
-    const response = await getLeaveRequestsByUser(userId);
 
     if (response.statusCode === 200) {
       return response.payload;
@@ -78,8 +68,12 @@ export const LeaveAction = {
     return response.payload;
   },
 
-  getAllLeaveRequestByUserId: async (userId: string) => {
-    const response = await getLeaveRequestsByUser(userId);
+  getAllLeaveRequestByUserId: async (
+    userId: string,
+    month: number,
+    year: number
+  ) => {
+    const response = await getLeaveRequestsByUser(userId, month, year);
 
     if (response.statusCode === 200) {
       return response.payload;

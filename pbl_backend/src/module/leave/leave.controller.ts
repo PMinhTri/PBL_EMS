@@ -336,13 +336,18 @@ export class LeaveController {
   @Get('/user/')
   public async getLeaveRequestByUserId(
     @Query('userId') userId: string,
+    @Query('year') year: number,
+    @Query('month') month: number,
     @Res() res: IResponse,
   ): Promise<IResponse> {
     const {
       result: leaveRequest,
       status,
       failure,
-    } = await this.leaveService.getLeaveRequestByUserId(userId);
+    } = await this.leaveService.getLeaveRequestByUserId(userId, {
+      year,
+      month,
+    });
 
     if (status === 'Failed') {
       switch (failure.reason) {

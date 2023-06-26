@@ -315,7 +315,7 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
                   </td>
                   <td className={`py-3 px-4 text-center border-b`}>
                     <div
-                      className={`inline-flex items-center gap-1 rounded-sm
+                      className={`inline-flex items-center justify-center gap-1 w-24 rounded-sm
                     px-2 py-2 text-xs font-semibold ${
                       item.status === LeaveStatus.Pending &&
                       "bg-blue-200 text-blue-600"

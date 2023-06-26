@@ -26,7 +26,11 @@ const TimeSheetPage: React.FunctionComponent = () => {
       );
 
       setLeaveRequest(
-        (await LeaveAction.getAllLeaveRequestByUserId(userAuthInfo.id)) ?? []
+        (await LeaveAction.getAllLeaveRequestByUserId(
+          userAuthInfo.id,
+          month,
+          year
+        )) ?? []
       );
       setOvertimeWorkload(
         await TimeSheetAction.getOvertimeWorkLoad(userAuthInfo.id, month, year)

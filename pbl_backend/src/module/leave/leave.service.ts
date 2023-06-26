@@ -645,12 +645,50 @@ export class LeaveService {
 
   public async getLeaveRequestByUserId(
     userId: string,
+    options?: {
+      year?: number;
+      month?: number;
+    },
   ): Promise<ServiceResponse<LeaveRequest[], ServiceFailure<LeaveFailure>>> {
+    const firstDateOfMonth = dayjs(
+      `${options?.year || dayjs().year()}-${
+        options?.month || dayjs().month() + 1
+      }`,
+      'YYYY-MM',
+    )
+      .startOf('month')
+      .toDate();
+
+    const lastDateOfMonth = dayjs(
+      `${options?.year || dayjs().year()}-${
+        options?.month || dayjs().month() + 1
+      }`,
+      'YYYY-MM',
+    )
+      .endOf('month')
+      .toDate();
+
     const existedLeaveRequest = await this.prisma.leaveRequest.findMany({
       where: {
         user: {
           id: userId,
         },
+        AND: [
+          {
+            startDate: {
+              gte: firstDateOfMonth,
+
+              lte: lastDateOfMonth,
+            },
+          },
+          {
+            endDate: {
+              gte: firstDateOfMonth,
+
+              lte: lastDateOfMonth,
+            },
+          },
+        ],
       },
       include: {
         leaveType: true,

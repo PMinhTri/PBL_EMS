@@ -14,13 +14,16 @@ import UpdateRequest from "./UpdateForm";
 import { defaultRequest } from "../../../../constants/constantVariables";
 
 type Props = {
-  userId?: string;
-  month?: number;
-  year: number;
+  userId: string;
 };
 
+const currentYears = Array.from(
+  { length: 5 },
+  (_, index) => new Date().getFullYear() + index
+);
+
 const RequestHistory: React.FunctionComponent<Props> = (props: Props) => {
-  const { userId, month, year } = props;
+  const { userId } = props;
   const [requestHistoryData, setRequestHistoryData] = React.useState<
     LeaveRequest[]
   >([]);
@@ -32,23 +35,30 @@ const RequestHistory: React.FunctionComponent<Props> = (props: Props) => {
     isOpen: false,
     item: defaultRequest,
   });
+  const [selectedMonth, setSelectedMonth] = React.useState<number>(
+    new Date().getMonth() + 1
+  );
+  const [selectedYear, setSelectedYear] = React.useState<number>(
+    new Date().getFullYear()
+  );
 
   const [isOpenCancelModal, setIsOpenCancelModal] = React.useState(false);
 
   React.useEffect(() => {
     const fetchDate = async () => {
       const leaveRequests = userId
-        ? await LeaveAction.getLeaveRequestsByUser(userId)
-        : await LeaveAction.getAllLeaveRequest(
-            month ?? new Date().getMonth() + 1,
-            year
-          );
+        ? await LeaveAction.getAllLeaveRequestByUserId(
+            userId,
+            selectedMonth,
+            selectedYear
+          )
+        : await LeaveAction.getAllLeaveRequest(selectedMonth, selectedYear);
       setLeaveType(await LeaveAction.getAllLeaveType());
       setRequestHistoryData(leaveRequests ?? []);
     };
 
     fetchDate();
-  }, [month, userId, year]);
+  }, [selectedMonth, selectedYear, userId]);
 
   const handleCancelRequest = async (id: string) => {
     try {
@@ -65,8 +75,45 @@ const RequestHistory: React.FunctionComponent<Props> = (props: Props) => {
   };
 
   return (
-    <div className="w-full mt-3 bg-white p-6 border rounded-lg shadow-lg">
+    <div className="w-full mt-3 bg-white p-6 border flex flex-col rounded-lg shadow-lg gap-2">
       <h2 className="text-xl font-bold mb-4">Lịch sử yêu cầu</h2>
+      <div className="w-full flex flex-row gap-2">
+        <div>
+          <label className="mx-2">Năm:</label>
+          <select
+            className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+          >
+            {currentYears.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="mx-2">Tháng:</label>
+          <select
+            className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(Number(e.target.value))}
+          >
+            <option value={1}>1</option>
+            <option value={2}>2</option>
+            <option value={3}>3</option>
+            <option value={4}>4</option>
+            <option value={5}>5</option>
+            <option value={6}>6</option>
+            <option value={7}>7</option>
+            <option value={8}>8</option>
+            <option value={9}>9</option>
+            <option value={10}>10</option>
+            <option value={11}>11</option>
+            <option value={12}>12</option>
+          </select>
+        </div>
+      </div>
       <table className="min-w-full border border-gray-300">
         <thead className="bg-gray-100">
           <tr>

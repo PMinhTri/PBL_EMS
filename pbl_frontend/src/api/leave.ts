@@ -46,11 +46,15 @@ export const updateLeaveRequest = async (
   return response;
 };
 
-export const getLeaveRequestsByUser = async (userId: string) => {
+export const getLeaveRequestsByUser = async (
+  userId: string,
+  month: number,
+  year: number
+) => {
   const response: {
     statusCode: number;
     payload: LeaveRequest[];
-  } = await $get(`/leave/user/?userId=${userId}`);
+  } = await $get(`/leave/user/?userId=${userId}&month=${month}&year=${year}`);
 
   return response;
 };

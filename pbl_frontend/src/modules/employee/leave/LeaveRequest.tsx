@@ -8,7 +8,6 @@ import Footer from "../../../components/Footer";
 
 export const LeaveRequest: React.FunctionComponent = () => {
   const { userAuthInfo } = useRecoilValue(userSelector);
-  const currentYear = new Date().getFullYear();
 
   const componentItems = [
     {
@@ -17,7 +16,7 @@ export const LeaveRequest: React.FunctionComponent = () => {
       value: "Yêu cầu nghỉ phép",
     },
     {
-      component: <RequestHistory userId={userAuthInfo.id} year={currentYear} />,
+      component: <RequestHistory userId={userAuthInfo.id} />,
       key: "requestHistory",
       value: "Lịch sử nghỉ phép",
     },
