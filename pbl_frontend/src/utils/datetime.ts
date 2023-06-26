@@ -183,17 +183,19 @@ export function renderEvent(year: number, timeSheet: TimeSheet[]) {
     }
 
     if (sheet.session === SessionDate.Afternoon) {
-      events.push({
-        title: sheet.session,
-        start: `${formatDate}T13:30:00`,
-        end: `${formatDate}T17:30:00`,
-        extendedProps: {
-          timeIn: sheet.timeIn,
-          status: sheet.status,
-          overTime: sheet.overtime,
-          hoursWorked: sheet.hoursWorked,
-        },
-      });
+      if (sheet.status === TimeSheetStatus.Submitted) {
+        events.push({
+          title: sheet.session,
+          start: `${formatDate}T13:30:00`,
+          end: `${formatDate}T17:30:00`,
+          extendedProps: {
+            timeIn: sheet.timeIn,
+            status: sheet.status,
+            overTime: sheet.overtime,
+            hoursWorked: sheet.hoursWorked,
+          },
+        });
+      }
     }
 
     if (sheet.session === SessionDate.Night) {
@@ -206,6 +208,58 @@ export function renderEvent(year: number, timeSheet: TimeSheet[]) {
           status: sheet.status,
           overTime: sheet.overtime,
           hoursWorked: sheet.hoursWorked,
+        },
+      });
+    }
+
+    if (
+      dayjs(formatDate).isSame(new Date(), "day") &&
+      !(sheet.session === SessionDate.Morning)
+    ) {
+      events.push({
+        title: SessionDate.Morning,
+        start: `${formatDate}T13:30:00`,
+        end: `${formatDate}T17:30:00`,
+        extendedProps: {
+          status: TimeSheetStatus.Unsubmitted,
+        },
+      });
+    } else if (
+      pastDates.includes(formatDate) &&
+      !(sheet.session === SessionDate.Morning)
+    ) {
+      events.push({
+        title: SessionDate.Morning,
+        start: `${formatDate}T13:30:00`,
+        end: `${formatDate}T17:30:00`,
+        extendedProps: {
+          status: TimeSheetStatus.LeaveWithoutRequest,
+        },
+      });
+    }
+
+    if (
+      dayjs(formatDate).isSame(new Date(), "day") &&
+      !(sheet.session === SessionDate.Afternoon)
+    ) {
+      events.push({
+        title: SessionDate.Afternoon,
+        start: `${formatDate}T13:30:00`,
+        end: `${formatDate}T17:30:00`,
+        extendedProps: {
+          status: TimeSheetStatus.Unsubmitted,
+        },
+      });
+    } else if (
+      pastDates.includes(formatDate) &&
+      !(sheet.session === SessionDate.Afternoon)
+    ) {
+      events.push({
+        title: SessionDate.Afternoon,
+        start: `${formatDate}T13:30:00`,
+        end: `${formatDate}T17:30:00`,
+        extendedProps: {
+          status: TimeSheetStatus.LeaveWithoutRequest,
         },
       });
     }

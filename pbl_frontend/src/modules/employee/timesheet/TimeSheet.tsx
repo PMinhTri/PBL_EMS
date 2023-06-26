@@ -32,10 +32,6 @@ const TimeSheetPage: React.FunctionComponent = () => {
         await TimeSheetAction.getOvertimeWorkLoad(userAuthInfo.id, month, year)
       );
 
-      console.log(
-        await TimeSheetAction.getOvertimeWorkLoad(userAuthInfo.id, month, year)
-      );
-
       setTotalWorkload(workload);
     };
     fetchData();
