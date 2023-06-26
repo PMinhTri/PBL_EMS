@@ -269,7 +269,7 @@ export function renderEvent(year: number, timeSheet: TimeSheet[]) {
     events.push({
       title: "Sáng",
       start: `${date}T08:00:00`,
-      end: `${date}T17:30:00`,
+      end: `${date}T12:00:00`,
       extendedProps: {
         status: TimeSheetStatus.Unsubmitted,
       },

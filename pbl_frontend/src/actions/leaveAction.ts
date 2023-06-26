@@ -3,6 +3,7 @@ import {
   cancelLeaveRequest,
   createLeaveRequest,
   createLeaveType,
+  deleteLeaveRequest,
   getAllLeaveRequest,
   getAllLeaveType,
   getLeaveRequestsByUser,
@@ -13,6 +14,7 @@ import {
 } from "../api/leave";
 import { LeaveRequestPayload, LeaveType } from "../types/leaveTypes";
 import { handleError } from "../utils/errorHandler";
+import showNotification from "../utils/notification";
 
 export const LeaveAction = {
   getAllLeaveType: async (): Promise<LeaveType[]> => {
@@ -35,6 +37,11 @@ export const LeaveAction = {
     const response = await createLeaveRequest(payload);
 
     if (response.statusCode === 200) {
+      showNotification("success", "Tạo yêu cầu thành công!");
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
       return response.payload;
     }
 
@@ -85,6 +92,11 @@ export const LeaveAction = {
     const response = await approveLeaveRequest(id);
 
     if (response.statusCode === 200) {
+      showNotification("success", "Đã duyệt yêu cầu!");
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
       return response.payload;
     }
 
@@ -103,6 +115,19 @@ export const LeaveAction = {
 
   reject: async (id: string) => {
     const response = await rejectLeaveRequest(id);
+
+    if (response.statusCode === 200) {
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+      return response.payload;
+    }
+
+    handleError(response);
+  },
+
+  delete: async (id: string) => {
+    const response = await deleteLeaveRequest(id);
 
     if (response.statusCode === 200) {
       return response.payload;

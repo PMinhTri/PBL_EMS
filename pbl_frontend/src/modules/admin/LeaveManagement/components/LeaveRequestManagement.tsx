@@ -1,5 +1,5 @@
 import React from "react";
-import { BiEdit } from "react-icons/bi";
+import { BiEdit, BiTrash } from "react-icons/bi";
 import {
   Button,
   Checkbox,
@@ -72,6 +72,14 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
     isOpen: false,
   });
 
+  const [openDeleteModal, setOpenDeleteModal] = React.useState<{
+    leaveRequest: LeaveRequest;
+    isOpen: boolean;
+  }>({
+    leaveRequest: {} as LeaveRequest,
+    isOpen: false,
+  });
+
   const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedMonth(Number(e.target.value));
   };
@@ -85,10 +93,6 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
       await LeaveAction.reject(id);
 
       showNotification("success", "Đã từ chối yêu cầu!");
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
     } catch (err) {
       showNotification("error", "Từ chối thất bại!");
     }
@@ -97,14 +101,22 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
   const handleApproveRequest = React.useCallback(async (id: string) => {
     try {
       await LeaveAction.approve(id);
+    } catch (err) {
+      showNotification("error", "Duyệt thất bại!");
+    }
+  }, []);
 
-      showNotification("success", "Đã duyệt yêu cầu!");
+  const handleDeleteRequest = React.useCallback(async (id: string) => {
+    try {
+      await LeaveAction.delete(id);
+
+      showNotification("success", "Đã xóa yêu cầu!");
 
       setTimeout(() => {
         window.location.reload();
       }, 2000);
     } catch (err) {
-      showNotification("error", "Duyệt thất bại!");
+      showNotification("error", "Xóa thất bại!");
     }
   }, []);
 
@@ -323,7 +335,7 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
                   </td>
                   <td className="py-3 px-4 text-center border-b">
                     <div className="w-full flex flex-row gap-2 justify-center items-center">
-                      {item.status === LeaveStatus.Pending && (
+                      {item.status === LeaveStatus.Pending ? (
                         <>
                           <div
                             className="text-green-500 text-2xl hover:text-green-600 hover:cursor-pointer"
@@ -336,6 +348,31 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
                           >
                             <BiEdit />
                           </div>
+                          <div
+                            className="text-red-500 text-2xl hover:text-red-600 hover:cursor-pointer"
+                            onClick={() =>
+                              setOpenDeleteModal({
+                                leaveRequest: item,
+                                isOpen: true,
+                              })
+                            }
+                          >
+                            <BiTrash />
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div
+                            className="text-red-500 text-2xl hover:text-red-600 hover:cursor-pointer"
+                            onClick={() =>
+                              setOpenDeleteModal({
+                                leaveRequest: item,
+                                isOpen: true,
+                              })
+                            }
+                          >
+                            <BiTrash />
+                          </div>
                         </>
                       )}
                     </div>
@@ -344,6 +381,38 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
               ))}
             </tbody>
           </table>
+          <Modal
+            title="Xóa yêu cầu này?"
+            open={openDeleteModal.isOpen}
+            width={400}
+            onCancel={() =>
+              setOpenDeleteModal({
+                leaveRequest: {} as LeaveRequest,
+                isOpen: false,
+              })
+            }
+            footer={[
+              <button
+                onClick={() =>
+                  setOpenDeleteModal({
+                    leaveRequest: {} as LeaveRequest,
+                    isOpen: false,
+                  })
+                }
+                className="w-24 ml-2 rounded-md h-8 bg-red-500 text-white cursor-pointer"
+              >
+                Hủy
+              </button>,
+              <Button
+                onClick={() =>
+                  handleDeleteRequest(openDeleteModal.leaveRequest.id)
+                }
+                className="ml-2 w-24 rounded-md h-8 bg-blue-500 text-white cursor-pointer"
+              >
+                Xóa
+              </Button>,
+            ]}
+          ></Modal>
           <Modal
             title="Duyệt yêu cầu này?"
             open={openApproveModal.isOpen}

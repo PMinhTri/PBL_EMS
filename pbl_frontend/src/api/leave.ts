@@ -5,7 +5,7 @@ import {
   LeaveStatus,
   LeaveType,
 } from "../types/leaveTypes";
-import { $get, $patch, $post } from "../utils/http";
+import { $delete, $get, $patch, $post } from "../utils/http";
 
 export const getAllLeaveType = async () => {
   const response: {
@@ -108,6 +108,15 @@ export const rejectLeaveRequest = async (id: string) => {
   } = await $patch(`/leave/reject/${id}`, {
     status: LeaveStatus.Rejected,
   });
+
+  return response;
+};
+
+export const deleteLeaveRequest = async (id: string) => {
+  const response: {
+    statusCode: number;
+    payload: LeaveRequest;
+  } = await $delete(`/leave/remove/${id}`);
 
   return response;
 };

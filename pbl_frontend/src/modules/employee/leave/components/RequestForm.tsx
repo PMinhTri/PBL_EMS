@@ -79,23 +79,20 @@ export const RequestForm: React.FunctionComponent = () => {
       showNotification("warning", "Vui lòng điền đầy đủ thông tin.");
       return;
     } else {
-      const response = await LeaveAction.createLeaveRequest({
-        userId: userAuthInfo.id,
-        leaveTypeId: onSelectLeaveType.id,
-        startDate: startDate,
-        endDate: endDate,
-        reason: reason.trim(),
-        session: onSelectSession,
-        leaveDays:
-          onLeaveDaysChange === "0" ? leaveDays : Number(onLeaveDaysChange),
-      });
-
-      if (response) {
-        showNotification("success", "Tạo yêu cầu thành công!");
-
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
+      try {
+        await LeaveAction.createLeaveRequest({
+          userId: userAuthInfo.id,
+          leaveTypeId: onSelectLeaveType.id,
+          startDate: startDate,
+          endDate: endDate,
+          reason: reason.trim(),
+          session: onSelectSession,
+          leaveDays:
+            onLeaveDaysChange === "0" ? leaveDays : Number(onLeaveDaysChange),
+        });
+      } catch (err) {
+        showNotification("error", "Đã có lỗi xảy ra, vui lòng thử lại sau");
+        return;
       }
     }
   };

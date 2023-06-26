@@ -11,6 +11,7 @@ import { TimeSheetService } from './timeSheet.service';
 import { BadRequestResult, IResponse, SuccessResult } from 'src/httpResponse';
 import { ServiceResponseStatus } from 'src/serviceResponse';
 import { TimeSheetDto } from './timeSheet.dto';
+import { TimeSheetFailure } from 'src/enumTypes/failure.enum';
 
 @Controller('time-sheet')
 export class TimeSheetController {
@@ -26,13 +27,13 @@ export class TimeSheetController {
 
     if (status === ServiceResponseStatus.Failed) {
       switch (failure.reason) {
-        case 'REQUEST_ON_LEAVE_DATE':
+        case TimeSheetFailure.REQUEST_ON_LEAVE_DATE:
           return res.send(
             BadRequestResult({
               message: 'Không thể chấm công trong ngày nghỉ!',
             }),
           );
-        case 'TIME_SHEET_ALREADY_EXISTS':
+        case TimeSheetFailure.TIME_SHEET_ALREADY_EXISTS:
           return res.send(
             BadRequestResult({
               message: 'Đã thực hiện chấm công!',
@@ -51,7 +52,7 @@ export class TimeSheetController {
     @Query('year') year: number,
     @Res() res: IResponse,
   ): Promise<IResponse> {
-    const { result, status } =
+    const { result, status, failure } =
       await this.timeSheetService.getAllTimeSheetByUserIdAndMonth(
         userId,
         Number(month),
@@ -59,11 +60,14 @@ export class TimeSheetController {
       );
 
     if (status === ServiceResponseStatus.Failed) {
-      return res.send(
-        BadRequestResult({
-          message: 'Không tìm thấy thông tin chấm công!',
-        }),
-      );
+      switch (failure.reason) {
+        case TimeSheetFailure.TIME_SHEET_NOT_FOUND:
+          return res.send(
+            BadRequestResult({
+              message: 'Không tìm thấy thông tin chấm công!',
+            }),
+          );
+      }
     }
 
     return res.send(SuccessResult(result));
@@ -76,18 +80,22 @@ export class TimeSheetController {
     @Query('year') year: number,
     @Res() res: IResponse,
   ): Promise<IResponse> {
-    const { result, status } = await this.timeSheetService.totalWorkloadOfUser(
-      userId,
-      Number(month),
-      Number(year),
-    );
+    const { result, status, failure } =
+      await this.timeSheetService.totalWorkloadOfUser(
+        userId,
+        Number(month),
+        Number(year),
+      );
 
     if (status === ServiceResponseStatus.Failed) {
-      return res.send(
-        BadRequestResult({
-          message: 'Không tìm thấy thông tin chấm công!',
-        }),
-      );
+      switch (failure.reason) {
+        case TimeSheetFailure.TIME_SHEET_NOT_FOUND:
+          return res.send(
+            BadRequestResult({
+              message: 'Không tìm thấy thông tin chấm công!',
+            }),
+          );
+      }
     }
 
     return res.send(SuccessResult(result));
@@ -123,18 +131,22 @@ export class TimeSheetController {
     @Query('year') year: number,
     @Res() res: IResponse,
   ): Promise<IResponse> {
-    const { result, status } = await this.timeSheetService.totalOvertimeOfUser(
-      userId,
-      Number(month),
-      Number(year),
-    );
+    const { result, status, failure } =
+      await this.timeSheetService.totalOvertimeOfUser(
+        userId,
+        Number(month),
+        Number(year),
+      );
 
     if (status === ServiceResponseStatus.Failed) {
-      return res.send(
-        BadRequestResult({
-          message: 'Không tìm thấy thông tin chấm công!',
-        }),
-      );
+      switch (failure.reason) {
+        case TimeSheetFailure.TIME_SHEET_NOT_FOUND:
+          return res.send(
+            BadRequestResult({
+              message: 'Không tìm thấy thông tin chấm công!',
+            }),
+          );
+      }
     }
 
     return res.send(SuccessResult(result));
@@ -191,16 +203,18 @@ export class TimeSheetController {
     @Query('userId') userId: string,
     @Res() res: IResponse,
   ): Promise<IResponse> {
-    const { status } = await this.timeSheetService.deleteAllTimeSheetByUserId(
-      userId,
-    );
+    const { status, failure } =
+      await this.timeSheetService.deleteAllTimeSheetByUserId(userId);
 
     if (status === ServiceResponseStatus.Failed) {
-      return res.send(
-        BadRequestResult({
-          message: 'Không tìm thấy thông tin chấm công!',
-        }),
-      );
+      switch (failure.reason) {
+        case TimeSheetFailure.TIME_SHEET_NOT_FOUND:
+          return res.send(
+            BadRequestResult({
+              message: 'Không tìm thấy thông tin chấm công!',
+            }),
+          );
+      }
     }
 
     return res.send(SuccessResult());

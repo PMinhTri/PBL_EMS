@@ -138,7 +138,7 @@ export class LeaveController {
           return res.send(
             BadRequestResult({
               reason: failure.reason,
-              message: 'Leave balance exceeded',
+              message: 'Số ngày phép của bạn đã hêt!',
             }),
           );
 
@@ -146,7 +146,7 @@ export class LeaveController {
           return res.send(
             BadRequestResult({
               reason: failure.reason,
-              message: 'Invalid leave request',
+              message: 'Yêu cầu nghỉ phép không hợp lệ',
             }),
           );
 
@@ -154,7 +154,7 @@ export class LeaveController {
           return res.send(
             BadRequestResult({
               reason: failure.reason,
-              message: 'Leave request overlap',
+              message: 'Đã có yêu cầu nghỉ phép trong thời gian này',
             }),
           );
 
@@ -162,7 +162,7 @@ export class LeaveController {
           return res.send(
             NotFoundResult({
               reason: failure.reason,
-              message: 'Leave request not found',
+              message: 'Không tìm thấy yêu cầu nghỉ phép',
             }),
           );
       }
@@ -197,11 +197,11 @@ export class LeaveController {
 
     if (status === 'Failed') {
       switch (failure.reason) {
-        case 'LEAVE_TYPE_NOT_FOUND':
+        case LeaveFailure.LEAVE_TYPE_NOT_FOUND:
           return res.send(
             NotFoundResult({
               reason: failure.reason,
-              message: 'Leave type not found',
+              message: 'Không tìm thấy loại nghỉ phép',
             }),
           );
       }
@@ -224,11 +224,19 @@ export class LeaveController {
 
     if (status === ServiceResponseStatus.Failed) {
       switch (failure.reason) {
-        case 'LEAVE_NOT_FOUND':
+        case LeaveFailure.LEAVE_NOT_FOUND:
           return res.send(
             NotFoundResult({
               reason: failure.reason,
-              message: 'Leave request not found',
+              message: 'Không tìm thấy yêu cầu nghỉ phép',
+            }),
+          );
+
+        case LeaveFailure.LEAVE_REQUEST_EXPIRED:
+          return res.send(
+            BadRequestResult({
+              reason: failure.reason,
+              message: 'Yêu cầu nghỉ phép đã hết hạn',
             }),
           );
       }
@@ -251,11 +259,11 @@ export class LeaveController {
 
     if (status === ServiceResponseStatus.Failed) {
       switch (failure.reason) {
-        case 'LEAVE_NOT_FOUND':
+        case LeaveFailure.LEAVE_NOT_FOUND:
           return res.send(
             NotFoundResult({
               reason: failure.reason,
-              message: 'Leave request not found',
+              message: 'Không tìm thấy yêu cầu nghỉ phép',
             }),
           );
       }
@@ -278,11 +286,19 @@ export class LeaveController {
 
     if (status === ServiceResponseStatus.Failed) {
       switch (failure.reason) {
-        case 'LEAVE_NOT_FOUND':
+        case LeaveFailure.LEAVE_NOT_FOUND:
           return res.send(
             NotFoundResult({
               reason: failure.reason,
-              message: 'Leave request not found',
+              message: 'Không tìm thấy yêu cầu nghỉ phép',
+            }),
+          );
+
+        case LeaveFailure.LEAVE_REQUEST_EXPIRED:
+          return res.send(
+            BadRequestResult({
+              reason: failure.reason,
+              message: 'Yêu cầu nghỉ phép đã hết hạn',
             }),
           );
       }
@@ -304,11 +320,11 @@ export class LeaveController {
 
     if (status === 'Failed') {
       switch (failure.reason) {
-        case 'LEAVE_NOT_FOUND':
+        case LeaveFailure.LEAVE_NOT_FOUND:
           return res.send(
             NotFoundResult({
               reason: failure.reason,
-              message: 'Leave request not found',
+              message: 'Không tìm thấy yêu cầu nghỉ phép',
             }),
           );
       }
@@ -330,11 +346,11 @@ export class LeaveController {
 
     if (status === 'Failed') {
       switch (failure.reason) {
-        case 'LEAVE_NOT_FOUND':
+        case LeaveFailure.LEAVE_NOT_FOUND:
           return res.send(
             NotFoundResult({
               reason: failure.reason,
-              message: 'Leave request not found',
+              message: 'Không tìm thấy yêu cầu nghỉ phép',
             }),
           );
       }
@@ -356,11 +372,11 @@ export class LeaveController {
 
     if (status === 'Failed') {
       switch (failure.reason) {
-        case 'LEAVE_NOT_FOUND':
+        case LeaveFailure.LEAVE_NOT_FOUND:
           return res.send(
             NotFoundResult({
               reason: failure.reason,
-              message: 'Leave request not found',
+              message: 'Không tìm thấy yêu cầu nghỉ phép',
             }),
           );
       }
@@ -387,11 +403,11 @@ export class LeaveController {
 
     if (status === 'Failed') {
       switch (failure.reason) {
-        case 'LEAVE_TYPE_NOT_FOUND':
+        case LeaveFailure.LEAVE_TYPE_NOT_FOUND:
           return res.send(
             NotFoundResult({
               reason: failure.reason,
-              message: 'Leave type not found',
+              message: 'Không tìm thấy loại nghỉ phép',
             }),
           );
       }

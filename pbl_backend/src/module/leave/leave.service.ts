@@ -469,6 +469,15 @@ export class LeaveService {
       };
     }
 
+    if (dayjs(existedLeaveRequest.startDate).isBefore(dayjs())) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: LeaveFailure.LEAVE_REQUEST_EXPIRED,
+        },
+      };
+    }
+
     const leaveRequest = await this.prisma.leaveRequest.update({
       where: {
         id: id,
@@ -531,6 +540,15 @@ export class LeaveService {
         status: ServiceResponseStatus.Failed,
         failure: {
           reason: LeaveFailure.LEAVE_NOT_FOUND,
+        },
+      };
+    }
+
+    if (dayjs(existedLeaveRequest.startDate).isBefore(dayjs())) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: LeaveFailure.LEAVE_REQUEST_EXPIRED,
         },
       };
     }
