@@ -290,11 +290,11 @@ const CalendarTimeSheet: React.FunctionComponent = () => {
         }}
         customButtons={{
           nextMonth: {
-            text: "Sau",
+            icon: "chevron-right",
             click: handleNextButtonClick,
           },
           prevMonth: {
-            text: "Trước",
+            icon: "chevron-left",
             click: handlePrevButtonClick,
           },
           today: {
