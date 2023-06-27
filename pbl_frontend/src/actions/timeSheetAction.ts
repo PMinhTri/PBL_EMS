@@ -80,4 +80,16 @@ export const TimeSheetAction = {
 
     return response.payload;
   },
+
+  getByDate: async (userId: string, date: string) => {
+    const extractDate = date.split("-").map(Number);
+    const [year, month, day] = extractDate;
+    const response = await getTimeSheetOfUser(userId, month, year, day);
+
+    if (response.statusCode === 200) {
+      return response.payload;
+    }
+
+    handleError(response);
+  },
 };

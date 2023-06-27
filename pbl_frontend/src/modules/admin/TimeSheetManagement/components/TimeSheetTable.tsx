@@ -8,10 +8,16 @@ import { useRecoilValue } from "recoil";
 import userSelector from "../../../../recoil/selectors/user";
 import { LeaveRequest, LeaveStatus } from "../../../../types/leaveTypes";
 import { LeaveAction } from "../../../../actions/leaveAction";
-import { BiEdit, BiReset } from "react-icons/bi";
 import { Modal } from "antd";
-import { isWeekend } from "../../../../utils/datetime";
+import {
+  formatDateTime,
+  getDates,
+  isWeekend,
+} from "../../../../utils/datetime";
 import TimeSheetModal from "./TimeSheetModal";
+import _ from "lodash";
+import dayjs from "dayjs";
+import { SessionDate } from "../../../../constants/enum";
 
 const currentYears = Array.from(
   { length: 5 },
@@ -36,7 +42,23 @@ const TimeSheetTable: React.FunctionComponent = () => {
 
   const [overtimes, setOvertimes] = React.useState<TimeSheet[]>([]);
 
-  const [openModal, setOpenModal] = React.useState<boolean>(false);
+  const [openModal, setOpenModal] = React.useState<{
+    open: boolean;
+    userId: string;
+    date: string;
+    leaveDay: {
+      isLeaveDay: boolean;
+      context: string;
+    };
+  }>({
+    open: false,
+    userId: "",
+    date: "",
+    leaveDay: {
+      isLeaveDay: false,
+      context: "",
+    },
+  });
 
   const [allWorkload, setAllWorkload] = React.useState<
     {
@@ -97,6 +119,58 @@ const TimeSheetTable: React.FunctionComponent = () => {
       .reduce((acc, curr) => acc + curr.hoursWorked, 0);
 
     return value ? value / 8 : 0;
+  };
+
+  const isLeaveDay = (userId: string, day: Date) => {
+    const userLeaves = leaveRequests.filter(
+      (leaveRequest) =>
+        leaveRequest.userId === userId &&
+        leaveRequest.status === LeaveStatus.Approved
+    );
+
+    const leaveDays: string[] = [];
+
+    for (const leaveRequest of userLeaves) {
+      leaveDays.push(
+        ..._.uniq(getDates(leaveRequest.startDate, leaveRequest.endDate))
+      );
+    }
+
+    if (
+      leaveDays.includes(
+        formatDateTime(day.getDate(), day.getMonth() + 1, day.getFullYear())
+      )
+    ) {
+      const leaveRequest = leaveRequests.find(
+        (leaveRequest) =>
+          leaveRequest.userId === userId &&
+          leaveRequest.status === LeaveStatus.Approved &&
+          dayjs(leaveRequest.startDate).isSame(leaveRequest.endDate)
+      );
+
+      if (leaveRequest) {
+        if (leaveRequest.leaveDays === 0.5) {
+          if (leaveRequest.session === SessionDate.Morning)
+            return {
+              context: "S1/2",
+              isLeaveDays: true,
+            };
+        }
+
+        if (leaveRequest.leaveDays === 0.5) {
+          if (leaveRequest.session === SessionDate.Afternoon)
+            return {
+              context: "C1/2",
+              isLeaveDays: true,
+            };
+        }
+      }
+
+      return {
+        context: "P",
+        isLeaveDays: true,
+      };
+    }
   };
 
   const daysOfWeek = ["CN", "Th.2", "Th.3", "Th.4", "Th.5", "Th.6", "Th.7"];
@@ -192,13 +266,10 @@ const TimeSheetTable: React.FunctionComponent = () => {
               Số ngày công trong tháng
             </div>
             <div className="flex border w-28 justify-center items-center text-md font-bold">
-              Số ngày nghỉ
+              Nghỉ phép
             </div>
             <div className="flex border w-28 justify-center items-center text-md font-bold">
               Tăng ca
-            </div>
-            <div className="flex border w-28 justify-center items-center text-md font-bold">
-              Thao tác
             </div>
           </div>
         </div>
@@ -234,11 +305,31 @@ const TimeSheetTable: React.FunctionComponent = () => {
                     <div
                       key={day}
                       className={inputClass}
-                      onClick={() => setOpenModal(true)}
+                      onClick={() =>
+                        setOpenModal({
+                          open: true,
+                          userId: employee.id,
+                          date: formatDateTime(
+                            day,
+                            selectedMonth,
+                            selectedYear
+                          ),
+                          leaveDay: {
+                            isLeaveDay:
+                              isLeaveDay(employee.id, date)?.isLeaveDays ??
+                              false,
+                            context:
+                              isLeaveDay(employee.id, date)?.context ?? "",
+                          },
+                        })
+                      }
                     >
-                      {isWeekend(date)
-                        ? getOvertimeValue(employee.id, day)
-                        : getWorkLoadValue(employee.id, day)}
+                      {isWeekend(date) && getOvertimeValue(employee.id, day)}
+                      {!isWeekend(date) &&
+                        !isLeaveDay(employee.id, date) &&
+                        getWorkLoadValue(employee.id, day)}
+                      {isLeaveDay(employee.id, date)?.isLeaveDays &&
+                        isLeaveDay(employee.id, date)?.context}
                     </div>
                   );
                 })}
@@ -263,25 +354,42 @@ const TimeSheetTable: React.FunctionComponent = () => {
                       ?.totalOvertime
                   }
                 </div>
-                <div className="flex border w-28 justify-center items-center">
-                  {
-                    <div className="w-full flex flex-row gap-2 justify-center items-center">
-                      <div className="text-green-500 text-2xl hover:text-green-600 hover:cursor-pointer">
-                        <BiEdit />
-                      </div>
-                      <div className="text-slate-500 text-2xl hover:text-slate-600 hover:cursor-pointer">
-                        <BiReset />
-                      </div>
-                    </div>
-                  }
-                </div>
               </div>
             </div>
           ))}
         </div>
       </div>
-      <Modal open={openModal} onCancel={() => setOpenModal(false)}>
-        <TimeSheetModal />
+      <Modal
+        open={openModal.open}
+        onCancel={() =>
+          setOpenModal({
+            open: false,
+            userId: "",
+            date: "",
+            leaveDay: {
+              isLeaveDay: false,
+              context: "",
+            },
+          })
+        }
+        footer={null}
+      >
+        <TimeSheetModal
+          date={openModal.date}
+          userId={openModal.userId}
+          leaveDay={openModal.leaveDay}
+          onClose={() =>
+            setOpenModal({
+              open: false,
+              userId: "",
+              date: "",
+              leaveDay: {
+                isLeaveDay: false,
+                context: "",
+              },
+            })
+          }
+        />
       </Modal>
     </div>
   );

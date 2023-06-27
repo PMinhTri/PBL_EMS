@@ -340,18 +340,21 @@ const EmployeeManagement: React.FunctionComponent = () => {
             Tổng số nhân viên: <span>{employeeList.length}</span>
           </span>
           <div className="flex flex-row justify-around gap-2">
-            <div
+            <label
+              htmlFor="import-file"
               className="w-28 h-8 bg-white text-blue-600 text-lg flex justify-center items-center rounded-md 
-            hover:shadow-md border-[1px] border-blue-600"
+            hover:shadow-md border-[1px] border-blue-600 hover: cursor-pointer"
             >
               <input
+                id="import-file"
                 type="file"
                 accept=".xlsx, .xls"
+                className="hidden"
                 onChange={handleImportFile}
               />
               <BsFillArrowDownCircleFill />
               <span className="ml-2 text-[16px]">Nhập file</span>
-            </div>
+            </label>
             <button
               onClick={() => setIsOpenCreateModal(true)}
               className="w-24 h-8 bg-blue-600 text-white text-lg flex justify-center items-center border-[1px] rounded-md 

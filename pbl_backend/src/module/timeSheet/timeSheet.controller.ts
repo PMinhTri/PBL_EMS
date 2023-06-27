@@ -50,6 +50,7 @@ export class TimeSheetController {
     @Query('userId') userId: string,
     @Query('month') month: number,
     @Query('year') year: number,
+    @Query('date') date: number,
     @Res() res: IResponse,
   ): Promise<IResponse> {
     const { result, status, failure } =
@@ -57,6 +58,7 @@ export class TimeSheetController {
         userId,
         Number(month),
         Number(year),
+        Number(date),
       );
 
     if (status === ServiceResponseStatus.Failed) {

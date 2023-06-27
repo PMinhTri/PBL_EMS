@@ -43,15 +43,8 @@ export class LeaveService {
       };
     }
 
-    if (Session[dto.session] < 1 && Session[dto.session] !== dto.leaveDays) {
-      return {
-        valid: false,
-        failure: {
-          reason: LeaveFailure.INVALID_LEAVE_REQUEST,
-        },
-      };
-    } else {
-      if (validLeaveDays.length !== dto.leaveDays) {
+    if (dayjs(dto.startDate).isSame(dto.endDate)) {
+      if (Session[dto.session] < 1 && Session[dto.session] !== dto.leaveDays) {
         return {
           valid: false,
           failure: {
@@ -59,9 +52,7 @@ export class LeaveService {
           },
         };
       }
-    }
 
-    if (dayjs(dto.startDate).isSame(dto.endDate)) {
       const existedLeaveRequestByDate = await this.prisma.leaveRequest.findMany(
         {
           where: {
@@ -131,6 +122,15 @@ export class LeaveService {
         }
       }
     } else {
+      if (validLeaveDays.length !== dto.leaveDays) {
+        return {
+          valid: false,
+          failure: {
+            reason: LeaveFailure.INVALID_LEAVE_REQUEST,
+          },
+        };
+      }
+
       const allLeaveRequest = await this.prisma.leaveRequest.findMany({
         where: {
           user: {

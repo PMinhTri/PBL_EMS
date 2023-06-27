@@ -16,6 +16,23 @@ export const formatDateTime = (
   return `${yearStr}-${monthStr}-${dateStr}`;
 };
 
+export const getDates = (
+  startDate: string | Date,
+  endDate: string | Date
+): string[] => {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const dates: string[] = [];
+
+  // Iterate over the dates starting from the start date until reaching the end date
+  for (let date = start; date <= end; date.setDate(date.getDate() + 1)) {
+    const formattedDate = date.toISOString().split("T")[0];
+    dates.push(formattedDate);
+  }
+
+  return dates;
+};
+
 export const dateHelper = {
   dateToString: {
     toString: (date: Date) => {

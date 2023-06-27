@@ -13,12 +13,15 @@ export const createTimeSheet = async (timeSheet: TimeSheetPayload) => {
 export const getTimeSheetOfUser = async (
   userId: string,
   month: number,
-  year: number
+  year: number,
+  date?: number
 ) => {
   const response: {
     statusCode: number;
     payload: TimeSheet[];
-  } = await $get(`/time-sheet/?userId=${userId}&month=${month}&year=${year}`);
+  } = await $get(
+    `/time-sheet/?userId=${userId}&month=${month}&year=${year}&date=${date}`
+  );
 
   return response;
 };

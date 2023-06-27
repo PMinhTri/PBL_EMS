@@ -481,7 +481,7 @@ export class UserService {
     }
 
     await this.prisma.$transaction(async () => {
-      await this.prisma.jobInformation.findFirst({
+      await this.prisma.jobInformation.delete({
         where: {
           userId: id,
         },

@@ -102,7 +102,33 @@ export class TimeSheetService {
     userId: string,
     month: number,
     year: number,
+    date?: number,
   ): Promise<ServiceResponse<TimeSheet[], ServiceFailure<TimeSheetFailure>>> {
+    if (date) {
+      const timeSheets = await this.prisma.timeSheet.findMany({
+        where: {
+          userId: userId,
+          date: date,
+          month: month,
+          year: year,
+        },
+      });
+
+      if (!timeSheets) {
+        return {
+          status: ServiceResponseStatus.Failed,
+          failure: {
+            reason: TimeSheetFailure.TIME_SHEET_NOT_FOUND,
+          },
+        };
+      }
+
+      return {
+        status: ServiceResponseStatus.Success,
+        result: timeSheets,
+      };
+    }
+
     const timeSheets = await this.prisma.timeSheet.findMany({
       where: {
         userId: userId,
