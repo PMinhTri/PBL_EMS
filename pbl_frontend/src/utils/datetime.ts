@@ -214,7 +214,8 @@ export function renderEvent(year: number, timeSheet: TimeSheet[]) {
 
     if (
       dayjs(formatDate).isSame(new Date(), "day") &&
-      !(sheet.session === SessionDate.Morning)
+      !(sheet.session === SessionDate.Morning) &&
+      !sheet.overtime
     ) {
       events.push({
         title: SessionDate.Morning,
@@ -224,9 +225,14 @@ export function renderEvent(year: number, timeSheet: TimeSheet[]) {
           status: TimeSheetStatus.Unsubmitted,
         },
       });
-    } else if (
-      pastDates.includes(formatDate) &&
-      !(sheet.session === SessionDate.Morning)
+    }
+
+    if (
+      getPastDatesWithinYear(year, dayjs().format("YYYY-MM-DD"), true).includes(
+        formatDate
+      ) &&
+      !(sheet.session === SessionDate.Morning) &&
+      !sheet.overtime
     ) {
       events.push({
         title: SessionDate.Morning,
@@ -240,7 +246,8 @@ export function renderEvent(year: number, timeSheet: TimeSheet[]) {
 
     if (
       dayjs(formatDate).isSame(new Date(), "day") &&
-      !(sheet.session === SessionDate.Afternoon)
+      !(sheet.session === SessionDate.Afternoon) &&
+      !sheet.overtime
     ) {
       events.push({
         title: SessionDate.Afternoon,
@@ -250,9 +257,14 @@ export function renderEvent(year: number, timeSheet: TimeSheet[]) {
           status: TimeSheetStatus.Unsubmitted,
         },
       });
-    } else if (
-      pastDates.includes(formatDate) &&
-      !(sheet.session === SessionDate.Afternoon)
+    }
+
+    if (
+      getPastDatesWithinYear(year, dayjs().format("YYYY-MM-DD"), true).includes(
+        formatDate
+      ) &&
+      !(sheet.session === SessionDate.Afternoon) &&
+      !sheet.overtime
     ) {
       events.push({
         title: SessionDate.Afternoon,
