@@ -13,6 +13,14 @@ export const createNewUser = async (data: CreateNewUserInformation) => {
   return response;
 };
 
+export const importUsers = async (data: CreateNewUserInformation[]) => {
+  const response: {
+    statusCode: number;
+    payload: UserDetailInformation[];
+  } = await $post(`/users/import`, data);
+  return response;
+};
+
 export const getUserById = async (id: string) => {
   const response: {
     statusCode: number;

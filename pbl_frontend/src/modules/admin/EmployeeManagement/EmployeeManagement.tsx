@@ -21,6 +21,7 @@ import { JobInformationAction } from "../../../actions/jobInformationAction";
 import dayjs from "dayjs";
 import EditEmployee from "./components/EditEmployee";
 import Loading from "../../../components/Loading";
+import * as XLSX from "xlsx";
 
 const EmployeeManagement: React.FunctionComponent = () => {
   const [isLoading, setIsLoading] = React.useState(true);
@@ -57,7 +58,13 @@ const EmployeeManagement: React.FunctionComponent = () => {
     userInfo: UserDetailInformation;
   }>({ userInfo: {} as UserDetailInformation, isOpen: false });
   const [isOpenCreateModal, setIsOpenCreateModal] = React.useState(false);
-  const [isModalDeleteOpen, setIsModalDeleteOpen] = React.useState(false);
+  const [isModalDeleteOpen, setIsModalDeleteOpen] = React.useState<{
+    userId: string;
+    isOpen: boolean;
+  }>({
+    userId: "",
+    isOpen: false,
+  });
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -97,6 +104,54 @@ const EmployeeManagement: React.FunctionComponent = () => {
     filterQuery.jobTitleId,
     searchQuery,
   ]);
+
+  const handleImportFile = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+
+    if (file) {
+      const extension = file.name.split(".").pop()?.toLowerCase();
+      // Check if the file extension is valid
+      if (extension === "xlsx" || extension === "xls") {
+        const reader = new FileReader();
+
+        reader.onload = async (e) => {
+          const data = new Uint8Array(e.target?.result as ArrayBuffer);
+          const workbook = XLSX.read(data, { type: "array" });
+
+          // Assuming the first sheet in the Excel file is the one you want to process
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+
+          // Convert the worksheet to JSON format
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+            header: 1,
+          }) as string[][];
+
+          const values: CreateNewUserInformation[] = [];
+          for (let i = 1; i < jsonData.length; i++) {
+            const row: string[] = jsonData[i];
+            let col = 1;
+            values.push({
+              fullName: row[col++],
+              gender: row[col++],
+              email: row[col++],
+              status: row[col++],
+              roleId: row[col++],
+            });
+          }
+
+          await UserAction.importUsers(values);
+        };
+
+        reader.readAsArrayBuffer(file);
+      } else {
+        // Display an error message for invalid file type
+        showNotification("error", "Vui lòng chọn file excel");
+      }
+    }
+  };
 
   const handleCreateNewEmployee = async () => {
     if (
@@ -177,7 +232,10 @@ const EmployeeManagement: React.FunctionComponent = () => {
     } catch (err) {
       showNotification("error", "Xóa nhân viên không thành công");
     }
-    setIsModalDeleteOpen(false);
+    setIsModalDeleteOpen({
+      userId: "",
+      isOpen: false,
+    });
     window.location.reload();
   };
 
@@ -282,13 +340,18 @@ const EmployeeManagement: React.FunctionComponent = () => {
             Tổng số nhân viên: <span>{employeeList.length}</span>
           </span>
           <div className="flex flex-row justify-around gap-2">
-            <button
+            <div
               className="w-28 h-8 bg-white text-blue-600 text-lg flex justify-center items-center rounded-md 
             hover:shadow-md border-[1px] border-blue-600"
             >
+              <input
+                type="file"
+                accept=".xlsx, .xls"
+                onChange={handleImportFile}
+              />
               <BsFillArrowDownCircleFill />
               <span className="ml-2 text-[16px]">Nhập file</span>
-            </button>
+            </div>
             <button
               onClick={() => setIsOpenCreateModal(true)}
               className="w-24 h-8 bg-blue-600 text-white text-lg flex justify-center items-center border-[1px] rounded-md 
@@ -422,38 +485,51 @@ const EmployeeManagement: React.FunctionComponent = () => {
                       </div>
                       <div
                         onClick={() => {
-                          setIsModalDeleteOpen(true);
+                          setIsModalDeleteOpen({
+                            userId: employee.id,
+                            isOpen: true,
+                          });
                         }}
                         className="flex justify-center items-center text-2xl cursor-pointer text-red-600"
                       >
                         <BiTrashAlt />
                       </div>
-                      <Modal
-                        title="Bạn muốn xóa nhân viên này?"
-                        open={isModalDeleteOpen}
-                        width={400}
-                        onCancel={() => setIsModalDeleteOpen(false)}
-                        footer={[
-                          <button
-                            onClick={() => setIsModalDeleteOpen(false)}
-                            className="w-24 ml-2 rounded-md h-8 bg-red-500 text-white cursor-pointer"
-                          >
-                            Hủy
-                          </button>,
-                          <Button
-                            onClick={() => handleDeleteUser(employee.id)}
-                            className="ml-2 w-24 rounded-md h-8 bg-blue-500 text-white cursor-pointer"
-                          >
-                            Xóa
-                          </Button>,
-                        ]}
-                      />
                     </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          <Modal
+            title="Bạn muốn xóa nhân viên này?"
+            open={isModalDeleteOpen.isOpen}
+            width={400}
+            onCancel={() =>
+              setIsModalDeleteOpen({
+                userId: "",
+                isOpen: false,
+              })
+            }
+            footer={[
+              <button
+                onClick={() =>
+                  setIsModalDeleteOpen({
+                    userId: "",
+                    isOpen: false,
+                  })
+                }
+                className="w-24 ml-2 rounded-md h-8 bg-red-500 text-white cursor-pointer"
+              >
+                Hủy
+              </button>,
+              <Button
+                onClick={() => handleDeleteUser(isModalDeleteOpen.userId)}
+                className="ml-2 w-24 rounded-md h-8 bg-blue-500 text-white cursor-pointer"
+              >
+                Xóa
+              </Button>,
+            ]}
+          />
           <Modal
             onCancel={() =>
               setIsOpenEditModal({

@@ -11,6 +11,7 @@ import { LeaveAction } from "../../../../actions/leaveAction";
 import { BiEdit, BiReset } from "react-icons/bi";
 import { Modal } from "antd";
 import { isWeekend } from "../../../../utils/datetime";
+import TimeSheetModal from "./TimeSheetModal";
 
 const currentYears = Array.from(
   { length: 5 },
@@ -94,8 +95,6 @@ const TimeSheetTable: React.FunctionComponent = () => {
     const value = overtimes
       .filter((ovetime) => ovetime.userId === userId && ovetime.date === day)
       .reduce((acc, curr) => acc + curr.hoursWorked, 0);
-
-    console.log(value);
 
     return value ? value / 8 : 0;
   };
@@ -282,7 +281,7 @@ const TimeSheetTable: React.FunctionComponent = () => {
         </div>
       </div>
       <Modal open={openModal} onCancel={() => setOpenModal(false)}>
-        {"THIS WILL OPEN"}
+        <TimeSheetModal />
       </Modal>
     </div>
   );

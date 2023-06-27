@@ -10,7 +10,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { createUserDto } from './user.dto';
+import { CreateUserDto } from './user.dto';
 import { BadRequestResult, IResponse, SuccessResult } from 'src/httpResponse';
 import { ServiceResponseStatus } from 'src/serviceResponse';
 import { UserFailure } from 'src/enumTypes/failure.enum';
@@ -41,10 +41,32 @@ export class UserController {
     return res.send(SuccessResult(users));
   }
 
+  @Post('import')
+  async importUsers(
+    @Body() data: CreateUserDto[],
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const { status, failure } = await this.userService.importUsers(data);
+
+    if (status === ServiceResponseStatus.Failed) {
+      switch (failure.reason) {
+        case UserFailure.USER_ALREADY_EXISTS:
+          return res.send(
+            BadRequestResult({
+              reason: failure.reason,
+              message: `Người dùng đã tồn tại`,
+            }),
+          );
+      }
+    }
+
+    return res.send(SuccessResult());
+  }
+
   @Post('/create')
   @Roles(RoleEnum.ADMIN)
   public async createUser(
-    @Body() dto: createUserDto,
+    @Body() dto: CreateUserDto,
     @Res() res: IResponse,
   ): Promise<IResponse> {
     const {

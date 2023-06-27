@@ -9,6 +9,8 @@ import { BiEdit, BiReset } from "react-icons/bi";
 import { PayrollAction } from "../../../actions/payrollAction";
 import { Payroll } from "../../../types/payrollTypes";
 import { moneyFormat } from "../../../utils/format";
+import { Modal } from "antd";
+import PayrollModal from "./components/PayrollModal";
 
 const currentYears = Array.from(
   { length: 5 },
@@ -29,9 +31,14 @@ const PayrollManagement: React.FunctionComponent = () => {
   const [timeSheets, setTimeSheets] = React.useState<TimeSheet[]>([]);
 
   const [leaveRequests, setLeaveRequests] = React.useState<LeaveRequest[]>([]);
-  const [allOvertimeSheets, setAllOvertimeSheets] = React.useState<TimeSheet[]>(
-    []
-  );
+  const [allOvertimeSheets, setAllOvertimeSheets] = React.useState<
+    {
+      userId: string;
+      totalOvertime: number;
+    }[]
+  >([]);
+
+  const [openPayrollModal, setOpenPayrollModal] = React.useState(false);
 
   const [payrollList, setPayrollList] = React.useState<Payroll[]>([]);
 
@@ -45,10 +52,7 @@ const PayrollManagement: React.FunctionComponent = () => {
         await LeaveAction.getAllLeaveRequest(selectedMonth, selectedYear)
       );
       setAllOvertimeSheets(
-        await TimeSheetAction.getAllOvertimeWorkload(
-          selectedMonth,
-          selectedYear
-        )
+        await TimeSheetAction.getAllTotalOvertime(selectedMonth, selectedYear)
       );
       setPayrollList(
         await PayrollAction.getAllPayload(selectedMonth, selectedYear)
@@ -64,6 +68,11 @@ const PayrollManagement: React.FunctionComponent = () => {
 
   const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedMonth(Number(e.target.value));
+  };
+
+  const getOvertimes = (userId: string) => {
+    return allOvertimeSheets.find((overtime) => overtime.userId === userId)
+      ?.totalOvertime;
   };
 
   return (
@@ -151,16 +160,7 @@ const PayrollManagement: React.FunctionComponent = () => {
                       )}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
-                    {allOvertimeSheets
-                      .filter(
-                        (overtimeSheet) =>
-                          overtimeSheet.userId === employee.id &&
-                          overtimeSheet.status === "Đã chấm công"
-                      )
-                      .reduce(
-                        (acc, overtimeSheet) => acc + overtimeSheet.hoursWorked,
-                        0
-                      ) / 8}
+                    {getOvertimes(employee.id) || 0}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
                     {payrollList.find(
@@ -186,11 +186,11 @@ const PayrollManagement: React.FunctionComponent = () => {
                   </td>
                   <td className="py-3 px-4 text-center border-[2px]">
                     <div className="w-full flex flex-row gap-2 justify-center items-center">
-                      <div className="text-green-500 text-2xl hover:text-green-600 hover:cursor-pointer">
+                      <div
+                        className="text-green-500 text-2xl hover:text-green-600 hover:cursor-pointer"
+                        onClick={() => setOpenPayrollModal(true)}
+                      >
                         <BiEdit />
-                      </div>
-                      <div className="text-slate-500 text-2xl hover:text-slate-600 hover:cursor-pointer">
-                        <BiReset />
                       </div>
                     </div>
                   </td>
@@ -200,6 +200,13 @@ const PayrollManagement: React.FunctionComponent = () => {
           </table>
         </div>
       </div>
+      <Modal
+        open={openPayrollModal}
+        onCancel={() => setOpenPayrollModal(false)}
+        footer={null}
+      >
+        <PayrollModal />
+      </Modal>
     </div>
   );
 };

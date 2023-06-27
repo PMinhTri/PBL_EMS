@@ -13,3 +13,5 @@ export const LeaveStatusKey: Record<string, LeaveStatus> = {
   ['Rejected']: LeaveStatus.Rejected,
   ['Cancelled']: LeaveStatus.Cancelled,
 };
+
+export const basicSalary = 50000;

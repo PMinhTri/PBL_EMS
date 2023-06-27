@@ -3,6 +3,7 @@ import {
   deleteUser,
   getAllEmployees,
   getUserById,
+  importUsers,
   updateAvatar,
   updateUserInformation,
 } from "../api/user";
@@ -12,6 +13,7 @@ import {
   UserDetailInformation,
 } from "../types/userTypes";
 import { handleError } from "../utils/errorHandler";
+import showNotification from "../utils/notification";
 
 export const UserAction = {
   createNewUser: async (data: CreateNewUserInformation) => {
@@ -19,6 +21,21 @@ export const UserAction = {
 
     if (response.statusCode === 200) {
       const { payload } = response;
+      return payload;
+    }
+
+    handleError(response);
+  },
+
+  importUsers: async (data: CreateNewUserInformation[]) => {
+    const response = await importUsers(data);
+
+    if (response.statusCode === 200) {
+      const { payload } = response;
+      showNotification("success", "Nhập danh sách nhân viên thành công");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
       return payload;
     }
 
