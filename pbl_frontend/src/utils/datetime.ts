@@ -199,6 +199,38 @@ export function renderEvent(year: number, timeSheet: TimeSheet[]) {
       });
     }
 
+    if (
+      dayjs(formatDate).isSame(new Date(), "day") &&
+      !(sheet.session === SessionDate.Morning) &&
+      !sheet.overtime
+    ) {
+      events.push({
+        title: SessionDate.Morning,
+        start: `${formatDate}T08:00:00`,
+        end: `${formatDate}T12:00:00`,
+        extendedProps: {
+          status: TimeSheetStatus.Unsubmitted,
+        },
+      });
+    }
+
+    if (
+      getPastDatesWithinYear(year, dayjs().format("YYYY-MM-DD"), true).includes(
+        formatDate
+      ) &&
+      !(sheet.session === SessionDate.Morning) &&
+      !sheet.overtime
+    ) {
+      events.push({
+        title: SessionDate.Morning,
+        start: `${formatDate}T13:30:00`,
+        end: `${formatDate}T17:30:00`,
+        extendedProps: {
+          status: TimeSheetStatus.LeaveWithoutRequest,
+        },
+      });
+    }
+
     if (sheet.session === SessionDate.Afternoon) {
       if (sheet.status === TimeSheetStatus.Submitted) {
         events.push({
@@ -215,6 +247,38 @@ export function renderEvent(year: number, timeSheet: TimeSheet[]) {
       }
     }
 
+    if (
+      dayjs(formatDate).isSame(new Date(), "day") &&
+      !(sheet.session === SessionDate.Afternoon) &&
+      !sheet.overtime
+    ) {
+      events.push({
+        title: SessionDate.Afternoon,
+        start: `${formatDate}T13:30:00`,
+        end: `${formatDate}T17:30:00`,
+        extendedProps: {
+          status: TimeSheetStatus.Unsubmitted,
+        },
+      });
+    }
+
+    if (
+      getPastDatesWithinYear(year, dayjs().format("YYYY-MM-DD"), true).includes(
+        formatDate
+      ) &&
+      !(sheet.session === SessionDate.Afternoon) &&
+      !sheet.overtime
+    ) {
+      events.push({
+        title: SessionDate.Afternoon,
+        start: `${formatDate}T13:30:00`,
+        end: `${formatDate}T17:30:00`,
+        extendedProps: {
+          status: TimeSheetStatus.LeaveWithoutRequest,
+        },
+      });
+    }
+
     if (sheet.session === SessionDate.Night) {
       events.push({
         title: sheet.session,
@@ -225,70 +289,6 @@ export function renderEvent(year: number, timeSheet: TimeSheet[]) {
           status: sheet.status,
           overTime: sheet.overtime,
           hoursWorked: sheet.hoursWorked,
-        },
-      });
-    }
-
-    if (
-      dayjs(formatDate).isSame(new Date(), "day") &&
-      !(sheet.session === SessionDate.Morning) &&
-      !sheet.overtime
-    ) {
-      events.push({
-        title: SessionDate.Morning,
-        start: `${formatDate}T13:30:00`,
-        end: `${formatDate}T17:30:00`,
-        extendedProps: {
-          status: TimeSheetStatus.Unsubmitted,
-        },
-      });
-    }
-
-    if (
-      getPastDatesWithinYear(year, dayjs().format("YYYY-MM-DD"), true).includes(
-        formatDate
-      ) &&
-      !(sheet.session === SessionDate.Morning) &&
-      !sheet.overtime
-    ) {
-      events.push({
-        title: SessionDate.Morning,
-        start: `${formatDate}T13:30:00`,
-        end: `${formatDate}T17:30:00`,
-        extendedProps: {
-          status: TimeSheetStatus.LeaveWithoutRequest,
-        },
-      });
-    }
-
-    if (
-      dayjs(formatDate).isSame(new Date(), "day") &&
-      !(sheet.session === SessionDate.Afternoon) &&
-      !sheet.overtime
-    ) {
-      events.push({
-        title: SessionDate.Afternoon,
-        start: `${formatDate}T13:30:00`,
-        end: `${formatDate}T17:30:00`,
-        extendedProps: {
-          status: TimeSheetStatus.Unsubmitted,
-        },
-      });
-    }
-
-    if (
-      getPastDatesWithinYear(year, dayjs().format("YYYY-MM-DD"), true).includes(
-        formatDate
-      ) &&
-      !(sheet.session === SessionDate.Afternoon) &&
-      !sheet.overtime
-    ) {
-      events.push({
-        title: SessionDate.Afternoon,
-        start: `${formatDate}T13:30:00`,
-        end: `${formatDate}T17:30:00`,
-        extendedProps: {
-          status: TimeSheetStatus.LeaveWithoutRequest,
         },
       });
     }

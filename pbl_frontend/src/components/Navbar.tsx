@@ -123,7 +123,7 @@ const Navbar: React.FunctionComponent = () => {
             else window.location.href = "/employee/time-sheet";
           }}
         >
-          HR Management System
+          HỆ THỐNG NHÂN SỰ
         </div>
 
         <div
