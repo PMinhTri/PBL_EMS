@@ -26,6 +26,23 @@ export const getTimeSheetOfUser = async (
   return response;
 };
 
+export const updateByDate = async (
+  userId: string,
+  date: Date,
+  timeSheets: TimeSheetPayload[]
+) => {
+  const response: {
+    statusCode: number;
+    payload: TimeSheet;
+  } = await $post(`/time-sheet/update-by-date`, {
+    userId: userId,
+    date: date,
+    dto: timeSheets,
+  });
+
+  return response;
+};
+
 export const getTotalWorkload = async (
   userId: string,
   month: number,

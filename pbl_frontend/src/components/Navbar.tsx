@@ -79,8 +79,8 @@ const SelectContent: React.FunctionComponent = () => {
           />
         </div>
         <div className="text-xs pr-4 justify-center">
-          <div className="font-bold">{user.fullName}</div>
-          <div>{user.email}</div>
+          <div className="font-bold">{userInfo.fullName}</div>
+          <div>{userInfo.email}</div>
         </div>
       </div>
       <ul>

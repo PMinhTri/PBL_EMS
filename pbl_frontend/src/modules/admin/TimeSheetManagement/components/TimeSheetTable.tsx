@@ -333,13 +333,13 @@ const TimeSheetTable: React.FunctionComponent = () => {
                     </div>
                   );
                 })}
-                <div className="flex border w-28 justify-center items-center">
+                <div className="flex border w-28 font-bold justify-center items-center">
                   {
                     allWorkload.find((sheet) => sheet.userId === employee.id)
                       ?.totalWorkload
                   }
                 </div>
-                <div className="flex border w-28 justify-center items-center">
+                <div className="flex border w-28 font-bold justify-center items-center">
                   {leaveRequests
                     .filter(
                       (leaveRequest) =>
@@ -348,7 +348,7 @@ const TimeSheetTable: React.FunctionComponent = () => {
                     )
                     .reduce((acc, curr) => acc + curr.leaveDays, 0)}
                 </div>
-                <div className="flex border w-28 justify-center items-center">
+                <div className="flex border w-28 font-bold justify-center items-center">
                   {
                     allOvertime.find((sheet) => sheet.userId === employee.id)
                       ?.totalOvertime

@@ -223,8 +223,8 @@ export function renderEvent(year: number, timeSheet: TimeSheet[]) {
     ) {
       events.push({
         title: SessionDate.Morning,
-        start: `${formatDate}T13:30:00`,
-        end: `${formatDate}T17:30:00`,
+        start: `${formatDate}T08:30:00`,
+        end: `${formatDate}T12:00:00`,
         extendedProps: {
           status: TimeSheetStatus.LeaveWithoutRequest,
         },

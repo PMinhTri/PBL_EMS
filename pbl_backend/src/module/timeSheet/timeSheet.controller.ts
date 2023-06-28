@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Patch,
   Post,
   Query,
   Res,
@@ -12,6 +13,7 @@ import { BadRequestResult, IResponse, SuccessResult } from 'src/httpResponse';
 import { ServiceResponseStatus } from 'src/serviceResponse';
 import { TimeSheetDto } from './timeSheet.dto';
 import { TimeSheetFailure } from 'src/enumTypes/failure.enum';
+import { TimeSheet } from '@prisma/client';
 
 @Controller('time-sheet')
 export class TimeSheetController {
@@ -59,6 +61,37 @@ export class TimeSheetController {
         Number(month),
         Number(year),
         Number(date),
+      );
+
+    if (status === ServiceResponseStatus.Failed) {
+      switch (failure.reason) {
+        case TimeSheetFailure.TIME_SHEET_NOT_FOUND:
+          return res.send(
+            BadRequestResult({
+              message: 'Không tìm thấy thông tin chấm công!',
+            }),
+          );
+      }
+    }
+
+    return res.send(SuccessResult(result));
+  }
+
+  @Patch('update-by-date')
+  public async updateTimeSheet(
+    @Body()
+    payload: {
+      userId: string;
+      date: Date;
+      dto: TimeSheet[];
+    },
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const { result, status, failure } =
+      await this.timeSheetService.updateTimeSheetByDate(
+        payload.userId,
+        payload.date,
+        payload.dto,
       );
 
     if (status === ServiceResponseStatus.Failed) {

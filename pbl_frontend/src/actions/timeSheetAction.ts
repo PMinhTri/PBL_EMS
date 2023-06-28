@@ -7,6 +7,7 @@ import {
   getOvertimeWorkload,
   getTimeSheetOfUser,
   getTotalWorkload,
+  updateByDate,
 } from "../api/timeSheet";
 import { TimeSheetPayload } from "../types/timeSheet";
 import { handleError } from "../utils/errorHandler";
@@ -18,6 +19,26 @@ export const TimeSheetAction = {
 
     if (response.statusCode === 200) {
       showNotification("success", "Đã thực hiện chấm công!");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+      return response.payload;
+    }
+
+    handleError(response);
+
+    return;
+  },
+
+  updateByDate: async (
+    userId: string,
+    date: Date,
+    timeSheets: TimeSheetPayload[]
+  ) => {
+    const response = await updateByDate(userId, date, timeSheets);
+
+    if (response.statusCode === 200) {
+      showNotification("success", "Đã thực hiện cập nhật chấm công!");
       setTimeout(() => {
         window.location.reload();
       }, 1000);

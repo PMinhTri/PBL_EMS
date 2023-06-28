@@ -201,6 +201,52 @@ export class TimeSheetService {
     };
   }
 
+  public async updateTimeSheetByDate(
+    userId: string,
+    date: Date,
+    dto: TimeSheet[],
+  ): Promise<ServiceResponse<TimeSheet[], ServiceFailure<TimeSheetFailure>>> {
+    const extractDate = dayjs(date).format('DD/MM/YYYY');
+    const [day, month, year] = extractDate.split('/').map(Number);
+
+    const existingTimeSheet = await this.prisma.timeSheet.findMany({
+      where: {
+        userId: userId,
+        date: day,
+        month: month,
+        year: year,
+      },
+    });
+
+    if (!existingTimeSheet.length) {
+      return {
+        status: ServiceResponseStatus.Failed,
+        failure: {
+          reason: TimeSheetFailure.TIME_SHEET_NOT_FOUND,
+        },
+      };
+    }
+
+    for (const timeSheet of dto) {
+      await this.prisma.timeSheet.update({
+        where: {
+          id: timeSheet.id,
+        },
+        data: {
+          session: timeSheet.session,
+          status: timeSheet.status,
+          hoursWorked: timeSheet.hoursWorked,
+          timeIn: timeSheet.timeIn,
+          overtime: timeSheet.overtime,
+        },
+      });
+    }
+
+    return {
+      status: ServiceResponseStatus.Success,
+    };
+  }
+
   public async getAllTotalWorkloadOfAllUser(
     month: number,
     year: number,
