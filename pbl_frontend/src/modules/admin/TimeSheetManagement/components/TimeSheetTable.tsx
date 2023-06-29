@@ -372,6 +372,7 @@ const TimeSheetTable: React.FunctionComponent = () => {
             },
           })
         }
+        destroyOnClose={true}
         footer={null}
       >
         <TimeSheetModal

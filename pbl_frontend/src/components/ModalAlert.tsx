@@ -52,6 +52,7 @@ export const ModalAlert: React.FunctionComponent<Props> = (props: Props) => {
           </button>
         </div>
       }
+      destroyOnClose={true}
       className={getModalClassName()}
     >
       <div className="modal-alert-content">

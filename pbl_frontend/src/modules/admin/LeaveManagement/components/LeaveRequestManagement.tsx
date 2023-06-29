@@ -384,6 +384,7 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
           <Modal
             title="Xóa yêu cầu này?"
             open={openDeleteModal.isOpen}
+            destroyOnClose={true}
             width={400}
             onCancel={() =>
               setOpenDeleteModal({
@@ -416,6 +417,7 @@ const LeaveRequestManagement: React.FunctionComponent<Props> = (
           <Modal
             title="Duyệt yêu cầu này?"
             open={openApproveModal.isOpen}
+            destroyOnClose={true}
             width={600}
             onCancel={() =>
               setOpenApproveModal({

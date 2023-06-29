@@ -1,4 +1,5 @@
 export type TimeSheetPayload = {
+  id?: string;
   userId: string;
   session: string;
   hoursWorked: number;
@@ -9,6 +10,7 @@ export type TimeSheetPayload = {
 };
 
 export type TimeSheet = {
+  id?: string;
   userId: string;
   session: string;
   hoursWorked: number;

@@ -317,6 +317,7 @@ const PayrollManagement: React.FunctionComponent = () => {
       )}
       <Modal
         open={paidModal.isOpen}
+        destroyOnClose={true}
         onCancel={() =>
           setPaidModal({ user: {} as UserDetailInformation, isOpen: false })
         }
@@ -356,6 +357,7 @@ const PayrollManagement: React.FunctionComponent = () => {
             isOpen: false,
           })
         }
+        destroyOnClose={true}
         footer={null}
       >
         <PayrollModal

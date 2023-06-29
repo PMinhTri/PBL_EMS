@@ -1,5 +1,5 @@
 import { TimeSheet, TimeSheetPayload } from "../types/timeSheet";
-import { $get, $post } from "../utils/http";
+import { $get, $patch, $post } from "../utils/http";
 
 export const createTimeSheet = async (timeSheet: TimeSheetPayload) => {
   const response: {
@@ -34,7 +34,7 @@ export const updateByDate = async (
   const response: {
     statusCode: number;
     payload: TimeSheet;
-  } = await $post(`/time-sheet/update-by-date`, {
+  } = await $patch(`/time-sheet/update-by-date`, {
     userId: userId,
     date: date,
     dto: timeSheets,

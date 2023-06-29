@@ -8,7 +8,6 @@ import PageWrapper from "../../components/PageWrapper";
 import {
   BiCalendarAlt,
   BiDollarCircle,
-  BiGridAlt,
   BiGroup,
   BiTask,
   BiWrench,
@@ -16,7 +15,6 @@ import {
 
 const Admin: React.FunctionComponent = () => {
   const adminSideBarItems = [
-    { name: "Thống kê", icon: <BiGridAlt />, path: "/admin/dashboard" },
     { name: "Nhân viên", icon: <BiGroup />, path: "/admin/employees" },
     { name: "Chấm công", icon: <BiTask />, path: "/admin/time-sheet" },
     { name: "Nghỉ phép", icon: <BiCalendarAlt />, path: "/admin/leaves" },

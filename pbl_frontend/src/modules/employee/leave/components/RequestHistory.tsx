@@ -187,6 +187,7 @@ const RequestHistory: React.FunctionComponent<Props> = (props: Props) => {
                 open={isOpenCancelModal}
                 width={400}
                 onCancel={() => setIsOpenCancelModal(false)}
+                destroyOnClose={true}
                 footer={[
                   <button
                     onClick={() => setIsOpenCancelModal(false)}
@@ -215,6 +216,7 @@ const RequestHistory: React.FunctionComponent<Props> = (props: Props) => {
             item: defaultRequest,
           })
         }
+        destroyOnClose={true}
         footer={null}
       >
         <UpdateRequest leaveRequest={isUpdateRequest.item} />

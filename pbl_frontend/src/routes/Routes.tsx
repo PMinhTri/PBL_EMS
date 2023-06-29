@@ -7,7 +7,6 @@ import {
 } from "react-router-dom";
 import LoginPage from "../modules/auth/LoginPage";
 import Admin from "../modules/admin/Admin";
-import Dashboard from "../modules/admin/Dashboard/Dashboard";
 import EmployeeManagement from "../modules/admin/EmployeeManagement/EmployeeManagement";
 import Auth from "../modules/auth/Auth";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -54,7 +53,7 @@ const Routes: React.FunctionComponent = () => {
 
     if (auth.isAuthenticated) {
       if (userBasicInfo.role === RoleEnum.ADMIN) {
-        window.location.href = "/admin/dashboard";
+        window.location.href = "/admin/employees";
       } else {
         window.location.href = "/employee/time-sheet";
       }
@@ -89,7 +88,6 @@ const Routes: React.FunctionComponent = () => {
               path="/admin/*"
               element={<AuthenticatedRoute element={<Admin />} />}
             >
-              <Route path="dashboard" element={<Dashboard />} />
               <Route path="employees" element={<EmployeeManagement />} />
               <Route path="leaves" element={<LeaveManagement />} />
               <Route path="payroll" element={<PayrollManagement />} />

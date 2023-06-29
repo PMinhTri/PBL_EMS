@@ -368,6 +368,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
               open={isOpenCreateModal}
               width={600}
               onCancel={() => setIsOpenCreateModal(false)}
+              destroyOnClose={true}
               footer={[
                 <Button
                   onClick={async () => {
@@ -507,6 +508,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
             title="Bạn muốn xóa nhân viên này?"
             open={isModalDeleteOpen.isOpen}
             width={400}
+            destroyOnClose={true}
             onCancel={() =>
               setIsModalDeleteOpen({
                 userId: "",
@@ -540,6 +542,7 @@ const EmployeeManagement: React.FunctionComponent = () => {
                 userInfo: {} as UserDetailInformation,
               })
             }
+            destroyOnClose={true}
             open={isOpenEditModal.isOpen}
             width={800}
             title="Thông tin nhân viên"

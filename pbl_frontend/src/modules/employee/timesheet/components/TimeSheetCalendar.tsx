@@ -316,6 +316,7 @@ const CalendarTimeSheet: React.FunctionComponent = () => {
           });
           setSession(SessionDate.Morning);
         }}
+        destroyOnClose={true}
         footer={
           <div className="w-full grid grid-cols-2 gap-1">
             <div></div>
