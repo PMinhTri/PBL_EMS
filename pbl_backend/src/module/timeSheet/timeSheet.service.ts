@@ -228,18 +228,20 @@ export class TimeSheetService {
     }
 
     for (const timeSheet of dto) {
-      await this.prisma.timeSheet.update({
-        where: {
-          id: timeSheet.id,
-        },
-        data: {
-          session: timeSheet.session,
-          status: timeSheet.status,
-          hoursWorked: timeSheet.hoursWorked,
-          timeIn: timeSheet.timeIn,
-          overtime: timeSheet.overtime,
-        },
-      });
+      if (timeSheet.status === timeSheetStatus.Submitted) {
+        await this.prisma.timeSheet.update({
+          where: {
+            id: timeSheet.id,
+          },
+          data: {
+            session: timeSheet.session,
+            status: timeSheet.status,
+            hoursWorked: timeSheet.hoursWorked,
+            timeIn: timeSheet.timeIn,
+            overtime: timeSheet.overtime,
+          },
+        });
+      }
     }
 
     return {

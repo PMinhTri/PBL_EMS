@@ -38,11 +38,9 @@ export const PayrollAction = {
     id: string,
     payload: Partial<Omit<PayrollPayload, "userId">>
   ) => {
-    console.log(id);
     const response = await updatedPayroll(id, payload);
 
     if (response.statusCode === 200) {
-      console.log(response.payload);
       showNotification("success", "Cập nhật bảng lương thành công");
       setTimeout(() => {
         window.location.reload();
