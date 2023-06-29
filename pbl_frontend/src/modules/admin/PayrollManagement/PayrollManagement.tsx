@@ -1,16 +1,18 @@
 import React from "react";
 import { TimeSheetAction } from "../../../actions/timeSheetAction";
-import { TimeSheet } from "../../../types/timeSheet";
 import { UserDetailInformation } from "../../../types/userTypes";
 import { UserAction } from "../../../actions/userAction";
 import { LeaveAction } from "../../../actions/leaveAction";
 import { LeaveRequest, LeaveStatus } from "../../../types/leaveTypes";
-import { BiEdit, BiReset } from "react-icons/bi";
+import { BiDollarCircle, BiEdit } from "react-icons/bi";
 import { PayrollAction } from "../../../actions/payrollAction";
-import { Payroll } from "../../../types/payrollTypes";
+import { Payroll, PayrollPayload } from "../../../types/payrollTypes";
 import { moneyFormat } from "../../../utils/format";
 import { Modal } from "antd";
 import PayrollModal from "./components/PayrollModal";
+import { PayrollStatus } from "../../../constants/enum";
+import Loading from "../../../components/Loading";
+import dayjs from "dayjs";
 
 const currentYears = Array.from(
   { length: 5 },
@@ -28,9 +30,13 @@ const PayrollManagement: React.FunctionComponent = () => {
     UserDetailInformation[]
   >([]);
 
-  const [timeSheets, setTimeSheets] = React.useState<TimeSheet[]>([]);
-
   const [leaveRequests, setLeaveRequests] = React.useState<LeaveRequest[]>([]);
+  const [allTotalWorkload, setAllTotalWorkload] = React.useState<
+    {
+      userId: string;
+      totalWorkload: number;
+    }[]
+  >([]);
   const [allOvertimeSheets, setAllOvertimeSheets] = React.useState<
     {
       userId: string;
@@ -38,29 +44,25 @@ const PayrollManagement: React.FunctionComponent = () => {
     }[]
   >([]);
 
-  const [openPayrollModal, setOpenPayrollModal] = React.useState(false);
+  const [openPayrollModal, setOpenPayrollModal] = React.useState<{
+    user: UserDetailInformation;
+    isOpen: boolean;
+  }>({
+    user: {} as UserDetailInformation,
+    isOpen: false,
+  });
+
+  const [paidModal, setPaidModal] = React.useState<{
+    user: UserDetailInformation;
+    isOpen: boolean;
+  }>({
+    user: {} as UserDetailInformation,
+    isOpen: false,
+  });
 
   const [payrollList, setPayrollList] = React.useState<Payroll[]>([]);
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      setEmployeeList(await UserAction.getAllEmployees());
-      setTimeSheets(
-        await TimeSheetAction.getAllInMonth(selectedMonth, selectedYear)
-      );
-      setLeaveRequests(
-        await LeaveAction.getAllLeaveRequest(selectedMonth, selectedYear)
-      );
-      setAllOvertimeSheets(
-        await TimeSheetAction.getAllTotalOvertime(selectedMonth, selectedYear)
-      );
-      setPayrollList(
-        await PayrollAction.getAllPayload(selectedMonth, selectedYear)
-      );
-    };
-
-    fetchData();
-  }, [selectedMonth, selectedYear]);
+  const [isCreating, setIsCreating] = React.useState(false);
 
   const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedYear(Number(e.target.value));
@@ -70,9 +72,77 @@ const PayrollManagement: React.FunctionComponent = () => {
     setSelectedMonth(Number(e.target.value));
   };
 
+  const getTotalWorkload = (userId: string) => {
+    return (
+      allTotalWorkload.find((workload) => workload.userId === userId)
+        ?.totalWorkload || 0
+    );
+  };
+
   const getOvertimes = (userId: string) => {
-    return allOvertimeSheets.find((overtime) => overtime.userId === userId)
-      ?.totalOvertime;
+    return (
+      allOvertimeSheets.find((overtime) => overtime.userId === userId)
+        ?.totalOvertime || 0
+    );
+  };
+
+  const handleCreatePayroll = React.useCallback(async () => {
+    const newListPayroll: PayrollPayload[] = [];
+    setIsCreating(true);
+    for (const employee of employeeList) {
+      newListPayroll.push({
+        userId: employee.id,
+        month: selectedMonth,
+        year: selectedYear,
+        basicSalary: 0,
+        additional: 0,
+        status: PayrollStatus.Unpaid,
+      });
+    }
+
+    await PayrollAction.calculatePayrollForAllUser(newListPayroll);
+  }, [employeeList, selectedMonth, selectedYear]);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      setEmployeeList(await UserAction.getAllEmployees());
+      setLeaveRequests(
+        await LeaveAction.getAllLeaveRequest(selectedMonth, selectedYear)
+      );
+      setAllTotalWorkload(
+        await TimeSheetAction.getAllTotalWorkload(selectedMonth, selectedYear)
+      );
+      setAllOvertimeSheets(
+        await TimeSheetAction.getAllTotalOvertime(selectedMonth, selectedYear)
+      );
+      setPayrollList(
+        (await PayrollAction.getAllPayload(selectedMonth, selectedYear)) || []
+      );
+    };
+
+    fetchData();
+  }, [selectedMonth, selectedYear, handleCreatePayroll]);
+
+  if (isCreating) {
+    return (
+      <div className="w-full h-full">
+        <Loading />
+      </div>
+    );
+  }
+
+  const handlePaidSalary = async () => {
+    const body: Partial<Omit<PayrollPayload, "userId">> = {
+      month: selectedMonth,
+      year: selectedYear,
+      status: PayrollStatus.Paid,
+    };
+
+    await PayrollAction.updatedPayroll(
+      payrollList.find((payload) => payload.userId === paidModal.user.id)?.id ||
+        "",
+      body
+    );
   };
 
   return (
@@ -112,100 +182,187 @@ const PayrollManagement: React.FunctionComponent = () => {
           </select>
         </div>
       </div>
-      <div className="w-full border-2 p-6 rounded-md flex flex-col overflow-x-auto">
-        <h2 className="text-2xl font-bold mb-4">Danh sách bảng lương</h2>
-
-        <div className="w-full h-80 overflow-y-auto scrollbar">
-          <table className="w-full border-collapse table-auto">
-            <thead className="sticky top-0">
-              <tr className="bg-slate-200 text-gray-600">
-                <th className="border border-gray-300 px-4 py-2">STT</th>
-                <th className="border border-gray-300 px-4 py-2">Họ và tên</th>
-                <th className="border border-gray-300 px-4 py-2">Ngày công</th>
-                <th className="border border-gray-300 px-4 py-2">Nghỉ phép</th>
-                <th className="border border-gray-300 px-4 py-2">Tăng ca</th>
-                <th className="border border-gray-300 px-4 py-2">Phụ cấp</th>
-                <th className="border border-gray-300 px-4 py-2">
-                  Lương cơ bản
-                </th>
-                <th className="border border-gray-300 px-4 py-2">Trạng thái</th>
-                <th className="border border-gray-300 px-4 py-2">Lương</th>
-                <th className="border border-gray-300 px-4 py-2">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody>
-              {employeeList.map((employee, index) => (
-                <tr className="text-center">
-                  <td className="border border-gray-300 px-4 py-2">
-                    {index + 1}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {employee.fullName}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {(timeSheets.find(
-                      (timeSheet) => timeSheet.userId === employee.id
-                    )?.hoursWorked || 0) / 8}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {leaveRequests
-                      .filter(
-                        (leaveRequest) =>
-                          leaveRequest.userId === employee.id &&
-                          leaveRequest.status === LeaveStatus.Approved
-                      )
-                      .reduce(
-                        (acc, leaveRequest) => acc + leaveRequest.leaveDays,
-                        0
-                      )}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {getOvertimes(employee.id) || 0}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {payrollList.find(
-                      (payroll) => payroll.userId === employee.id
-                    )?.additional || 0}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {payrollList.find(
-                      (payroll) => payroll.userId === employee.id
-                    )?.basicSalary || 0}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {payrollList.find(
-                      (payroll) => payroll.userId === employee.id
-                    )?.status || "Chưa thanh toán"}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {moneyFormat(
-                      payrollList.find(
-                        (payroll) => payroll.userId === employee.id
-                      )?.totalSalary || 0
-                    )}
-                  </td>
-                  <td className="py-3 px-4 text-center border-[2px]">
-                    <div className="w-full flex flex-row gap-2 justify-center items-center">
-                      <div
-                        className="text-green-500 text-2xl hover:text-green-600 hover:cursor-pointer"
-                        onClick={() => setOpenPayrollModal(true)}
-                      >
-                        <BiEdit />
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {!payrollList.length ? (
+        <div className="w-full flex flex-col justify-center items-center gap-2">
+          <div className="w-full flex justify-center items-center">
+            <span className="font-bold text-xl">
+              Chưa có dữ liệu bảng lương nào cho tháng {selectedMonth} năm
+              {selectedYear}
+            </span>
+          </div>
+          <div className="w-full flex justify-center items-center">
+            <button
+              className="p-2 border rounded-md bg-blue-500 hover:bg-blue-600"
+              onClick={handleCreatePayroll}
+            >
+              <span className="text-white font-bold text-md">Tạo dữ liệu</span>
+            </button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="w-full border-2 p-6 rounded-md flex flex-col overflow-x-auto">
+          <h2 className="text-2xl font-bold mb-4">Danh sách bảng lương</h2>
+
+          <div className="w-full h-80 overflow-y-auto scrollbar">
+            <table className="w-full border-collapse table-auto">
+              <thead className="sticky top-0">
+                <tr className="bg-slate-200 text-gray-600">
+                  <th className="border border-gray-300 px-4 py-2">STT</th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Họ và tên
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Ngày công
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Nghỉ phép
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">Tăng ca</th>
+                  <th className="border border-gray-300 px-4 py-2">Phụ cấp</th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Lương cơ bản
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Trạng thái
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">Lương</th>
+                  <th className="border border-gray-300 px-4 py-2">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {employeeList.map((employee, index) => (
+                  <tr className="text-center">
+                    <td className="border border-gray-300 px-4 py-2">
+                      {index + 1}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {employee.fullName}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {getTotalWorkload(employee.id)}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {leaveRequests
+                        .filter(
+                          (leaveRequest) =>
+                            leaveRequest.userId === employee.id &&
+                            leaveRequest.status === LeaveStatus.Approved
+                        )
+                        .reduce(
+                          (acc, leaveRequest) => acc + leaveRequest.leaveDays,
+                          0
+                        )}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {getOvertimes(employee.id)}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {payrollList.find(
+                        (payroll) => payroll.userId === employee.id
+                      )?.additional || 0}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {payrollList.find(
+                        (payroll) => payroll.userId === employee.id
+                      )?.basicSalary || 0}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {payrollList.find(
+                        (payroll) => payroll.userId === employee.id
+                      )?.status || "Chưa thanh toán"}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {moneyFormat(
+                        payrollList.find(
+                          (payroll) => payroll.userId === employee.id
+                        )?.totalSalary || 0
+                      )}
+                    </td>
+                    <td className="py-3 px-4 text-center border-[2px]">
+                      {payrollList.find(
+                        (payroll) => payroll.userId === employee.id
+                      )?.status === PayrollStatus.Unpaid && (
+                        <div className="w-full flex flex-row gap-2 justify-center items-center">
+                          <div
+                            className="text-green-500 text-2xl hover:text-green-600 hover:cursor-pointer"
+                            onClick={() =>
+                              setOpenPayrollModal({
+                                user: employee,
+                                isOpen: true,
+                              })
+                            }
+                          >
+                            <BiEdit />
+                          </div>
+                          <div
+                            className="text-yellow-500 text-2xl hover:text-yellow-600 hover:cursor-pointer"
+                            onClick={() =>
+                              setPaidModal({
+                                user: employee,
+                                isOpen: true,
+                              })
+                            }
+                          >
+                            <BiDollarCircle />
+                          </div>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
       <Modal
-        open={openPayrollModal}
-        onCancel={() => setOpenPayrollModal(false)}
+        open={paidModal.isOpen}
+        onCancel={() =>
+          setPaidModal({ user: {} as UserDetailInformation, isOpen: false })
+        }
+        footer={
+          <div className="w-full flex flex-row gap-2 justify-center items-center">
+            <button
+              className="p-2 w-24 border rounded-md bg-red-500 hover:bg-red-600"
+              onClick={() =>
+                setPaidModal({
+                  user: {} as UserDetailInformation,
+                  isOpen: false,
+                })
+              }
+            >
+              <span className="text-white font-bold text-md">Hủy</span>
+            </button>
+            <button
+              className="p-2 w-24 border rounded-md bg-blue-500 hover:bg-blue-600"
+              onClick={handlePaidSalary}
+            >
+              <span className="text-white font-bold text-md">Xác nhận</span>
+            </button>
+          </div>
+        }
+      >
+        <div className="w-full flex flex-col justify-center items-center gap-2">
+          <div className="w-full flex justify-center items-center">
+            <span className="font-bold text-lg">Xác nhận thanh toán lương</span>
+          </div>
+        </div>
+      </Modal>
+      <Modal
+        open={openPayrollModal.isOpen}
+        onCancel={() =>
+          setOpenPayrollModal({
+            user: {} as UserDetailInformation,
+            isOpen: false,
+          })
+        }
         footer={null}
       >
-        <PayrollModal />
+        <PayrollModal
+          user={openPayrollModal.user}
+          time={dayjs(`${selectedYear}-${selectedMonth}-01`).toDate()}
+        />
+        .
       </Modal>
     </div>
   );

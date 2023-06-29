@@ -18,16 +18,27 @@ export const formatDateTime = (
 
 export const getDates = (
   startDate: string | Date,
-  endDate: string | Date
+  endDate: string | Date,
+  weekend?: boolean
 ): string[] => {
   const start = new Date(startDate);
   const end = new Date(endDate);
   const dates: string[] = [];
 
-  // Iterate over the dates starting from the start date until reaching the end date
-  for (let date = start; date <= end; date.setDate(date.getDate() + 1)) {
-    const formattedDate = date.toISOString().split("T")[0];
-    dates.push(formattedDate);
+  for (
+    let current = start;
+    current <= end;
+    current.setDate(current.getDate() + 1)
+  ) {
+    // Push the current date formatted to YYYY-MM-DD to the array
+    if (weekend) {
+      if (current.getDay() === 6 || current.getDay() === 0) {
+        continue;
+      }
+    }
+    dates.push(
+      `${current.getFullYear()}-${current.getMonth() + 1}-${current.getDate()}`
+    );
   }
 
   return dates;
@@ -202,6 +213,7 @@ export function renderEvent(year: number, timeSheet: TimeSheet[]) {
     if (
       dayjs(formatDate).isSame(new Date(), "day") &&
       !(sheet.session === SessionDate.Morning) &&
+      !(sheet.status === TimeSheetStatus.Submitted) &&
       !sheet.overtime
     ) {
       events.push({
@@ -250,6 +262,7 @@ export function renderEvent(year: number, timeSheet: TimeSheet[]) {
     if (
       dayjs(formatDate).isSame(new Date(), "day") &&
       !(sheet.session === SessionDate.Afternoon) &&
+      !(sheet.status === TimeSheetStatus.Submitted) &&
       !sheet.overtime
     ) {
       events.push({

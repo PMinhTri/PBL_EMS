@@ -22,6 +22,7 @@ import TimeSheetManagement from "../modules/admin/TimeSheetManagement/TimeSheetM
 import LeaveRequest from "../modules/employee/leave/LeaveRequest";
 import Account from "../modules/account/Account";
 import Setting from "../modules/admin/SettingManagement/Setting";
+import ForgotPassword from "../modules/auth/ForgotPassword";
 
 export enum RoleEnum {
   ADMIN = "Admin",
@@ -80,6 +81,7 @@ const Routes: React.FunctionComponent = () => {
           }
         >
           <Route path="login" element={<LoginPage />} />
+          <Route path="forgot-password" element={<ForgotPassword />} />
         </Route>
         {userBasicInfo.role === RoleEnum.ADMIN ? (
           <>

@@ -24,3 +24,11 @@ export const changePassword = async (payload: ChangePasswordPayload) => {
 
   return response;
 };
+
+export const forgotPassword = async (email: string) => {
+  const response: AuthResponse = await $post("/auth/forgot-password", {
+    email,
+  });
+
+  return response;
+};

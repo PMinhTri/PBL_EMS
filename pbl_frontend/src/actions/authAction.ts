@@ -1,6 +1,7 @@
-import { LoginAPI, changePassword } from "../api/auth";
+import { LoginAPI, changePassword, forgotPassword } from "../api/auth";
 import { AuthPayload, ChangePasswordPayload } from "../types/authTypes";
 import { handleError } from "../utils/errorHandler";
+import showNotification from "../utils/notification";
 
 export const AuthAction = {
   login: async (payload: AuthPayload) => {
@@ -31,6 +32,21 @@ export const AuthAction = {
 
     if (response.statusCode === 200) {
       const { payload } = response;
+      return payload;
+    }
+
+    handleError(response);
+  },
+
+  fortgotPassword: async (email: string) => {
+    const response = await forgotPassword(email);
+
+    if (response.statusCode === 200) {
+      const { payload } = response;
+      showNotification("success", "Đã gửi thành công, hãy kiểm tra email!");
+      setTimeout(() => {
+        window.location.href = "/auth/login";
+      }, 1000);
       return payload;
     }
 

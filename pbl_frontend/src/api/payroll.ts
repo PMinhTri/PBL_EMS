@@ -1,11 +1,32 @@
-import { Payroll } from "../types/payrollTypes";
-import { $get, $post } from "../utils/http";
+import { Payroll, PayrollPayload } from "../types/payrollTypes";
+import { $get, $patch, $post } from "../utils/http";
 
 export const calculatePayroll = async (payload: Omit<Payroll, "id">) => {
   const response: {
     statusCode: number;
     payload: Payroll;
   } = await $post("/payroll", payload);
+
+  return response;
+};
+
+export const calculatePayrollForAllUser = async (payload: PayrollPayload[]) => {
+  const response: {
+    statusCode: number;
+    payload: Payroll[];
+  } = await $post(`/payroll/all`, payload);
+
+  return response;
+};
+
+export const updatedPayroll = async (
+  id: string,
+  payload: Partial<Omit<PayrollPayload, "userId">>
+) => {
+  const response: {
+    statusCode: number;
+    payload: Payroll;
+  } = await $patch(`/payroll/${id}`, payload);
 
   return response;
 };
@@ -27,9 +48,7 @@ export const getAllPayrollOfUser = async (
   const response: {
     statusCode: number;
     payload: Payroll[];
-  } = await $get(
-    `/payroll/user/user/?userId=${userId}&month=${month}&year=${year}`
-  );
+  } = await $get(`/payroll/user/?userId=${userId}&month=${month}&year=${year}`);
 
   return response;
 };

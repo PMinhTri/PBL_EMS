@@ -10,6 +10,7 @@ import { Payroll } from '@prisma/client';
 import { PayrollFailure } from 'src/enumTypes/failure.enum';
 import { PayrollDto } from './payroll.dto';
 import { LeaveService } from '../leave/leave.service';
+import { PayrollStatus } from 'src/enumTypes/payroll.enum';
 
 @Injectable()
 export class PayrollService {
@@ -27,6 +28,7 @@ export class PayrollService {
         userId: dto.userId,
         month: dto.month,
         year: dto.year,
+        status: PayrollStatus.Paid,
       },
     });
 
@@ -46,6 +48,13 @@ export class PayrollService {
         dto.year,
       );
 
+    const { result: totalOvertime } =
+      await this.timeSheetService.totalOvertimeOfUser(
+        payroll.userId,
+        payroll.month,
+        payroll.year,
+      );
+
     const leaveRequestInMonth = await this.leaveService.getAllLeaveRequest(
       dto.month,
       dto.year,
@@ -60,6 +69,7 @@ export class PayrollService {
     const totalSalary =
       totalHoursWorked * dto.basicSalary +
       totalLeaveRequestInMonthOfUser +
+      totalOvertime * dto.basicSalary +
       dto.additional;
 
     const newPayroll = await this.prisma.payroll.create({
@@ -79,9 +89,84 @@ export class PayrollService {
     };
   }
 
+  public async calculatePayrollForAllUserInMonth(
+    dto: PayrollDto[],
+  ): Promise<ServiceResponse<Payroll[], ServiceFailure<PayrollFailure>>> {
+    const listNewPayroll: Payroll[] = [];
+    for (const payroll of dto) {
+      const existingPayroll = await this.prisma.payroll.findFirst({
+        where: {
+          userId: payroll.userId,
+          month: payroll.month,
+          year: payroll.year,
+          status: PayrollStatus.Paid,
+        },
+      });
+
+      if (existingPayroll) {
+        return {
+          status: ServiceResponseStatus.Failed,
+          failure: {
+            reason: PayrollFailure.PAYROLL_ALREADY_PAID,
+          },
+        };
+      }
+
+      const { result: totalHoursWorked } =
+        await this.timeSheetService.totalWorkloadOfUser(
+          payroll.userId,
+          payroll.month,
+          payroll.year,
+        );
+
+      const { result: totalOvertime } =
+        await this.timeSheetService.totalOvertimeOfUser(
+          payroll.userId,
+          payroll.month,
+          payroll.year,
+        );
+
+      const leaveRequestInMonth = await this.leaveService.getAllLeaveRequest(
+        payroll.month,
+        payroll.year,
+      );
+
+      const totalLeaveRequestInMonthOfUser = leaveRequestInMonth
+        .filter((leave) => leave.userId === payroll.userId)
+        .reduce((acc, leave) => {
+          if (leave.status === 'APPROVED') return acc + leave.leaveDays;
+        }, 0);
+
+      const totalSalary =
+        totalHoursWorked * payroll.basicSalary +
+        totalOvertime * payroll.basicSalary +
+        totalLeaveRequestInMonthOfUser +
+        payroll.additional;
+
+      const newPayroll = await this.prisma.payroll.create({
+        data: {
+          userId: payroll.userId,
+          month: payroll.month,
+          year: payroll.year,
+          totalSalary: totalSalary,
+          basicSalary: payroll.basicSalary,
+          additional: payroll.additional,
+          status: PayrollStatus.Unpaid,
+        },
+      });
+
+      listNewPayroll.push(newPayroll);
+    }
+
+    return {
+      status: ServiceResponseStatus.Success,
+      result: listNewPayroll,
+    };
+  }
+
   public async updatePayroll(
     id: string,
-    dto: Omit<PayrollDto, 'userId'>,
+    dto: Partial<Omit<PayrollDto, 'userId'>>,
   ): Promise<ServiceResponse<Payroll, ServiceFailure<PayrollFailure>>> {
     const payroll = await this.prisma.payroll.findFirst({
       where: {
@@ -107,6 +192,13 @@ export class PayrollService {
         payroll.year,
       );
 
+    const { result: totalOvertime } =
+      await this.timeSheetService.totalOvertimeOfUser(
+        payroll.userId,
+        payroll.month,
+        payroll.year,
+      );
+
     const leaveRequestInMonth = await this.leaveService.getAllLeaveRequest(
       payroll.month,
       payroll.year,
@@ -118,8 +210,17 @@ export class PayrollService {
         if (leave.status === 'APPROVED') return acc + leave.leaveDays;
       }, 0);
 
+    if (!dto.basicSalary) {
+      dto.basicSalary = payroll.basicSalary;
+    }
+
+    if (!dto.additional) {
+      dto.additional = payroll.additional;
+    }
+
     const totalSalary =
       totalHoursWorked * dto.basicSalary +
+      totalOvertime * dto.basicSalary +
       totalLeaveRequestInMonthOfUser +
       dto.additional;
 

@@ -41,6 +41,29 @@ export class PayrollController {
     return res.send(SuccessResult(result));
   }
 
+  @Post('/all')
+  public async calculatePayrollForAllUser(
+    @Body() dto: PayrollDto[],
+    @Res() res: IResponse,
+  ): Promise<IResponse> {
+    const { status, result, failure } =
+      await this.payrollService.calculatePayrollForAllUserInMonth(dto);
+
+    if (status === ServiceResponseStatus.Failed) {
+      switch (failure.reason) {
+        case PayrollFailure.PAYROLL_ALREADY_PAID:
+          return res.send(
+            BadRequestResult({
+              reason: failure.reason,
+              message: 'Có một vài nhân viên đã được thanh toán rồi',
+            }),
+          );
+      }
+    }
+
+    return res.send(SuccessResult(result));
+  }
+
   @Get('/user')
   public async getAllPayrollInYearOfUser(
     @Query('userId') userId: string,
@@ -90,7 +113,7 @@ export class PayrollController {
   @Patch('/:id')
   public async updatePayroll(
     @Param('id') id: string,
-    @Body() dto: Omit<PayrollDto, 'userId'>,
+    @Body() dto: Partial<Omit<PayrollDto, 'userId'>>,
     @Res() res: IResponse,
   ): Promise<IResponse> {
     const { status, result, failure } = await this.payrollService.updatePayroll(

@@ -36,4 +36,10 @@ export enum TimeSheetStatus {
   Unsubmitted = "Chưa chấm công",
   LeaveWithoutRequest = "Nghỉ không phép",
   LeaveWithRequest = "Nghỉ có phép",
+  Overtime = "Tăng ca",
+}
+
+export enum PayrollStatus {
+  Unpaid = "Chưa thanh toán",
+  Paid = "Đã thanh toán",
 }
