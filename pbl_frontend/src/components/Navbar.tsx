@@ -1,5 +1,4 @@
 import React from "react";
-import loginImg from "../assets/login.jpg";
 import { Popover, Space } from "antd";
 import { AuthAction } from "../actions/authAction";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -60,7 +59,7 @@ const SelectContent: React.FunctionComponent = () => {
     }
 
     if (e.currentTarget.textContent === NavbarOptions.Admin) {
-      window.location.href = "/admin/dashboard";
+      window.location.href = "/admin/employees";
     }
 
     if (e.currentTarget.textContent === NavbarOptions.Employee) {

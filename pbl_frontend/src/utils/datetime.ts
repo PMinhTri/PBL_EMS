@@ -195,6 +195,7 @@ export function renderEvent(year: number, timeSheet: TimeSheet[]) {
   );
 
   for (const sheet of timeSheet) {
+    console.log(sheet.date === 26 && sheet);
     const formatDate = formatDateTime(sheet.date, sheet.month, year);
     if (sheet.session === SessionDate.Morning) {
       events.push({
@@ -216,6 +217,7 @@ export function renderEvent(year: number, timeSheet: TimeSheet[]) {
       !(sheet.status === TimeSheetStatus.Submitted) &&
       !sheet.overtime
     ) {
+      console.log("Here");
       events.push({
         title: SessionDate.Morning,
         start: `${formatDate}T08:00:00`,
@@ -231,8 +233,10 @@ export function renderEvent(year: number, timeSheet: TimeSheet[]) {
         formatDate
       ) &&
       !(sheet.session === SessionDate.Morning) &&
+      !(sheet.status === TimeSheetStatus.Submitted) &&
       !sheet.overtime
     ) {
+      console.log("Here 1");
       events.push({
         title: SessionDate.Morning,
         start: `${formatDate}T08:30:00`,
@@ -254,7 +258,7 @@ export function renderEvent(year: number, timeSheet: TimeSheet[]) {
             status: sheet.status,
             overTime: sheet.overtime,
             hoursWorked: sheet.hoursWorked,
-          },
+          }
         });
       }
     }
@@ -265,6 +269,7 @@ export function renderEvent(year: number, timeSheet: TimeSheet[]) {
       !(sheet.status === TimeSheetStatus.Submitted) &&
       !sheet.overtime
     ) {
+      console.log("Here 2");
       events.push({
         title: SessionDate.Afternoon,
         start: `${formatDate}T13:30:00`,
@@ -279,7 +284,8 @@ export function renderEvent(year: number, timeSheet: TimeSheet[]) {
       getPastDatesWithinYear(year, dayjs().format("YYYY-MM-DD"), true).includes(
         formatDate
       ) &&
-      !(sheet.session === SessionDate.Afternoon) &&
+      sheet.session === SessionDate.Afternoon &&
+      sheet.status !== TimeSheetStatus.Submitted &&
       !sheet.overtime
     ) {
       events.push({

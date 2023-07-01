@@ -106,11 +106,18 @@ const TimeSheetTable: React.FunctionComponent = () => {
   const getWorkLoadValue = (userId: string, day: number) => {
     const value = timeSheets
       .filter(
-        (timeSheet) => timeSheet.userId === userId && timeSheet.date === day
+        (timeSheet) =>
+          timeSheet.userId === userId &&
+          timeSheet.date === day &&
+          !timeSheet.overtime
       )
       .reduce((acc, curr) => acc + curr.hoursWorked, 0);
 
-    return value ? value / 8 : 0;
+    const nightOvertime = overtimes
+      .filter((overtime) => overtime.userId === userId && overtime.date === day)
+      .reduce((acc, curr) => acc + curr.hoursWorked, 0);
+
+    return value ? value / 8 + nightOvertime / 8 : 0;
   };
 
   const getOvertimeValue = (userId: string, day: number) => {
@@ -379,17 +386,6 @@ const TimeSheetTable: React.FunctionComponent = () => {
           date={openModal.date}
           userId={openModal.userId}
           leaveDay={openModal.leaveDay}
-          onClose={() =>
-            setOpenModal({
-              open: false,
-              userId: "",
-              date: "",
-              leaveDay: {
-                isLeaveDay: false,
-                context: "",
-              },
-            })
-          }
         />
       </Modal>
     </div>

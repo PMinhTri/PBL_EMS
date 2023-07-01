@@ -7,6 +7,9 @@ import { SessionDate, TimeSheetStatus } from "../../../../constants/enum";
 import { dateHelper, isWeekend } from "../../../../utils/datetime";
 import dayjs from "dayjs";
 import { Select } from "antd";
+import { Session } from "../../../../constants/constantVariables";
+import showNotification from "../../../../utils/notification";
+import { BsCheckLg } from "react-icons/bs";
 
 type Props = {
   date: string;
@@ -15,11 +18,10 @@ type Props = {
     isLeaveDay: boolean;
     context: string;
   };
-  onClose: () => void;
 };
 
 const TimeSheetModal: React.FunctionComponent<Props> = (props: Props) => {
-  const { date, userId, leaveDay, onClose } = props;
+  const { date, userId, leaveDay } = props;
   const [user, setUser] = React.useState<UserDetailInformation>(
     {} as UserDetailInformation
   );
@@ -35,6 +37,13 @@ const TimeSheetModal: React.FunctionComponent<Props> = (props: Props) => {
   const [onSelectNightStatus, setOnSelectNightStatus] =
     React.useState<TimeSheetStatus>("" as TimeSheetStatus);
 
+  const [isOvertime, setIsOvertime] = React.useState<boolean>(false);
+
+  const [onSelectOvertimeStatus, setOnSelectOvertimeStatus] =
+    React.useState<SessionDate>(SessionDate.Morning);
+
+  const [isAddOvertime, setIsAddOvertime] = React.useState<boolean>(false);
+
   const statusOptions = [
     {
       label: TimeSheetStatus.Submitted,
@@ -47,10 +56,6 @@ const TimeSheetModal: React.FunctionComponent<Props> = (props: Props) => {
     {
       label: TimeSheetStatus.LeaveWithoutRequest,
       value: TimeSheetStatus.LeaveWithoutRequest,
-    },
-    {
-      label: TimeSheetStatus.Overtime,
-      value: TimeSheetStatus.Overtime,
     },
   ];
 
@@ -117,6 +122,7 @@ const TimeSheetModal: React.FunctionComponent<Props> = (props: Props) => {
         }),
       date: date,
       status: onSelectMorningStatus,
+      overtime: dateHelper.dateToString.isWeekend(date),
     };
 
     const afternoonTimeSheetData: TimeSheetPayload = {
@@ -124,10 +130,7 @@ const TimeSheetModal: React.FunctionComponent<Props> = (props: Props) => {
       userId: userId,
       session: afternoonTimeSheet?.session ?? SessionDate.Afternoon,
       hoursWorked:
-        onSelectAfternoonStatus === TimeSheetStatus.Submitted ||
-        onSelectAfternoonStatus === TimeSheetStatus.Overtime
-          ? 4
-          : 0,
+        onSelectAfternoonStatus === TimeSheetStatus.Submitted ? 4 : 0,
       timeIn:
         afternoonTimeSheet?.timeIn ??
         new Date().toLocaleTimeString("vi", {
@@ -137,6 +140,7 @@ const TimeSheetModal: React.FunctionComponent<Props> = (props: Props) => {
         }),
       date: date,
       status: onSelectAfternoonStatus,
+      overtime: dateHelper.dateToString.isWeekend(date),
     };
 
     const nightTimeSheetData: TimeSheetPayload = {
@@ -144,8 +148,7 @@ const TimeSheetModal: React.FunctionComponent<Props> = (props: Props) => {
       userId: userId,
       session: nightTimeSheet?.session ?? SessionDate.Night,
       hoursWorked:
-        onSelectNightStatus === TimeSheetStatus.Submitted ||
-        onSelectNightStatus === TimeSheetStatus.Overtime
+        onSelectNightStatus === TimeSheetStatus.Submitted || isAddOvertime
           ? 4
           : 0,
       timeIn:
@@ -156,14 +159,46 @@ const TimeSheetModal: React.FunctionComponent<Props> = (props: Props) => {
           second: "2-digit",
         }),
       date: date,
-      status: onSelectNightStatus,
+      status: isAddOvertime ? TimeSheetStatus.Submitted : onSelectNightStatus,
+      overtime: true,
     };
 
-    await TimeSheetAction.updateByDate(userId, dayjs(date).toDate(), [
-      morningTimeSheetData,
-      afternoonTimeSheetData,
-      nightTimeSheetData,
-    ]);
+    if (
+      isAddOvertime ||
+      dateHelper.dateToString.isWeekend(date) ||
+      nightTimeSheet?.id
+    ) {
+      await TimeSheetAction.updateByDate(userId, dayjs(date).toDate(), [
+        morningTimeSheetData,
+        afternoonTimeSheetData,
+        nightTimeSheetData,
+      ]);
+    } else {
+      await TimeSheetAction.updateByDate(userId, dayjs(date).toDate(), [
+        morningTimeSheetData,
+        afternoonTimeSheetData,
+      ]);
+    }
+  };
+
+  const handleAddOvertime = async () => {
+    try {
+      await TimeSheetAction.create({
+        userId: userId,
+        session: onSelectOvertimeStatus,
+        hoursWorked: Session[onSelectOvertimeStatus] * 8,
+        timeIn: new Date().toLocaleTimeString("vi", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        }),
+        date: date,
+        status: TimeSheetStatus.Submitted,
+        overtime: true,
+      });
+    } catch (error) {
+      showNotification("error", "Thêm thất bại! Vui lòng thử lại");
+    }
   };
 
   const checkStatus = (
@@ -174,15 +209,9 @@ const TimeSheetModal: React.FunctionComponent<Props> = (props: Props) => {
       context: string;
     }
   ) => {
-    if (timeSheet.status === TimeSheetStatus.Submitted && !timeSheet.overtime) {
+    if (timeSheet.status === TimeSheetStatus.Submitted) {
       return {
         status: TimeSheetStatus.Submitted,
-      };
-    }
-
-    if (timeSheet.status === TimeSheetStatus.Submitted && timeSheet.overtime) {
-      return {
-        status: TimeSheetStatus.Overtime,
       };
     }
 
@@ -214,25 +243,67 @@ const TimeSheetModal: React.FunctionComponent<Props> = (props: Props) => {
     if (!timeSheets.length) {
       return (
         <div className="w-full p-4 flex flex-col gap-4">
-          <div className="w-full p-4">
-            <span className="font-bold text-xl text-gray-800">
-              Không có tăng ca vào ngày nghỉ
-            </span>
-          </div>
+          {!isOvertime ? (
+            <div className="w-full p-4">
+              <span className="font-bold text-xl text-gray-800">
+                Không có tăng ca vào ngày nghỉ
+              </span>
+            </div>
+          ) : (
+            <div className="w-full flex flex-col">
+              <div className="w-full p-4 flex justify-center items-center">
+                <span className="font-bold text-xl text-gray-800">
+                  Chọn thời gian tăng ca cuối tuần
+                </span>
+              </div>
+              <div className="grid grid-cols-2 justify-center items-center">
+                <span className="text-sm font-bold">Chọn ca:</span>
+                <Select
+                  className="w-full mr-1"
+                  value={onSelectOvertimeStatus}
+                  options={[
+                    { value: SessionDate.Morning, label: "Sáng 8:00 -> 12:00" },
+                    {
+                      value: SessionDate.Afternoon,
+                      label: "Chiều 13:30 -> 17:30",
+                    },
+                    { value: SessionDate.Night, label: "Tối 18:00 -> 22:00" },
+                  ]}
+                  onChange={(value) =>
+                    setOnSelectOvertimeStatus(value as SessionDate)
+                  }
+                />
+              </div>
+            </div>
+          )}
           <div className="w-full flex flex-row justify-end items-center gap-2">
-            <button
-              className="px-4 py-2 w-24 bg-gray-200 hover:bg-gray-400 rounded-md text-gray-700 font-bold text-sm"
-              onClick={onClose}
-            >
-              Đóng
-            </button>
-            <button
-              className="
+            {isOvertime ? (
+              <>
+                <button
+                  className="px-4 py-2 w-24 bg-red-500 hover:bg-red-600 rounded-md text-white font-bold text-sm"
+                  onClick={() => setIsOvertime(false)}
+                >
+                  Hủy
+                </button>
+                <button
+                  className="
+        px-4 py-2 w-26 bg-green-500 hover:bg-green-600 rounded-md text-white font-bold text-sm
+      "
+                  onClick={handleAddOvertime}
+                >
+                  Cập nhật
+                </button>
+              </>
+            ) : (
+              <button
+                className="
           px-4 py-2 w-26 bg-blue-500 hover:bg-blue-600 rounded-md text-white font-bold text-sm
         "
-            >
-              Thêm tăng ca
-            </button>
+                onClick={() => setIsOvertime(true)}
+              >
+                Thêm tăng ca
+              </button>
+            )}
           </div>
         </div>
       );
@@ -266,124 +337,153 @@ const TimeSheetModal: React.FunctionComponent<Props> = (props: Props) => {
               <span className="text-sm text-gray-900">{date}</span>
             </div>
           </div>
-          {timeSheets.find(
-            (timeSheet) => timeSheet.session === SessionDate.Morning
-          )?.overtime && (
-            <div className="grid grid-cols-2 justify-center items-center">
-              <div className="flex justify-start">
-                <span className="font-bold text-sm text-gray-700">
-                  Ca sáng:
-                </span>
-              </div>
-              <div className="w-[152px] flex flex-row justify-between items-center cursor-pointer">
-                <Select
-                  className="w-full mr-1"
-                  disabled={!isEditTimeSheet}
-                  value={onSelectMorningStatus}
-                  defaultValue={
-                    checkStatus(
-                      timeSheets.find(
-                        (timeSheet) => timeSheet.session === SessionDate.Morning
-                      ) ?? ({} as TimeSheet),
-                      date,
-                      leaveDay
-                    )?.status
-                  }
-                  options={statusOptions}
-                  onChange={(value) => setOnSelectMorningStatus(value)}
-                />
-                <span className="font-bold text-sm">
-                  {timeSheets.find(
-                    (timeSheet) =>
-                      timeSheet.userId === userId &&
-                      timeSheet.session === SessionDate.Morning
-                  )?.timeIn || ""}
-                </span>
-              </div>
+          <div className="grid grid-cols-2 justify-center items-center">
+            <div className="flex justify-start">
+              <span className="font-bold text-sm text-gray-700">Ca sáng:</span>
             </div>
-          )}
-          {timeSheets.find(
-            (timeSheet) => timeSheet.session === SessionDate.Afternoon
-          )?.overtime && (
-            <div className="grid grid-cols-2 justify-center items-center">
-              <div className="flex justify-start">
-                <span className="font-bold text-sm text-gray-700">
-                  Ca chiều:
-                </span>
-              </div>
-              <div className="w-[152px] flex flex-row justify-between items-center cursor-pointer">
-                <Select
-                  className="w-full mr-1"
-                  disabled={!isEditTimeSheet}
-                  value={
-                    checkStatus(
-                      timeSheets.find(
-                        (timeSheet) =>
-                          timeSheet.session === SessionDate.Afternoon
-                      ) ?? ({} as TimeSheet),
-                      date,
-                      leaveDay
-                    )?.status
-                  }
-                  options={statusOptions}
-                  onChange={(value) => setOnSelectAfternoonStatus(value)}
-                />
-                <span className="font-bold text-sm">
-                  {timeSheets.find(
-                    (timeSheet) =>
-                      timeSheet.userId === userId &&
-                      timeSheet.session === SessionDate.Afternoon
-                  )?.timeIn || ""}
-                </span>
-              </div>
+            <div className="w-[212px] flex flex-row justify-between items-center cursor-pointer">
+              <Select
+                className="w-full mr-1"
+                disabled={!isEditTimeSheet}
+                value={onSelectMorningStatus}
+                defaultValue={
+                  checkStatus(
+                    timeSheets.find(
+                      (timeSheet) => timeSheet.session === SessionDate.Morning
+                    ) ?? ({} as TimeSheet),
+                    date,
+                    leaveDay
+                  )?.status
+                }
+                options={[
+                  {
+                    label: TimeSheetStatus.Submitted,
+                    value: TimeSheetStatus.Submitted,
+                  },
+                  {
+                    label: TimeSheetStatus.Unsubmitted,
+                    value: TimeSheetStatus.Unsubmitted,
+                  },
+                ]}
+                onChange={(value) => setOnSelectMorningStatus(value)}
+              />
+              <span className="font-bold text-sm">
+                {timeSheets.find(
+                  (timeSheet) =>
+                    timeSheet.userId === userId &&
+                    timeSheet.session === SessionDate.Morning
+                )?.timeIn || ""}
+              </span>
             </div>
-          )}
-          {timeSheets.find(
-            (timeSheet) => timeSheet.session === SessionDate.Night
-          )?.overtime && (
-            <div className="grid grid-cols-2 justify-center items-center">
-              <div className="flex justify-start">
-                <span className="font-bold text-sm text-gray-700">Ca tối:</span>
-              </div>
-              <div className="w-[152px] flex flex-row justify-between items-center cursor-pointer">
-                <Select
-                  className="w-full mr-1"
-                  disabled={!isEditTimeSheet}
-                  value={
-                    checkStatus(
-                      timeSheets.find(
-                        (timeSheet) => timeSheet.session === SessionDate.Night
-                      ) ?? ({} as TimeSheet),
-                      date,
-                      leaveDay
-                    )?.status
-                  }
-                  options={statusOptions}
-                  onChange={(value) => setOnSelectNightStatus(value)}
-                />
-                <span className="font-bold text-sm">
-                  {timeSheets.find((timeSheet) => timeSheet.userId === userId)
-                    ?.timeIn || ""}
-                </span>
-              </div>
+          </div>
+          <div className="grid grid-cols-2 justify-center items-center">
+            <div className="flex justify-start">
+              <span className="font-bold text-sm text-gray-700">Ca chiều:</span>
             </div>
-          )}
+            <div className="w-[212px] flex flex-row justify-between items-center cursor-pointer">
+              <Select
+                className="w-full mr-1"
+                disabled={!isEditTimeSheet}
+                value={onSelectAfternoonStatus}
+                defaultValue={
+                  checkStatus(
+                    timeSheets.find(
+                      (timeSheet) => timeSheet.session === SessionDate.Afternoon
+                    ) ?? ({} as TimeSheet),
+                    date,
+                    leaveDay
+                  )?.status
+                }
+                options={[
+                  {
+                    label: TimeSheetStatus.Submitted,
+                    value: TimeSheetStatus.Submitted,
+                  },
+                  {
+                    label: TimeSheetStatus.Unsubmitted,
+                    value: TimeSheetStatus.Unsubmitted,
+                  },
+                ]}
+                onChange={(value) => setOnSelectAfternoonStatus(value)}
+              />
+              <span className="font-bold text-sm">
+                {timeSheets.find(
+                  (timeSheet) =>
+                    timeSheet.userId === userId &&
+                    timeSheet.session === SessionDate.Afternoon
+                )?.timeIn || ""}
+              </span>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 justify-center items-center">
+            <div className="flex justify-start">
+              <span className="font-bold text-sm text-gray-700">Ca tối:</span>
+            </div>
+            <div className="w-[212px] flex flex-row justify-between items-center cursor-pointer">
+              <Select
+                className="w-full mr-1"
+                disabled={!isEditTimeSheet}
+                value={onSelectNightStatus}
+                defaultValue={
+                  checkStatus(
+                    timeSheets.find(
+                      (timeSheet) => timeSheet.session === SessionDate.Night
+                    ) ?? ({} as TimeSheet),
+                    date,
+                    leaveDay
+                  )?.status
+                }
+                options={[
+                  {
+                    label: TimeSheetStatus.Submitted,
+                    value: TimeSheetStatus.Submitted,
+                  },
+                  {
+                    label: TimeSheetStatus.Unsubmitted,
+                    value: TimeSheetStatus.Unsubmitted,
+                  },
+                ]}
+                onChange={(value) => setOnSelectNightStatus(value)}
+              />
+              <span className="font-bold text-sm">
+                {timeSheets.find(
+                  (timeSheet) =>
+                    timeSheet.userId === userId &&
+                    timeSheet.session === SessionDate.Night
+                )?.timeIn || ""}
+              </span>
+            </div>
+          </div>
         </div>
-        <div className="w-full flex flex-row justify-end items-center gap-2">
-          <button
-            className="px-4 py-2 w-24 bg-gray-200 hover:bg-gray-400 rounded-md text-gray-700 font-bold text-sm"
-            onClick={onClose}
-          >
-            Đóng
-          </button>
-          <button
-            className="
-          px-4 py-2 w-26 bg-blue-500 hover:bg-blue-600 rounded-md text-white font-bold text-sm
+        {isEditTimeSheet ? (
+          <div className="w-full flex flex-row justify-end items-center gap-2">
+            <button
+              className="px-4 py-2 w-24 bg-red-500 hover:bg-red-600 rounded-md text-white font-bold text-sm"
+              onClick={() => setIsEditTimeSheet(false)}
+            >
+              Hủy
+            </button>
+            <button
+              className="
+          px-4 py-2 w-26 bg-green-500 hover:bg-green-600 rounded-md text-white font-bold text-sm
         "
-          >
-            Thêm tăng ca
-          </button>
-        </div>
+              onClick={handleApply}
+            >
+              Cập nhật
+            </button>
+          </div>
+        ) : (
+          <div className="w-full flex flex-row justify-end items-center gap-2">
+            <button
+              className="
+      px-4 py-2 w-26 bg-blue-500 hover:bg-blue-600 rounded-md text-white font-bold text-sm
+    "
+              onClick={() => setIsEditTimeSheet(true)}
+            >
+              Chỉnh sửa
+            </button>
+          </div>
+        )}
       </div>
     );
   }
@@ -417,7 +517,7 @@ const TimeSheetModal: React.FunctionComponent<Props> = (props: Props) => {
             <div className="flex justify-start">
               <span className="font-bold text-sm text-gray-700">Ca sáng:</span>
             </div>
-            <div className="w-[152px] flex flex-row justify-between items-center cursor-pointer">
+            <div className="w-[212px] flex flex-row justify-between items-center cursor-pointer">
               <Select
                 className="w-full mr-1"
                 disabled={!isEditTimeSheet}
@@ -451,7 +551,7 @@ const TimeSheetModal: React.FunctionComponent<Props> = (props: Props) => {
             <div className="flex justify-start">
               <span className="font-bold text-sm text-gray-700">Ca chiều:</span>
             </div>
-            <div className="w-[152px] flex flex-row justify-between items-center cursor-pointer">
+            <div className="w-[212px] flex flex-row justify-between items-center cursor-pointer">
               <Select
                 className="w-full mr-1"
                 disabled={!isEditTimeSheet}
@@ -481,6 +581,37 @@ const TimeSheetModal: React.FunctionComponent<Props> = (props: Props) => {
           </div>
         </div>
         <div>
+          {isEditTimeSheet &&
+            !timeSheets.find(
+              (timeSheet) => timeSheet.session === SessionDate.Night
+            )?.overtime && (
+              <div>
+                <div className="flex justify-center items-center">
+                  <div
+                    className={`px-4 py-2 w-26 flex flex-row gap-2 ${
+                      !isAddOvertime && `bg-blue-500 hover:bg-blue-600`
+                    } ${
+                      isAddOvertime && `bg-green-500 hover:bg-green-400`
+                    } rounded-md 
+             font-bold text-sm hover:cursor-pointer`}
+                    onClick={() => {
+                      if (isAddOvertime) {
+                        setIsAddOvertime(false);
+                      } else {
+                        setIsAddOvertime(true);
+                      }
+                    }}
+                  >
+                    <span className="font-bold text-sm text-white">
+                      Tăng ca tối
+                    </span>
+                    {isAddOvertime && (
+                      <BsCheckLg className="text-white text-lg" />
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           {timeSheets.find(
             (timeSheet) => timeSheet.session === SessionDate.Night
           )?.overtime && (
@@ -488,7 +619,7 @@ const TimeSheetModal: React.FunctionComponent<Props> = (props: Props) => {
               <div className="flex justify-start">
                 <span className="font-bold text-sm text-gray-700">Ca tối:</span>
               </div>
-              <div className="w-[152px] flex flex-row justify-between items-center cursor-pointer">
+              <div className="w-[212px] flex flex-row justify-between items-center cursor-pointer">
                 <Select
                   className="w-full mr-1"
                   disabled={!isEditTimeSheet}
@@ -502,7 +633,16 @@ const TimeSheetModal: React.FunctionComponent<Props> = (props: Props) => {
                       leaveDay
                     )?.status
                   }
-                  options={statusOptions}
+                  options={[
+                    {
+                      label: TimeSheetStatus.Submitted,
+                      value: TimeSheetStatus.Submitted,
+                    },
+                    {
+                      label: TimeSheetStatus.Unsubmitted,
+                      value: TimeSheetStatus.Unsubmitted,
+                    },
+                  ]}
                   onChange={(value) => {
                     setOnSelectNightStatus(value);
                   }}

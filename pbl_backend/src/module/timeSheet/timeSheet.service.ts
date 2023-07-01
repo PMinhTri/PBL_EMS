@@ -209,26 +209,8 @@ export class TimeSheetService {
     const extractDate = dayjs(date).format('DD/MM/YYYY');
     const [day, month, year] = extractDate.split('/').map(Number);
 
-    const existingTimeSheet = await this.prisma.timeSheet.findMany({
-      where: {
-        userId: userId,
-        date: day,
-        month: month,
-        year: year,
-      },
-    });
-
-    if (!existingTimeSheet.length) {
-      return {
-        status: ServiceResponseStatus.Failed,
-        failure: {
-          reason: TimeSheetFailure.TIME_SHEET_NOT_FOUND,
-        },
-      };
-    }
-
     for (const timeSheet of dto) {
-      if (timeSheet.status === timeSheetStatus.Submitted) {
+      if (timeSheet.status === timeSheetStatus.Submitted && timeSheet.id) {
         await this.prisma.timeSheet.update({
           where: {
             id: timeSheet.id,
@@ -238,6 +220,30 @@ export class TimeSheetService {
             status: timeSheet.status,
             hoursWorked: timeSheet.hoursWorked,
             timeIn: timeSheet.timeIn,
+            overtime: timeSheet.overtime,
+          },
+        });
+      }
+
+      if (timeSheet.status !== timeSheetStatus.Submitted && timeSheet.id) {
+        await this.prisma.timeSheet.delete({
+          where: {
+            id: timeSheet.id,
+          },
+        });
+      }
+
+      if (!timeSheet.id && timeSheet.status === timeSheetStatus.Submitted) {
+        await this.prisma.timeSheet.create({
+          data: {
+            userId: userId,
+            session: timeSheet.session,
+            status: timeSheet.status,
+            hoursWorked: timeSheet.hoursWorked,
+            timeIn: timeSheet.timeIn,
+            date: day,
+            month: month,
+            year: year,
             overtime: timeSheet.overtime,
           },
         });
@@ -346,7 +352,6 @@ export class TimeSheetService {
         if (curr.userId === user.id) {
           return acc + curr.hoursWorked;
         }
-        return acc;
       }, 0);
 
       totalOvertimeOfAllUser.push({
