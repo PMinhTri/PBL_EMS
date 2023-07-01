@@ -194,122 +194,123 @@ export function renderEvent(year: number, timeSheet: TimeSheet[]) {
     getPastDatesWithinYear(year, dayjs().format("YYYY-MM-DD"))
   );
 
-  for (const sheet of timeSheet) {
-    console.log(sheet.date === 26 && sheet);
-    const formatDate = formatDateTime(sheet.date, sheet.month, year);
-    if (sheet.session === SessionDate.Morning) {
-      events.push({
-        title: sheet.session,
-        start: `${formatDate}T08:00:00`,
-        end: `${formatDate}T12:00:00`,
-        extendedProps: {
-          timeIn: sheet.timeIn,
-          status: sheet.status,
-          overTime: sheet.overtime,
-          hoursWorked: sheet.hoursWorked,
-        },
-      });
-    }
+  for (const date of sheetDate) {
+    const sheets = timeSheet.filter(
+      (sheet) =>
+        formatDateTime(sheet.date, sheet.month, year) === date &&
+        sheet.status === TimeSheetStatus.Submitted
+    );
 
-    if (
-      dayjs(formatDate).isSame(new Date(), "day") &&
-      !(sheet.session === SessionDate.Morning) &&
-      !(sheet.status === TimeSheetStatus.Submitted) &&
-      !sheet.overtime
-    ) {
-      console.log("Here");
-      events.push({
-        title: SessionDate.Morning,
-        start: `${formatDate}T08:00:00`,
-        end: `${formatDate}T12:00:00`,
-        extendedProps: {
-          status: TimeSheetStatus.Unsubmitted,
-        },
-      });
-    }
+    const nonExistSession = _.difference(
+      [SessionDate.Morning, SessionDate.Afternoon, SessionDate.Night],
+      sheets.map((sheet) => sheet.session)
+    );
 
-    if (
-      getPastDatesWithinYear(year, dayjs().format("YYYY-MM-DD"), true).includes(
-        formatDate
-      ) &&
-      !(sheet.session === SessionDate.Morning) &&
-      !(sheet.status === TimeSheetStatus.Submitted) &&
-      !sheet.overtime
-    ) {
-      console.log("Here 1");
-      events.push({
-        title: SessionDate.Morning,
-        start: `${formatDate}T08:30:00`,
-        end: `${formatDate}T12:00:00`,
-        extendedProps: {
-          status: TimeSheetStatus.LeaveWithoutRequest,
-        },
-      });
-    }
-
-    if (sheet.session === SessionDate.Afternoon) {
-      if (sheet.status === TimeSheetStatus.Submitted) {
+    for (const sh of sheets) {
+      if (sh.session === SessionDate.Morning) {
         events.push({
-          title: sheet.session,
-          start: `${formatDate}T13:30:00`,
-          end: `${formatDate}T17:30:00`,
+          title: sh.session,
+          start: `${date}T08:00:00`,
+          end: `${date}T12:00:00`,
           extendedProps: {
-            timeIn: sheet.timeIn,
-            status: sheet.status,
-            overTime: sheet.overtime,
-            hoursWorked: sheet.hoursWorked,
-          }
+            timeIn: sh.timeIn,
+            status: sh.status,
+            overTime: sh.overtime,
+            hoursWorked: sh.hoursWorked,
+          },
+        });
+      }
+
+      if (sh.session === SessionDate.Afternoon) {
+        events.push({
+          title: sh.session,
+          start: `${date}T13:30:00`,
+          end: `${date}T17:30:00`,
+          extendedProps: {
+            timeIn: sh.timeIn,
+            status: sh.status,
+            overTime: sh.overtime,
+            hoursWorked: sh.hoursWorked,
+          },
+        });
+      }
+
+      if (sh.session === SessionDate.Night) {
+        events.push({
+          title: sh.session,
+          start: `${date}T18:00:00`,
+          end: `${date}T22:00:00`,
+          extendedProps: {
+            timeIn: sh.timeIn,
+            status: sh.status,
+            overTime: sh.overtime,
+            hoursWorked: sh.hoursWorked,
+          },
         });
       }
     }
 
-    if (
-      dayjs(formatDate).isSame(new Date(), "day") &&
-      !(sheet.session === SessionDate.Afternoon) &&
-      !(sheet.status === TimeSheetStatus.Submitted) &&
-      !sheet.overtime
-    ) {
-      console.log("Here 2");
-      events.push({
-        title: SessionDate.Afternoon,
-        start: `${formatDate}T13:30:00`,
-        end: `${formatDate}T17:30:00`,
-        extendedProps: {
-          status: TimeSheetStatus.Unsubmitted,
-        },
-      });
-    }
+    for (const s of nonExistSession) {
+      if (dayjs(date).isSame(new Date(), "day") && s === SessionDate.Morning) {
+        events.push({
+          title: SessionDate.Morning,
+          start: `${date}T08:00:00`,
+          end: `${date}T12:00:00`,
+          extendedProps: {
+            status: TimeSheetStatus.Unsubmitted,
+          },
+        });
+      }
 
-    if (
-      getPastDatesWithinYear(year, dayjs().format("YYYY-MM-DD"), true).includes(
-        formatDate
-      ) &&
-      sheet.session === SessionDate.Afternoon &&
-      sheet.status !== TimeSheetStatus.Submitted &&
-      !sheet.overtime
-    ) {
-      events.push({
-        title: SessionDate.Afternoon,
-        start: `${formatDate}T13:30:00`,
-        end: `${formatDate}T17:30:00`,
-        extendedProps: {
-          status: TimeSheetStatus.LeaveWithoutRequest,
-        },
-      });
-    }
+      if (
+        dayjs(date).isSame(new Date(), "day") &&
+        s === SessionDate.Afternoon
+      ) {
+        events.push({
+          title: SessionDate.Afternoon,
+          start: `${date}T13:30:00`,
+          end: `${date}T17:30:00`,
+          extendedProps: {
+            status: TimeSheetStatus.Unsubmitted,
+          },
+        });
+      }
 
-    if (sheet.session === SessionDate.Night) {
-      events.push({
-        title: sheet.session,
-        start: `${formatDate}T18:00:00`,
-        end: `${formatDate}T22:00:00`,
-        extendedProps: {
-          timeIn: sheet.timeIn,
-          status: sheet.status,
-          overTime: sheet.overtime,
-          hoursWorked: sheet.hoursWorked,
-        },
-      });
+      if (
+        getPastDatesWithinYear(
+          year,
+          dayjs().format("YYYY-MM-DD"),
+          true
+        ).includes(date) &&
+        s === SessionDate.Morning
+      ) {
+        events.push({
+          title: SessionDate.Morning,
+          start: `${date}T08:30:00`,
+          end: `${date}T12:00:00`,
+          extendedProps: {
+            status: TimeSheetStatus.LeaveWithoutRequest,
+          },
+        });
+      }
+
+      if (
+        getPastDatesWithinYear(
+          year,
+          dayjs().format("YYYY-MM-DD"),
+          true
+        ).includes(date) &&
+        s === SessionDate.Afternoon
+      ) {
+        events.push({
+          title: SessionDate.Afternoon,
+          start: `${date}T13:30:00`,
+          end: `${date}T17:30:00`,
+          extendedProps: {
+            status: TimeSheetStatus.LeaveWithoutRequest,
+          },
+        });
+      }
     }
   }
 
