@@ -14,10 +14,14 @@ import { LeaveStatus } from 'src/enumTypes/leave.enum';
 import * as dayjs from 'dayjs';
 import { intersection, isEqual } from 'lodash';
 import { LeaveBalance } from './leave.type';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class LeaveService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private mailService: MailService,
+  ) {}
 
   private async checkValidLeaveRequest(
     dto: LeaveRequestDto,
@@ -222,6 +226,16 @@ export class LeaveService {
         status: LeaveStatus.Pending,
       },
     });
+
+    await this.mailService.sendOnCreateLeaveRequest(
+      dto.userId,
+      await this.getLeaveTypeByLeaveRequestId(leaveRequest.id).then(
+        (res) => res.result.name,
+      ),
+      dayjs(dto.startDate).format('DD/MM/YYYY'),
+      dayjs(dto.endDate).format('DD/MM/YYYY'),
+      dto.reason,
+    );
 
     return {
       status: ServiceResponseStatus.Success,
