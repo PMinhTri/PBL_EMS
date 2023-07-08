@@ -18,6 +18,7 @@ import TimeSheetModal from "./TimeSheetModal";
 import _ from "lodash";
 import dayjs from "dayjs";
 import { SessionDate } from "../../../../constants/enum";
+import { exportExcelForTimeSheet } from "../../../../utils/file";
 
 const currentYears = Array.from(
   { length: 5 },
@@ -182,6 +183,43 @@ const TimeSheetTable: React.FunctionComponent = () => {
 
   const daysOfWeek = ["CN", "Th.2", "Th.3", "Th.4", "Th.5", "Th.6", "Th.7"];
 
+  const excelData = employeeList
+    .sort((a, b) => a.fullName.localeCompare(b.fullName))
+    .map((employee) => {
+      const row = {
+        fullName: employee.fullName,
+        // Generate days array based on your logic
+        days: generateDaysArray().map((day) => {
+          const date = new Date(selectedYear, selectedMonth - 1, day);
+
+          if (isWeekend(date)) {
+            return getOvertimeValue(employee.id, day);
+          } else if (!isLeaveDay(employee.id, date)) {
+            return getWorkLoadValue(employee.id, day);
+          } else {
+            return isLeaveDay(employee.id, date)?.context;
+          }
+        }),
+        totalWorkload: allWorkload.find((sheet) => sheet.userId === employee.id)
+          ?.totalWorkload,
+        totalLeaveDays: leaveRequests
+          .filter(
+            (leaveRequest) =>
+              leaveRequest.userId === employee.id &&
+              leaveRequest.status === LeaveStatus.Approved
+          )
+          .reduce((acc, curr) => acc + curr.leaveDays, 0),
+        totalOvertime: allOvertime.find((sheet) => sheet.userId === employee.id)
+          ?.totalOvertime,
+      };
+
+      return row;
+    });
+
+  const handleExportFile = () => {
+    exportExcelForTimeSheet(excelData, "sheet1", "timeSheet");
+  };
+
   return (
     <div className="w-full p-6 rounded-md flex flex-col bg-white">
       <h2 className="text-2xl font-bold mb-4">Bảng công</h2>
@@ -224,7 +262,10 @@ const TimeSheetTable: React.FunctionComponent = () => {
           </div>
         </div>
         <div>
-          <button className="bg-blue-600 flex flex-row items-center gap-2 text-white px-4 py-2 rounded-md">
+          <button
+            className="bg-blue-600 flex flex-row items-center gap-2 text-white px-4 py-2 rounded-md"
+            onClick={handleExportFile}
+          >
             <BsFillArrowDownCircleFill />
             <div>Xuất bảng</div>
           </button>
@@ -281,89 +322,91 @@ const TimeSheetTable: React.FunctionComponent = () => {
           </div>
         </div>
         <div className="flex flex-col w-full h-5/6">
-          {employeeList.map((employee, index) => (
-            <div key={employee.id} className="flex w-full h-16">
-              <div className="flex flex-row sticky bg-white border-r border-slate-400 left-0 z-10">
-                <div className="flex border w-8 justify-center items-center">
-                  {index}
+          {employeeList
+            .sort((a, b) => a.fullName.localeCompare(b.fullName))
+            .map((employee, index) => (
+              <div key={employee.id} className="flex w-full h-16">
+                <div className="flex flex-row sticky bg-white border-r border-slate-400 left-0 z-10">
+                  <div className="flex border w-8 justify-center items-center">
+                    {index + 1}
+                  </div>
+                  <div className="flex border w-48 justify-start items-center">
+                    {employee.fullName}
+                  </div>
                 </div>
-                <div className="flex border w-48 justify-center items-center">
-                  {employee.fullName}
+                <div className="flex flex-row z-1">
+                  {generateDaysArray().map((day) => {
+                    const date = new Date(selectedYear, selectedMonth - 1, day);
+                    const dayOfWeek = date.getDay();
+                    let inputClass =
+                      "flex border w-12 justify-center items-center hover:cursor-pointer";
+
+                    if (dayOfWeek === 0) {
+                      // Sunday (CN) - Apply specific styles
+                      inputClass += " bg-blue-500 hover:bg-blue-600";
+                    } else if (dayOfWeek === 6) {
+                      // Saturday (Th.7) - Apply specific styles
+                      inputClass += " bg-blue-500 hover:bg-blue-600";
+                    } else {
+                      inputClass += " bg-white hover:bg-gray-100";
+                    }
+
+                    return (
+                      <div
+                        key={day}
+                        className={inputClass}
+                        onClick={() =>
+                          setOpenModal({
+                            open: true,
+                            userId: employee.id,
+                            date: formatDateTime(
+                              day,
+                              selectedMonth,
+                              selectedYear
+                            ),
+                            leaveDay: {
+                              isLeaveDay:
+                                isLeaveDay(employee.id, date)?.isLeaveDays ??
+                                false,
+                              context:
+                                isLeaveDay(employee.id, date)?.context ?? "",
+                            },
+                          })
+                        }
+                      >
+                        {isWeekend(date) && getOvertimeValue(employee.id, day)}
+                        {!isWeekend(date) &&
+                          !isLeaveDay(employee.id, date) &&
+                          getWorkLoadValue(employee.id, day)}
+                        {isLeaveDay(employee.id, date)?.isLeaveDays &&
+                          isLeaveDay(employee.id, date)?.context}
+                      </div>
+                    );
+                  })}
+                  <div className="flex border w-28 font-bold justify-center items-center">
+                    {
+                      allWorkload.find((sheet) => sheet.userId === employee.id)
+                        ?.totalWorkload
+                    }
+                  </div>
+                  <div className="flex border w-28 font-bold justify-center items-center">
+                    {leaveRequests
+                      .filter(
+                        (leaveRequest) =>
+                          leaveRequest.userId === employee.id &&
+                          leaveRequest.status === LeaveStatus.Approved
+                      )
+                      .reduce((acc, curr) => acc + curr.leaveDays, 0)}
+                  </div>
+                  <div className="flex border w-28 font-bold justify-center items-center">
+                    {
+                      allOvertime.find((sheet) => sheet.userId === employee.id)
+                        ?.totalOvertime
+                    }
+                  </div>
                 </div>
               </div>
-              <div className="flex flex-row z-1">
-                {generateDaysArray().map((day) => {
-                  const date = new Date(selectedYear, selectedMonth - 1, day);
-                  const dayOfWeek = date.getDay();
-                  let inputClass =
-                    "flex border w-12 justify-center items-center hover:cursor-pointer";
-
-                  if (dayOfWeek === 0) {
-                    // Sunday (CN) - Apply specific styles
-                    inputClass += " bg-blue-500 hover:bg-blue-600";
-                  } else if (dayOfWeek === 6) {
-                    // Saturday (Th.7) - Apply specific styles
-                    inputClass += " bg-blue-500 hover:bg-blue-600";
-                  } else {
-                    inputClass += " bg-white hover:bg-gray-100";
-                  }
-
-                  return (
-                    <div
-                      key={day}
-                      className={inputClass}
-                      onClick={() =>
-                        setOpenModal({
-                          open: true,
-                          userId: employee.id,
-                          date: formatDateTime(
-                            day,
-                            selectedMonth,
-                            selectedYear
-                          ),
-                          leaveDay: {
-                            isLeaveDay:
-                              isLeaveDay(employee.id, date)?.isLeaveDays ??
-                              false,
-                            context:
-                              isLeaveDay(employee.id, date)?.context ?? "",
-                          },
-                        })
-                      }
-                    >
-                      {isWeekend(date) && getOvertimeValue(employee.id, day)}
-                      {!isWeekend(date) &&
-                        !isLeaveDay(employee.id, date) &&
-                        getWorkLoadValue(employee.id, day)}
-                      {isLeaveDay(employee.id, date)?.isLeaveDays &&
-                        isLeaveDay(employee.id, date)?.context}
-                    </div>
-                  );
-                })}
-                <div className="flex border w-28 font-bold justify-center items-center">
-                  {
-                    allWorkload.find((sheet) => sheet.userId === employee.id)
-                      ?.totalWorkload
-                  }
-                </div>
-                <div className="flex border w-28 font-bold justify-center items-center">
-                  {leaveRequests
-                    .filter(
-                      (leaveRequest) =>
-                        leaveRequest.userId === employee.id &&
-                        leaveRequest.status === LeaveStatus.Approved
-                    )
-                    .reduce((acc, curr) => acc + curr.leaveDays, 0)}
-                </div>
-                <div className="flex border w-28 font-bold justify-center items-center">
-                  {
-                    allOvertime.find((sheet) => sheet.userId === employee.id)
-                      ?.totalOvertime
-                  }
-                </div>
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
       <Modal

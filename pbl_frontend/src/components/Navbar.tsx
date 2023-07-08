@@ -118,7 +118,7 @@ const Navbar: React.FunctionComponent = () => {
         text-white mb-4 md:mb-0"
           onClick={() => {
             if (auth.role === "Admin")
-              window.location.href = "/admin/dashboard";
+              window.location.href = "/admin/employees";
             else window.location.href = "/employee/time-sheet";
           }}
         >

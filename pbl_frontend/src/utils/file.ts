@@ -1,5 +1,6 @@
 import { RcFile } from "antd/es/upload/interface";
 import * as XLSX from "xlsx";
+import * as XLSXStyle from "xlsx-js-style";
 import { CreateNewUserInformation } from "../types/userTypes";
 
 export const getBase64 = (img: RcFile, callback: (url: string) => void) => {
@@ -41,4 +42,23 @@ export const processExcelFile = (file: File) => {
   };
 
   reader.readAsArrayBuffer(file);
+};
+
+export const exportExcelForTimeSheet = (
+  data: {
+    fullName: string;
+    days: (string | number | undefined)[];
+    totalWorkload: number | undefined;
+    totalLeaveDays: number;
+    totalOvertime: number | undefined;
+  }[],
+  nameSheet: string,
+  nameFile: string
+) => {
+  const days = data.map((d) => d.days);
+  const workbook = XLSXStyle.utils.book_new();
+  const worksheet = XLSXStyle.utils.json_to_sheet(data);
+
+  XLSXStyle.utils.book_append_sheet(workbook, worksheet, nameSheet);
+  XLSXStyle.writeFile(workbook, `${nameFile}.xlsx`);
 };

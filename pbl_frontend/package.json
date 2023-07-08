@@ -28,7 +28,8 @@
     "recharts": "^2.7.1",
     "recoil": "^0.7.7",
     "selectorator": "^4.0.3",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "xlsx-js-style": "^1.2.0"
   },
   "devDependencies": {
     "@fullcalendar/core": "^6.1.8",

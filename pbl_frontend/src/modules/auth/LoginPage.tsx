@@ -25,12 +25,12 @@ const LoginPage: React.FunctionComponent = () => {
     });
 
     if (!email || !password) {
-      showNotification("error", "Email and Password is required");
+      showNotification("error", "Email hoặc mật khẩu không chính xác");
       return;
     }
 
     if (Object.values(error).some((err) => err)) {
-      showNotification("error", "Please fill all the fields correctly");
+      showNotification("error", "Vui lòng điền tất cả các trường");
       return;
     }
 
